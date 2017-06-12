@@ -4,9 +4,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/elb"
 )
 
-func (c *Connector) GetLoadBalancers(input *elb.DescribeLoadBalancersInput) ([]*elb.DescribeLoadBalancersOutput, []error) {
-	var errs []error
+// Returns a list of ELB (v1) based on the input from the different regions
+func (c *Connector) GetLoadBalancers(input *elb.DescribeLoadBalancersInput) ([]*elb.DescribeLoadBalancersOutput, error) {
 	var elbs []*elb.DescribeLoadBalancersOutput
+	var errElbs RawsErr = RawsErr{}
 
 	for _, svc := range c.svcs {
 		if svc.elb == nil {
@@ -14,22 +15,29 @@ func (c *Connector) GetLoadBalancers(input *elb.DescribeLoadBalancersInput) ([]*
 		}
 		elb, err := svc.elb.DescribeLoadBalancers(input)
 		elbs = append(elbs, elb)
-		errs = append(errs, err)
+		errElbs.AppendError(svc.region, svc.elb.ServiceName, err)
 	}
-	return elbs, errs
+	if len(errElbs.APIErrs) == 0 {
+		return elbs, nil
+	}
+	return elbs, errElbs
 }
 
-func (c *Connector) GetLoadBalancersTags(input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, []error) {
-	var errs []error
+// Returns a list of Tags based on the input from the different regions
+func (c *Connector) GetLoadBalancersTags(input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, error) {
 	var elbTags []*elb.DescribeTagsOutput
+	var errTags RawsErr = RawsErr{}
 
 	for _, svc := range c.svcs {
 		if svc.elb == nil {
 			svc.elb = elb.New(svc.session)
 		}
-		elb, err := svc.elb.DescribeTags(input)
-		elbTags = append(elbTags, elb)
-		errs = append(errs, err)
+		tags, err := svc.elb.DescribeTags(input)
+		elbTags = append(elbTags, tags)
+		errTags.AppendError(svc.region, svc.elb.ServiceName, err)
 	}
-	return elbTags, errs
+	if len(errTags.APIErrs) == 0 {
+		return elbTags, nil
+	}
+	return elbTags, errTags
 }
