@@ -1,6 +1,10 @@
 package core
 
 import (
+	"path/filepath"
+
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -8,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"path/filepath"
+	"github.com/pkg/errors"
 )
 
 type Connector struct {
@@ -58,8 +62,12 @@ type serviceConnector struct {
 }
 
 func (c *Connector) setRegions(s *session.Session, enabledRegions []string) error {
+	if len(enabledRegions) == 0 {
+		return errors.New("at least one region name is required")
+	}
 	svc := ec2.New(s)
 	regions, err := svc.DescribeRegions(nil)
+
 	if err != nil {
 		return err
 	}
@@ -69,6 +77,9 @@ func (c *Connector) setRegions(s *session.Session, enabledRegions []string) erro
 				c.regions = append(c.regions, *region.RegionName)
 			}
 		}
+	}
+	if len(c.regions) == 0 {
+		return fmt.Errorf("found 0 regions matching: %v", enabledRegions)
 	}
 	return nil
 }
