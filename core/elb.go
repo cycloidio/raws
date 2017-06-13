@@ -13,9 +13,9 @@ func (c *Connector) GetLoadBalancers(input *elb.DescribeLoadBalancersInput) ([]*
 		if svc.elb == nil {
 			svc.elb = elb.New(svc.session)
 		}
-		elb, err := svc.elb.DescribeLoadBalancers(input)
-		elbs = append(elbs, elb)
-		errElbs.AppendError(svc.region, svc.elb.ServiceName, err)
+		elbv1, err := svc.elb.DescribeLoadBalancers(input)
+		elbs = append(elbs, elbv1)
+		errElbs.AppendError(svc.region, elb.ServiceName, err)
 	}
 	if len(errElbs.APIErrs) == 0 {
 		return elbs, nil
@@ -34,7 +34,7 @@ func (c *Connector) GetLoadBalancersTags(input *elb.DescribeTagsInput) ([]*elb.D
 		}
 		tags, err := svc.elb.DescribeTags(input)
 		elbTags = append(elbTags, tags)
-		errTags.AppendError(svc.region, svc.elb.ServiceName, err)
+		errTags.AppendError(svc.region, elb.ServiceName, err)
 	}
 	if len(errTags.APIErrs) == 0 {
 		return elbTags, nil

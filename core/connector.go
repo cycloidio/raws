@@ -9,8 +9,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/aws/aws-sdk-go/service/elb"
-	"github.com/aws/aws-sdk-go/service/elbv2"
+	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go/service/elb/elbiface"
+	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/pkg/errors"
 )
@@ -72,11 +73,11 @@ func NewConnector(accessKey string, secretKey string, regions []string, config *
 }
 
 type serviceConnector struct {
-	region  string
-	session *session.Session
-	ec2     *ec2.EC2
-	elb     *elb.ELB
-	elbv2   *elbv2.ELBV2
+	region      string
+	session     *session.Session
+	ec2         ec2iface.EC2API
+	elb         elbiface.ELBAPI
+	elbv2       elbv2iface.ELBV2API
 }
 
 func (c *Connector) setRegions(s *session.Session, enabledRegions []string) error {

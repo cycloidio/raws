@@ -14,7 +14,7 @@ func (c *Connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) 
 		}
 		elb, err := svc.elbv2.DescribeLoadBalancers(input)
 		elbs = append(elbs, elb)
-		errElbs.AppendError(svc.region, svc.elbv2.ServiceName, err)
+		errElbs.AppendError(svc.region, elbv2.ServiceName, err)
 	}
 	return elbs, errElbs
 }
@@ -29,7 +29,7 @@ func (c *Connector) GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*e
 		}
 		elbTag, err := svc.elbv2.DescribeTags(input)
 		elbTags = append(elbTags, elbTag)
-		errTags.AppendError(svc.region, svc.elbv2.ServiceName, err)
+		errTags.AppendError(svc.region, elbv2.ServiceName, err)
 	}
 	return elbTags, errTags
 }
