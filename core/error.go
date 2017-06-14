@@ -10,6 +10,10 @@ type Err interface {
 	Service() string
 }
 
+type RawsErr struct {
+	APIErrs []callErr
+}
+
 func NewAPIError(e error, region string, service string) Err {
 	return &callErr{
 		err:     e,
@@ -50,10 +54,6 @@ func (e *callErr) Region() string {
 
 func (e *callErr) Service() string {
 	return e.service
-}
-
-type RawsErr struct {
-	APIErrs []callErr
 }
 
 type callErr struct {
