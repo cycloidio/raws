@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
@@ -80,6 +81,7 @@ type serviceConnector struct {
 	elb         elbiface.ELBAPI
 	elbv2       elbv2iface.ELBV2API
 	rds         rdsiface.RDSAPI
+	elasticache elasticacheiface.ElastiCacheAPI
 }
 
 func (c *Connector) setRegions(s *session.Session, enabledRegions []string) error {
