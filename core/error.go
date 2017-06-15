@@ -38,7 +38,7 @@ func (e Errs) Error() string {
 }
 
 // Error returns a string containing the region, service as well as the original API error message.
-func (e callErr) Error() string {
+func (e *callErr) Error() string {
 	return fmt.Sprintf("%s: error while using '%s' service - %s",
 		e.region,
 		e.service,
@@ -46,12 +46,12 @@ func (e callErr) Error() string {
 }
 
 // Returns the region of the error
-func (e callErr) Region() string {
+func (e *callErr) Region() string {
 	return e.region
 }
 
 // Returns the service name of the error
-func (e callErr) Service() string {
+func (e *callErr) Service() string {
 	return e.service
 }
 
