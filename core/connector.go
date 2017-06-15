@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/pkg/errors"
 )
@@ -81,6 +82,7 @@ type serviceConnector struct {
 	elb         elbiface.ELBAPI
 	elbv2       elbv2iface.ELBV2API
 	rds         rdsiface.RDSAPI
+	s3          s3iface.S3API
 	elasticache elasticacheiface.ElastiCacheAPI
 }
 
