@@ -13,11 +13,11 @@ func (c *Connector) GetDBInstances(input *rds.DescribeDBInstancesInput) ([]*rds.
 		if svc.rds == nil {
 			svc.rds = rds.New(svc.session)
 		}
-		elb, err := svc.rds.DescribeDBInstances(input)
+		instance, err := svc.rds.DescribeDBInstances(input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, rds.ServiceName, err))
 		} else {
-			instances = append(instances, elb)
+			instances = append(instances, instance)
 		}
 	}
 	return instances, errs
