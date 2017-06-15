@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
+// Returns all EC2 instances based on the input given
 func (c *Connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeInstancesOutput
@@ -19,6 +20,7 @@ func (c *Connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.Desc
 	return instances, errInsts
 }
 
+// Returns all EC2 VPCs based on the input given
 func (c *Connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeVpcsOutput
@@ -34,6 +36,7 @@ func (c *Connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOu
 	return instances, errInsts
 }
 
+// Returns all EC2 AMI belonging to the Account ID based on the input given
 func (c *Connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeImagesOutput
@@ -53,6 +56,7 @@ func (c *Connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeIm
 	return instances, errInsts
 }
 
+// Returns all EC2 security groups based on the input given
 func (c *Connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([]*ec2.DescribeSecurityGroupsOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeSecurityGroupsOutput
@@ -68,6 +72,7 @@ func (c *Connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([
 	return instances, errInsts
 }
 
+// Returns all EC2 subnets based on the input given
 func (c *Connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeSubnetsOutput
@@ -83,6 +88,7 @@ func (c *Connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.Describe
 	return instances, errInsts
 }
 
+// Returns all EC2 volumes based on the input given
 func (c *Connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeVolumesOutput
@@ -98,6 +104,7 @@ func (c *Connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.Describe
 	return instances, errInsts
 }
 
+// Returns all snapshots belonging to the Account ID based on the input given
 func (c *Connector) GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, error) {
 	var errInsts RawsErr = RawsErr{}
 	var instances []*ec2.DescribeSnapshotsOutput

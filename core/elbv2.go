@@ -4,6 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elbv2"
 )
 
+// Returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
 func (c *Connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.DescribeLoadBalancersOutput, error) {
 	var errElbs RawsErr = RawsErr{}
 	var elbs []*elbv2.DescribeLoadBalancersOutput
@@ -19,6 +20,7 @@ func (c *Connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) 
 	return elbs, errElbs
 }
 
+// Returns a list of Tags based on the input from the different regions
 func (c *Connector) GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*elbv2.DescribeTagsOutput, error) {
 	var errTags RawsErr = RawsErr{}
 	var elbTags []*elbv2.DescribeTagsOutput
