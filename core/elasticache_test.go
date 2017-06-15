@@ -35,7 +35,7 @@ func TestGetElasticacheCluster(t *testing.T) {
 		name             string
 		mocked           []*serviceConnector
 		expectedClusters []*elasticache.DescribeCacheClustersOutput
-		expectedError    error
+		expectedError    Errs
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
 			&serviceConnector{
@@ -73,18 +73,12 @@ func TestGetElasticacheCluster(t *testing.T) {
 					},
 				},
 			},
-			expectedError: RawsErr{
-				APIErrs: []callErr{
-					{
-						err:     errors.New("error with test"),
-						region:  "test",
-						service: elasticache.ServiceName,
-					},
-				},
-			},
-			expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-				&elasticache.DescribeCacheClustersOutput{},
-			},
+			expectedError: Errs{&callErr{
+				err:     errors.New("error with test"),
+				region:  "test",
+				service: elasticache.ServiceName,
+			}},
+			expectedClusters: nil,
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
@@ -156,17 +150,14 @@ func TestGetElasticacheCluster(t *testing.T) {
 					},
 				},
 			},
-			expectedError: RawsErr{
-				APIErrs: []callErr{
-					{
-						err:     errors.New("error with test"),
-						region:  "test-1",
-						service: elasticache.ServiceName,
-					},
+			expectedError: Errs{
+				&callErr{
+					err:     errors.New("error with test"),
+					region:  "test-1",
+					service: elasticache.ServiceName,
 				},
 			},
 			expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-				&elasticache.DescribeCacheClustersOutput{},
 				&elasticache.DescribeCacheClustersOutput{
 					CacheClusters: []*elasticache.CacheCluster{
 						&elasticache.CacheCluster{
@@ -180,11 +171,11 @@ func TestGetElasticacheCluster(t *testing.T) {
 
 	for i, tt := range tests {
 		c := &Connector{svcs: tt.mocked}
-		tags, err := c.GetElasticCacheCluster(nil)
+		cluster, err := c.GetElasticCacheCluster(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
-		if !reflect.DeepEqual(tags, tt.expectedClusters) {
+		if !reflect.DeepEqual(cluster, tt.expectedClusters) {
 			t.Errorf("%s [%d] - clusters: received=%+v | expected=%+v",
-				tt.name, i, tags, tt.expectedError)
+				tt.name, i, cluster, tt.expectedClusters)
 		}
 	}
 }
@@ -194,7 +185,7 @@ func TestGetElasticacheTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*elasticache.TagListMessage
-		expectedError error
+		expectedError Errs
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
 			&serviceConnector{
@@ -235,20 +226,14 @@ func TestGetElasticacheTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: RawsErr{
-				APIErrs: []callErr{
-					{
-						err:     errors.New("error with test"),
-						region:  "test",
-						service: elasticache.ServiceName,
-					},
+			expectedError: Errs{
+				&callErr{
+					err:     errors.New("error with test"),
+					region:  "test",
+					service: elasticache.ServiceName,
 				},
 			},
-			expectedTags: []*elasticache.TagListMessage{
-				&elasticache.TagListMessage{
-					TagList: []*elasticache.Tag{},
-				},
-			},
+			expectedTags: nil,
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
@@ -304,7 +289,7 @@ func TestGetElasticacheTags(t *testing.T) {
 				&serviceConnector{
 					region: "test-1",
 					elasticache: mockElasticCache{
-						ltfro: &elasticache.TagListMessage{},
+						ltfro:   &elasticache.TagListMessage{},
 						ltfrerr: errors.New("error with test-1"),
 					},
 				},
@@ -322,17 +307,14 @@ func TestGetElasticacheTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: RawsErr{
-				APIErrs: []callErr{
-					{
-						err:     errors.New("error with test-1"),
-						region:  "test-1",
-						service: elasticache.ServiceName,
-					},
+			expectedError: Errs{
+				&callErr{
+					err:     errors.New("error with test-1"),
+					region:  "test-1",
+					service: elasticache.ServiceName,
 				},
 			},
 			expectedTags: []*elasticache.TagListMessage{
-				&elasticache.TagListMessage{},
 				&elasticache.TagListMessage{
 					TagList: []*elasticache.Tag{
 						&elasticache.Tag{

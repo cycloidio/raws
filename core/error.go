@@ -16,43 +16,29 @@ type Err interface {
 
 // RawsErr type satisfies the standard error interface, thus allowing us to return an error when doing multiple call via
 // the go-SDK, even though multiple errors are met; which is why APIErrs save those more specific errors.
-type RawsErr struct {
-	APIErrs []callErr
-}
+type Errs []Err
 
 // NewAPIError returns an Err object filled with the error faced, the region and the service name.
-func NewAPIError(e error, region string, service string) Err {
+func NewAPIError(region string, service string, e error) Err {
 	return &callErr{
-		err:     e,
 		region:  region,
 		service: service,
-	}
-}
-
-// AppendError is to add errors to the list in an easy way. If there was indeed an error, it is added to the list of
-// APIErrs of the RawsErr struct.
-func (r *RawsErr) AppendError(regionErr string, serviceErr string, originErr error) {
-	if originErr != nil {
-		r.APIErrs = append(r.APIErrs, callErr{
-			region:  regionErr,
-			service: serviceErr,
-			err:     originErr,
-		})
+		err:     e,
 	}
 }
 
 // Error rerturns a string which summarize how many errors happened, in which regions and for which services.
-func (r RawsErr) Error() string {
+func (e Errs) Error() string {
 	var output [][]string
 
-	for _, callErr := range r.APIErrs {
-		output = append(output, []string{callErr.region, callErr.service})
+	for _, err := range e {
+		output = append(output, []string{err.Region(), err.Service()})
 	}
-	return fmt.Sprintf("%d error(s) occured: %s", len(r.APIErrs), output)
+	return fmt.Sprintf("%d error(s) occured: %s", len(e), output)
 }
 
 // Error returns a string containing the region, service as well as the original API error message.
-func (e *callErr) Error() string {
+func (e callErr) Error() string {
 	return fmt.Sprintf("%s: error while using '%s' service - %s",
 		e.region,
 		e.service,
@@ -60,16 +46,17 @@ func (e *callErr) Error() string {
 }
 
 // Returns the region of the error
-func (e *callErr) Region() string {
+func (e callErr) Region() string {
 	return e.region
 }
 
 // Returns the service name of the error
-func (e *callErr) Service() string {
+func (e callErr) Service() string {
 	return e.service
 }
 
 type callErr struct {
+	Err
 	err     error
 	region  string
 	service string

@@ -5,8 +5,8 @@ import (
 )
 
 // Returns all Elasticache clusters based on the input given
-func (c *Connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, error) {
-	var errs = RawsErr{}
+func (c *Connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, Errs) {
+	var errs Errs
 	var elasticCacheClusters []*elasticache.DescribeCacheClustersOutput
 
 	for _, svc := range c.svcs {
@@ -14,18 +14,18 @@ func (c *Connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClust
 			svc.elasticache = elasticache.New(svc.session)
 		}
 		elasticCacheCluster, err := svc.elasticache.DescribeCacheClusters(input)
-		elasticCacheClusters = append(elasticCacheClusters, elasticCacheCluster)
-		errs.AppendError(svc.region, elasticache.ServiceName, err)
-	}
-	if len(errs.APIErrs) == 0 {
-		return elasticCacheClusters, nil
+		if err != nil {
+			errs = append(errs, NewAPIError(svc.region, elasticache.ServiceName, err))
+		} else {
+			elasticCacheClusters = append(elasticCacheClusters, elasticCacheCluster)
+		}
 	}
 	return elasticCacheClusters, errs
 }
 
 // Returns a list of tags of Elasticache resources based on its ARN
-func (c *Connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, error) {
-	var errs RawsErr = RawsErr{}
+func (c *Connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, Errs) {
+	var errs Errs
 	var elastiCacheTags []*elasticache.TagListMessage
 
 	for _, svc := range c.svcs {
@@ -33,11 +33,11 @@ func (c *Connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInp
 			svc.elasticache = elasticache.New(svc.session)
 		}
 		elasticacheTag, err := svc.elasticache.ListTagsForResource(input)
-		elastiCacheTags = append(elastiCacheTags, elasticacheTag)
-		errs.AppendError(svc.region, elasticache.ServiceName, err)
-	}
-	if len(errs.APIErrs) == 0 {
-		return elastiCacheTags, nil
+		if err != nil {
+			errs = append(errs, NewAPIError(svc.region, elasticache.ServiceName, err))
+		} else {
+			elastiCacheTags = append(elastiCacheTags, elasticacheTag)
+		}
 	}
 	return elastiCacheTags, errs
 }
