@@ -22,12 +22,12 @@ type mockElasticCache struct {
 	ltfrerr error
 }
 
-func (c mockElasticCache) DescribeCacheClusters(input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error) {
-	return c.dcco, c.dccerr
+func (m mockElasticCache) DescribeCacheClusters(input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error) {
+	return m.dcco, m.dccerr
 }
 
-func (c mockElasticCache) ListTagsForResource(input *elasticache.ListTagsForResourceInput) (*elasticache.TagListMessage, error) {
-	return c.ltfro, c.ltfrerr
+func (m mockElasticCache) ListTagsForResource(input *elasticache.ListTagsForResourceInput) (*elasticache.TagListMessage, error) {
+	return m.ltfro, m.ltfrerr
 }
 
 func TestGetElasticacheCluster(t *testing.T) {
@@ -38,12 +38,12 @@ func TestGetElasticacheCluster(t *testing.T) {
 		expectedError    Errs
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
-			&serviceConnector{
+			{
 				region: "test",
 				elasticache: mockElasticCache{
 					dcco: &elasticache.DescribeCacheClustersOutput{
 						CacheClusters: []*elasticache.CacheCluster{
-							&elasticache.CacheCluster{
+							{
 								CacheClusterId: aws.String("1"),
 							},
 						},
@@ -54,9 +54,9 @@ func TestGetElasticacheCluster(t *testing.T) {
 		},
 		expectedError: nil,
 		expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-			&elasticache.DescribeCacheClustersOutput{
+			{
 				CacheClusters: []*elasticache.CacheCluster{
-					&elasticache.CacheCluster{
+					{
 						CacheClusterId: aws.String("1"),
 					},
 				},
@@ -65,7 +65,7 @@ func TestGetElasticacheCluster(t *testing.T) {
 	},
 		{name: "one region with error",
 			mocked: []*serviceConnector{
-				&serviceConnector{
+				{
 					region: "test",
 					elasticache: mockElasticCache{
 						dcco:   &elasticache.DescribeCacheClustersOutput{},
@@ -82,12 +82,12 @@ func TestGetElasticacheCluster(t *testing.T) {
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
-				&serviceConnector{
+				{
 					region: "test-1",
 					elasticache: mockElasticCache{
 						dcco: &elasticache.DescribeCacheClustersOutput{
 							CacheClusters: []*elasticache.CacheCluster{
-								&elasticache.CacheCluster{
+								{
 									CacheClusterId: aws.String("1"),
 								},
 							},
@@ -95,12 +95,12 @@ func TestGetElasticacheCluster(t *testing.T) {
 						dccerr: nil,
 					},
 				},
-				&serviceConnector{
+				{
 					region: "test-2",
 					elasticache: mockElasticCache{
 						dcco: &elasticache.DescribeCacheClustersOutput{
 							CacheClusters: []*elasticache.CacheCluster{
-								&elasticache.CacheCluster{
+								{
 									CacheClusterId: aws.String("2"),
 								},
 							},
@@ -111,16 +111,16 @@ func TestGetElasticacheCluster(t *testing.T) {
 			},
 			expectedError: nil,
 			expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-				&elasticache.DescribeCacheClustersOutput{
+				{
 					CacheClusters: []*elasticache.CacheCluster{
-						&elasticache.CacheCluster{
+						{
 							CacheClusterId: aws.String("1"),
 						},
 					},
 				},
-				&elasticache.DescribeCacheClustersOutput{
+				{
 					CacheClusters: []*elasticache.CacheCluster{
-						&elasticache.CacheCluster{
+						{
 							CacheClusterId: aws.String("2"),
 						},
 					},
@@ -129,19 +129,19 @@ func TestGetElasticacheCluster(t *testing.T) {
 		},
 		{name: "multiple region with error",
 			mocked: []*serviceConnector{
-				&serviceConnector{
+				{
 					region: "test-1",
 					elasticache: mockElasticCache{
 						dcco:   &elasticache.DescribeCacheClustersOutput{},
 						dccerr: errors.New("error with test"),
 					},
 				},
-				&serviceConnector{
+				{
 					region: "test-2",
 					elasticache: mockElasticCache{
 						dcco: &elasticache.DescribeCacheClustersOutput{
 							CacheClusters: []*elasticache.CacheCluster{
-								&elasticache.CacheCluster{
+								{
 									CacheClusterId: aws.String("2"),
 								},
 							},
@@ -158,9 +158,9 @@ func TestGetElasticacheCluster(t *testing.T) {
 				},
 			},
 			expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-				&elasticache.DescribeCacheClustersOutput{
+				{
 					CacheClusters: []*elasticache.CacheCluster{
-						&elasticache.CacheCluster{
+						{
 							CacheClusterId: aws.String("2"),
 						},
 					},
@@ -188,12 +188,12 @@ func TestGetElasticacheTags(t *testing.T) {
 		expectedError Errs
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
-			&serviceConnector{
+			{
 				region: "test",
 				elasticache: mockElasticCache{
 					ltfro: &elasticache.TagListMessage{
 						TagList: []*elasticache.Tag{
-							&elasticache.Tag{
+							{
 								Key:   aws.String("test"),
 								Value: aws.String("1"),
 							}},
@@ -204,9 +204,9 @@ func TestGetElasticacheTags(t *testing.T) {
 		},
 		expectedError: nil,
 		expectedTags: []*elasticache.TagListMessage{
-			&elasticache.TagListMessage{
+			{
 				TagList: []*elasticache.Tag{
-					&elasticache.Tag{
+					{
 						Key:   aws.String("test"),
 						Value: aws.String("1"),
 					},
@@ -216,7 +216,7 @@ func TestGetElasticacheTags(t *testing.T) {
 	},
 		{name: "one region with error",
 			mocked: []*serviceConnector{
-				&serviceConnector{
+				{
 					region: "test",
 					elasticache: mockElasticCache{
 						ltfro: &elasticache.TagListMessage{
@@ -237,12 +237,12 @@ func TestGetElasticacheTags(t *testing.T) {
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
-				&serviceConnector{
+				{
 					region: "test-1",
 					elasticache: mockElasticCache{
 						ltfro: &elasticache.TagListMessage{
 							TagList: []*elasticache.Tag{
-								&elasticache.Tag{
+								{
 									Key:   aws.String("test"),
 									Value: aws.String("1"),
 								}},
@@ -250,12 +250,12 @@ func TestGetElasticacheTags(t *testing.T) {
 						ltfrerr: nil,
 					},
 				},
-				&serviceConnector{
+				{
 					region: "test-2",
 					elasticache: mockElasticCache{
 						ltfro: &elasticache.TagListMessage{
 							TagList: []*elasticache.Tag{
-								&elasticache.Tag{
+								{
 									Key:   aws.String("test"),
 									Value: aws.String("2"),
 								}},
@@ -266,17 +266,17 @@ func TestGetElasticacheTags(t *testing.T) {
 			},
 			expectedError: nil,
 			expectedTags: []*elasticache.TagListMessage{
-				&elasticache.TagListMessage{
+				{
 					TagList: []*elasticache.Tag{
-						&elasticache.Tag{
+						{
 							Key:   aws.String("test"),
 							Value: aws.String("1"),
 						},
 					},
 				},
-				&elasticache.TagListMessage{
+				{
 					TagList: []*elasticache.Tag{
-						&elasticache.Tag{
+						{
 							Key:   aws.String("test"),
 							Value: aws.String("2"),
 						},
@@ -286,19 +286,19 @@ func TestGetElasticacheTags(t *testing.T) {
 		},
 		{name: "multiple region with error",
 			mocked: []*serviceConnector{
-				&serviceConnector{
+				{
 					region: "test-1",
 					elasticache: mockElasticCache{
 						ltfro:   &elasticache.TagListMessage{},
 						ltfrerr: errors.New("error with test-1"),
 					},
 				},
-				&serviceConnector{
+				{
 					region: "test-2",
 					elasticache: mockElasticCache{
 						ltfro: &elasticache.TagListMessage{
 							TagList: []*elasticache.Tag{
-								&elasticache.Tag{
+								{
 									Key:   aws.String("test"),
 									Value: aws.String("2"),
 								}},
@@ -315,9 +315,9 @@ func TestGetElasticacheTags(t *testing.T) {
 				},
 			},
 			expectedTags: []*elasticache.TagListMessage{
-				&elasticache.TagListMessage{
+				{
 					TagList: []*elasticache.Tag{
-						&elasticache.Tag{
+						{
 							Key:   aws.String("test"),
 							Value: aws.String("2"),
 						},

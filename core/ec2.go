@@ -15,9 +15,9 @@ func (c *Connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.Desc
 		}
 		instance, err := svc.ec2.DescribeInstances(input)
 		if err != nil {
-			instances = append(instances, instance)
-		} else {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+		} else {
+			instances = append(instances, instance)
 		}
 	}
 	return instances, errs
@@ -137,9 +137,9 @@ func (c *Connector) GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.Desc
 		}
 		snapshot, err := svc.ec2.DescribeSnapshots(input)
 		if err != nil {
-			snapshots = append(snapshots, snapshot)
-		} else {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+		} else {
+			snapshots = append(snapshots, snapshot)
 		}
 	}
 	return snapshots, errs
