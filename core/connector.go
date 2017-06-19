@@ -5,6 +5,8 @@ import (
 
 	"fmt"
 
+	"errors"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -16,7 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/pkg/errors"
+	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
 
 // The Connector provides easy access to AWS SDK calls.
@@ -45,30 +47,17 @@ type Connector struct {
 // The connections are not all established while instancing, but the various sessions are, this way connections are only
 // made for services that are called, otherwise only the sessions remain.
 func NewConnector(accessKey string, secretKey string, regions []string, config *aws.Config) (*Connector, error) {
-	/* The default region is only used to (1) get the list of region and
-	 * (2) get the account ID associated with the credentials.
-	 *
-	 * It is not used as a default region for services, therefore if no
-	 * region is specified when instantiating the connector, then it will
-	 * not try to establish any connections with AWS services.
-	 */
-	const defaultRegion string = "eu-west-1"
-	var defaultSession *session.Session
 	var c Connector = Connector{}
 
-	c.setCredentials(accessKey, secretKey)
-	defaultSession = session.Must(
-		session.NewSession(&aws.Config{
-			Region:      aws.String(defaultRegion),
-			DisableSSL:  aws.Bool(false),
-			MaxRetries:  aws.Int(3),
-			Credentials: c.creds,
-		}),
-	)
-	if err := c.setAccountID(defaultSession); err != nil {
+	creds, ec2, sts, err := configureAWS(accessKey, secretKey)
+	if err != nil {
 		return nil, err
 	}
-	if err := c.setRegions(defaultSession, regions); err != nil {
+	c.creds = creds
+	if err := c.setAccountID(sts); err != nil {
+		return nil, err
+	}
+	if err := c.setRegions(ec2, regions); err != nil {
 		return nil, err
 	}
 	c.setServices(config)
@@ -86,13 +75,38 @@ type serviceConnector struct {
 	elasticache elasticacheiface.ElastiCacheAPI
 }
 
-func (c *Connector) setRegions(s *session.Session, enabledRegions []string) error {
+func configureAWS(accessKey string, secretKey string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
+	/* The default region is only used to (1) get the list of region and
+	 * (2) get the account ID associated with the credentials.
+	 *
+	 * It is not used as a default region for services, therefore if no
+	 * region is specified when instantiating the connector, then it will
+	 * not try to establish any connections with AWS services.
+	 */
+	const defaultRegion string = "eu-west-1"
+	var token string = ""
+
+	creds := credentials.NewStaticCredentials(accessKey, secretKey, token)
+	_, err := creds.Get()
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	session := session.Must(
+		session.NewSession(&aws.Config{
+			Region:      aws.String(defaultRegion),
+			DisableSSL:  aws.Bool(false),
+			MaxRetries:  aws.Int(3),
+			Credentials: creds,
+		}),
+	)
+	return creds, ec2.New(session), sts.New(session), nil
+}
+
+func (c *Connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) error {
 	if len(enabledRegions) == 0 {
 		return errors.New("at least one region name is required")
 	}
-	svc := ec2.New(s)
-	regions, err := svc.DescribeRegions(nil)
-
+	regions, err := ec2.DescribeRegions(nil)
 	if err != nil {
 		return err
 	}
@@ -109,11 +123,8 @@ func (c *Connector) setRegions(s *session.Session, enabledRegions []string) erro
 	return nil
 }
 
-func (c *Connector) setAccountID(s *session.Session) error {
-	var params *sts.GetCallerIdentityInput
-
-	svc := sts.New(s)
-	resp, err := svc.GetCallerIdentity(params)
+func (c *Connector) setAccountID(sts stsiface.STSAPI) error {
+	resp, err := sts.GetCallerIdentity(nil)
 	if err != nil {
 		return err
 	}
@@ -121,19 +132,7 @@ func (c *Connector) setAccountID(s *session.Session) error {
 	return nil
 }
 
-func (c *Connector) setCredentials(accessKey string, secretKey string) error {
-	var token string = ""
-
-	c.creds = credentials.NewStaticCredentials(accessKey, secretKey, token)
-
-	_, err := c.creds.Get()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *Connector) setServices(config *aws.Config) error {
+func (c *Connector) setServices(config *aws.Config) {
 	if config != nil {
 		config.Credentials = c.creds
 	} else {
@@ -152,5 +151,4 @@ func (c *Connector) setServices(config *aws.Config) error {
 		}
 		c.svcs = append(c.svcs, svc)
 	}
-	return nil
 }
