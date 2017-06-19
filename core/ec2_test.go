@@ -26,6 +26,10 @@ type mockEC2 struct {
 	dimo   *ec2.DescribeImagesOutput
 	dimerr error
 
+	// Mocking of DescribeRegions
+	dro   *ec2.DescribeRegionsOutput
+	drerr error
+
 	// Mock of DescribeSecurityGroups
 	dsgo   *ec2.DescribeSecurityGroupsOutput
 	dsgerr error
@@ -49,6 +53,10 @@ func (m mockEC2) DescribeImages(*ec2.DescribeImagesInput) (*ec2.DescribeImagesOu
 
 func (m mockEC2) DescribeInstances(*ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
 	return m.dio, m.dierr
+}
+
+func (m mockEC2) DescribeRegions(input *ec2.DescribeRegionsInput) (*ec2.DescribeRegionsOutput, error) {
+	return m.dro, m.drerr
 }
 
 func (m mockEC2) DescribeSecurityGroups(*ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
