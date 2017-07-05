@@ -1,0 +1,15 @@
+language: go
+sudo: false
+go:
+ - 1.8.1
+ - tip
+
+before_install:
+ - go get -v github.com/mattn/goveralls
+
+script:
+ - make travis-ci
+ - $HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=coverage.out
+
+notifications:
+  email: false
