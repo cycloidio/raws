@@ -1,4 +1,4 @@
-package core
+package raws
 
 import (
 	"github.com/aws/aws-sdk-go/service/elasticache"
