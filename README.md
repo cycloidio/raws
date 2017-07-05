@@ -35,15 +35,18 @@ if err != nil {
 
 ### Start making call
 
-Errors are intentionally ignored in this example.
+Errors are intentionally ignored in this example, no inputs are provided to those calls, even though one could.
 
 ```go
 elbs, _ := c.GetLoadBalancersV2(nil)
+fmt.Println(elbs)
 instances, _ := c.GetInstances(nil)
 fmt.Println(instances)
 vpcs, _ := c.GetVpcs(nil)
 fmt.Println(vpcs)
 ```
+
+You can also take a look at the [example file](example/main.go).
 
 ### Enjoy
 That's it! Nothing more, nothing less.
@@ -60,5 +63,5 @@ Because the library currently simply make the call as a forwarder, it does not p
 
 ## License
 
-Please see the LICENSE file.
+Please see [LICENSE](LICENSE).
 
