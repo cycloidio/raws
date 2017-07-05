@@ -4,6 +4,10 @@ SRC := $(wildcard *.go)
 COVFILE := coverage.out
 GOFILES_NOVENDOR := $(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./example/*")
 
+.PHONY: get-deps
+get-deps:
+	go get -t ./...
+
 .PHONY: clean
 clean:
 	go clean -i ./...

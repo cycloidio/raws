@@ -7,6 +7,9 @@ go:
 before_install:
  - go get -v github.com/mattn/goveralls
 
+install:
+ - make get-deps 
+
 script:
  - make travis-ci
  - $HOME/gopath/bin/goveralls -service=travis-ci -coverprofile=coverage.out
