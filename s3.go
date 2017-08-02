@@ -79,7 +79,7 @@ func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, opti
 			return n, nil
 		}
 	}
-	return n, fmt.Errorf("Couldn't download '%v' in any of '%v' regions", input, c.GetRegions())
+	return n, fmt.Errorf("Couldn't download '%+v' in any of '%+v' regions", input, c.GetRegions())
 }
 
 // Returns tags associated with S3 objects based on the input given

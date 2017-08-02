@@ -22,6 +22,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
@@ -106,14 +107,15 @@ func (c *connector) GetRegions() []string {
 }
 
 type serviceConnector struct {
-	region      string
-	session     *session.Session
-	ec2         ec2iface.EC2API
-	elb         elbiface.ELBAPI
-	elbv2       elbv2iface.ELBV2API
-	rds         rdsiface.RDSAPI
-	s3          s3iface.S3API
-	elasticache elasticacheiface.ElastiCacheAPI
+	region       string
+	session      *session.Session
+	ec2          ec2iface.EC2API
+	elb          elbiface.ELBAPI
+	elbv2        elbv2iface.ELBV2API
+	rds          rdsiface.RDSAPI
+	s3           s3iface.S3API
+	s3downloader s3manageriface.DownloaderAPI
+	elasticache  elasticacheiface.ElastiCacheAPI
 }
 
 func configureAWS(accessKey string, secretKey string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {

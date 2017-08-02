@@ -69,7 +69,7 @@ func callS3(c raws.AWSReader) {
 	bucketsTags, _ := c.GetBucketTags(i)
 	fmt.Println(bucketsTags)
 	i2 := &s3.ListObjectsInput{Bucket: aws.String("MY_BUCKET")}
-	objects, _ := c.GetObjects(i2)
+	objects, _ := c.ListObjects(i2)
 	fmt.Println(objects)
 	i3 := &s3.GetObjectTaggingInput{
 		Bucket: aws.String("MY_BUCKET"),
