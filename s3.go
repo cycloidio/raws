@@ -1,11 +1,14 @@
 package raws
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"io"
 )
 
 // Returns all S3 buckets based on the input given
-func (c *Connector) GetBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
+func (c *Connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
 	var errs Errs
 	var bucketsList []*s3.ListBucketsOutput
 
@@ -43,7 +46,7 @@ func (c *Connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBuc
 }
 
 // Returns a list of all S3 objects in a bucket based on the input given
-func (c *Connector) GetObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
+func (c *Connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
 	var errs Errs
 	var objectsList []*s3.ListObjectsOutput
 
@@ -59,6 +62,23 @@ func (c *Connector) GetObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOut
 		}
 	}
 	return objectsList, errs
+}
+
+// DownloadObject downloads an object in a bucket based on the input given
+func (c *Connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, Errs) {
+	var err error = nil
+	var n int64 = 0
+
+	for _, svc := range c.svcs {
+		if svc.s3downloader == nil {
+			svc.s3downloader = s3manager.NewDownloader(svc.session)
+		}
+		n, err = svc.s3downloader.Download(w, input, options)
+		if err == nil {
+			return n, nil
+		}
+	}
+	return n, fmt.Errorf("Couldn't download '%+v' in any of '%+v' regions", input, c.Regions)
 }
 
 // Returns tags associated with S3 objects based on the input given
