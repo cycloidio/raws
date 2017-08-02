@@ -29,10 +29,10 @@ import (
 //
 // In order to start making calls, only calling NewConnector is required.
 type Connector struct {
-	Regions   []string
+	regions   []string
 	svcs      []*serviceConnector
 	creds     *credentials.Credentials
-	AccountID *string
+	accountID *string
 }
 
 // NewConnector returns an object which also contains the accountID and extend the different regions to use.
@@ -63,6 +63,16 @@ func NewConnector(accessKey string, secretKey string, regions []string, config *
 	}
 	c.setServices(config)
 	return &c, nil
+}
+
+// GetAccountID returns the current ID for the account used
+func (c *Connector) GetAccountID() string {
+	return *c.accountID
+}
+
+// GetRegions return the currently used regions for the Connector
+func (c *Connector) GetRegions() []string {
+	return c.regions
 }
 
 type serviceConnector struct {
