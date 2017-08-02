@@ -29,10 +29,10 @@ import (
 //
 // In order to start making calls, only calling NewConnector is required.
 type Connector struct {
-	regions   []string
+	Regions   []string
 	svcs      []*serviceConnector
 	creds     *credentials.Credentials
-	accountID *string
+	AccountID *string
 }
 
 // NewConnector returns an object which also contains the accountID and extend the different regions to use.
