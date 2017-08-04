@@ -169,7 +169,7 @@ func TestGetBuckets(t *testing.T) {
 
 	for i, tt := range tests {
 		c := &Connector{svcs: tt.mocked}
-		buckets, err := c.GetBuckets(nil)
+		buckets, err := c.ListBuckets(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(buckets, tt.expectedBuckets) {
 			t.Errorf("%s [%d] - S3 buckets: received=%+v | expected=%+v",
@@ -422,7 +422,7 @@ func TestGetObjets(t *testing.T) {
 
 	for i, tt := range tests {
 		c := &Connector{svcs: tt.mocked}
-		objects, err := c.GetObjects(nil)
+		objects, err := c.ListObjects(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(objects, tt.expectedObjects) {
 			t.Errorf("%s [%d] - S3 objects: received=%+v | expected=%+v",
