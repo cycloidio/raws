@@ -60,8 +60,8 @@ func Unzip(src string, dest string) (string, error) {
 		return "", err
 	}
 	defer func() {
-		if err := r.Close(); err != nil {
-			panic(err)
+		if closeErr := r.Close(); closeErr != nil {
+			panic(closeErr)
 		}
 	}()
 
@@ -93,8 +93,8 @@ func Unzip(src string, dest string) (string, error) {
 				return err
 			}
 			defer func() {
-				if err := f.Close(); err != nil {
-					panic(err)
+				if closeErr := f.Close(); closeErr != nil {
+					panic(closeErr)
 				}
 			}()
 
@@ -124,9 +124,9 @@ func (d *billingDownloader) getAndCreateOutputPath(dest string) (string, error) 
 		// checked, in order to know if we were given a supposed 'file'
 		// or if we were given a directory.
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(filepath.Dir(dest), 0755)
-			if err != nil {
-				return "", err
+			osErr := os.MkdirAll(filepath.Dir(dest), 0755)
+			if osErr != nil {
+				return "", osErr
 			}
 			if strings.Contains(filepath.Dir(dest), filepath.Base(dest)) {
 				return dest + d.filename, nil

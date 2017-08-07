@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/twinj/uuid"
 	"io"
 	"os"
 	"reflect"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/twinj/uuid"
 )
 
 type Loader struct {

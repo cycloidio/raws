@@ -2,9 +2,10 @@ package raws
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"io"
 )
 
 // Returns all S3 buckets based on the input given
