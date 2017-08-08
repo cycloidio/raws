@@ -20,6 +20,7 @@ import (
 type Loader struct {
 	reportName  string
 	report      *billingReport
+	reportFd    *os.File
 	concurrency int
 	wg          sync.WaitGroup
 	json        []byte
@@ -38,6 +39,7 @@ func NewLoader(injector Injector, concurrency int) *Loader {
 func (l *Loader) ProcessFile(reportName string, billingFile string) {
 	l.reportName = reportName
 	l.report = l.openBillingReport(billingFile)
+	defer l.reportFd.Close()
 
 	valuesSink := make(chan []string)
 	reportSinks := make([]chan *billingRecord, 0, 0)
@@ -166,7 +168,7 @@ func (l *Loader) openBillingReport(billingFile string) *billingReport {
 	if err != nil {
 		panic(err.Error())
 	}
-	defer file.Close()
+	l.reportFd = file
 	reader := csv.NewReader(file)
 	report := &billingReport{
 		CsvFileName:   billingFile,
