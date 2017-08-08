@@ -67,7 +67,7 @@ func (c *billingChecker) getS3Entry() error {
 		return err
 	}
 	if len(objectsOutput) != 1 {
-		return fmt.Errorf("Found too many objects matching (%d)\n", len(objectsOutput))
+		return fmt.Errorf("Found too many objects matching (%d)", len(objectsOutput))
 	}
 	if objectsOutput[0].Contents == nil || len(objectsOutput[0].Contents) == 0 {
 		return fmt.Errorf("s3 entry doesn't have 'Contents' attribute.")

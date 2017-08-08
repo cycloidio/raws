@@ -61,15 +61,11 @@ func (l *Loader) ProcessFile(reportName string, billingFile string) {
 	l.wg.Wait()
 }
 
-type fieldMapper map[string]map[interface{}]map[string]interface{}
-
 type billingReport struct {
 	CsvFileName   string
 	InvoicePeriod time.Time
-	ReportType    int
 	Fields        []string
 	csvReader     *csv.Reader
-	Mapper        fieldMapper
 }
 
 type billingRecord struct {
@@ -170,6 +166,7 @@ func (l *Loader) openBillingReport(billingFile string) *billingReport {
 	if err != nil {
 		panic(err.Error())
 	}
+	defer file.Close()
 	reader := csv.NewReader(file)
 	report := &billingReport{
 		CsvFileName:   billingFile,

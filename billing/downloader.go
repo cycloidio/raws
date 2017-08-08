@@ -39,10 +39,10 @@ func (d *billingDownloader) Download(dest string) (string, error) {
 	}
 	d.fileFullPath = fullPath
 	fd, err := os.Create(d.fileFullPath)
-	defer fd.Close()
 	if err != nil {
-		return "", fmt.Errorf("Couldn't create file '%s': %+v", dest, err)
+		return "", fmt.Errorf("Couldn't create file %q: %+v", dest, err)
 	}
+	defer fd.Close()
 	s3input := &s3.GetObjectInput{
 		Bucket: aws.String(d.s3Bucket),
 		Key:    aws.String(d.filename)}
