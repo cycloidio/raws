@@ -66,7 +66,7 @@ func TestConnector_setRegion(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{}
+		c := &connector{}
 		err := c.setRegions(tt.mocked, tt.regionsInput)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(c.regions, tt.expectedRegions) {
@@ -103,7 +103,7 @@ func TestConnector_setAccountID(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{}
+		c := &connector{}
 		err := c.setAccountID(tt.mocked)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(c.accountID, tt.expectedID) {
@@ -158,7 +158,7 @@ func TestConnector_setServices(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{
+		c := &connector{
 			regions: tt.regionsInput,
 			creds:   tt.credsInput,
 		}

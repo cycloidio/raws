@@ -19,14 +19,14 @@ To get started, you can download/include the library to your code:
 import 	"github.com/cycloidio/raws"
 ```
 
-### Create a connector
+### Create a reader
 ```go
 var config *aws.Config = nil
 var accessKey string = "xxxxxxxxxxxxxxxx"
 var secretKey string = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 var region []string = []string{"eu-*"}
 
-c, err := raws.NewConnector(accessKey, secretKey, region, config)
+c, err := raws.NewAWSReader(accessKey, secretKey, region, config)
 if err != nil {
 	fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
 	return err

@@ -1,11 +1,15 @@
 package raws
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 // Returns all S3 buckets based on the input given
-func (c *Connector) GetBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
+func (c *connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
 	var errs Errs
 	var bucketsList []*s3.ListBucketsOutput
 
@@ -24,7 +28,7 @@ func (c *Connector) GetBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOut
 }
 
 // Returns tags associated with S3 buckets based on the input given
-func (c *Connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs) {
+func (c *connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs) {
 	var errs Errs
 	var bucketsTagList []*s3.GetBucketTaggingOutput
 
@@ -43,7 +47,7 @@ func (c *Connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBuc
 }
 
 // Returns a list of all S3 objects in a bucket based on the input given
-func (c *Connector) GetObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
+func (c *connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
 	var errs Errs
 	var objectsList []*s3.ListObjectsOutput
 
@@ -61,8 +65,25 @@ func (c *Connector) GetObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOut
 	return objectsList, errs
 }
 
+// DownloadObject downloads an object in a bucket based on the input given
+func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error) {
+	var err error = nil
+	var n int64 = 0
+
+	for _, svc := range c.svcs {
+		if svc.s3downloader == nil {
+			svc.s3downloader = s3manager.NewDownloader(svc.session)
+		}
+		n, err = svc.s3downloader.Download(w, input, options...)
+		if err == nil {
+			return n, nil
+		}
+	}
+	return n, fmt.Errorf("Couldn't download '%v' in any of '%v' regions", input, c.GetRegions())
+}
+
 // Returns tags associated with S3 objects based on the input given
-func (c *Connector) GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs) {
+func (c *connector) GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs) {
 	var errs Errs
 	var objectsTagsList []*s3.GetObjectTaggingOutput
 
