@@ -15,7 +15,7 @@ type Checker interface {
 }
 
 type billingChecker struct {
-	s3Connector *raws.Connector
+	s3Connector raws.AWSReader
 	dynSvc      *dynamodb.DynamoDB
 	s3Bucket    string
 	filename    string
@@ -23,7 +23,7 @@ type billingChecker struct {
 	newMd5      string
 }
 
-func NewChecker(s3connector *raws.Connector, dynamoDB *dynamodb.DynamoDB, bucket string, filename string) Checker {
+func NewChecker(s3connector raws.AWSReader, dynamoDB *dynamodb.DynamoDB, bucket string, filename string) Checker {
 	return &billingChecker{
 		s3Connector: s3connector,
 		s3Bucket:    bucket,

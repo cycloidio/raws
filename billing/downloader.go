@@ -18,13 +18,13 @@ type Downloader interface {
 }
 
 type billingDownloader struct {
-	connector    *raws.Connector
+	connector    raws.AWSReader
 	s3Bucket     string
 	filename     string
 	fileFullPath string
 }
 
-func NewDownloader(s3Connector *raws.Connector, bucket, filename string) Downloader {
+func NewDownloader(s3Connector raws.AWSReader, bucket, filename string) Downloader {
 	return &billingDownloader{
 		connector: s3Connector,
 		filename:  filename,

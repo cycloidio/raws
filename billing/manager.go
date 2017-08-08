@@ -24,7 +24,7 @@ type Manager interface {
 
 type BillingManager struct {
 	date          string
-	s3Connector   *raws.Connector
+	s3Connector   raws.AWSReader
 	dynamoSvc     *dynamodb.DynamoDB
 	dynamoAccount *AwsConfig
 	s3Account     *AwsConfig
@@ -49,7 +49,7 @@ func (m *BillingManager) getS3Filename() string {
 }
 
 func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error) {
-	c, err := raws.NewConnector(
+	c, err := raws.NewAWSReader(
 		s3Account.AccessKey,
 		s3Account.SecretKey,
 		[]string{s3Account.Region},

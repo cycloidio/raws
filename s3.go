@@ -9,7 +9,7 @@ import (
 )
 
 // Returns all S3 buckets based on the input given
-func (c *Connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
+func (c *connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
 	var errs Errs
 	var bucketsList []*s3.ListBucketsOutput
 
@@ -28,7 +28,7 @@ func (c *Connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOu
 }
 
 // Returns tags associated with S3 buckets based on the input given
-func (c *Connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs) {
+func (c *connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs) {
 	var errs Errs
 	var bucketsTagList []*s3.GetBucketTaggingOutput
 
@@ -47,7 +47,7 @@ func (c *Connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBuc
 }
 
 // Returns a list of all S3 objects in a bucket based on the input given
-func (c *Connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
+func (c *connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
 	var errs Errs
 	var objectsList []*s3.ListObjectsOutput
 
@@ -66,7 +66,7 @@ func (c *Connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOu
 }
 
 // DownloadObject downloads an object in a bucket based on the input given
-func (c *Connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error) {
+func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error) {
 	var err error = nil
 	var n int64 = 0
 
@@ -83,7 +83,7 @@ func (c *Connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, opti
 }
 
 // Returns tags associated with S3 objects based on the input given
-func (c *Connector) GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs) {
+func (c *connector) GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs) {
 	var errs Errs
 	var objectsTagsList []*s3.GetObjectTaggingOutput
 

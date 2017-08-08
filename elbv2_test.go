@@ -171,7 +171,7 @@ func TestGetLoadBalancersV2(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		elbs, err := c.GetLoadBalancersV2(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(elbs, tt.expectedELBs) {
@@ -321,7 +321,7 @@ func TestGetLoadBalancersV2Tags(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		tags, err := c.GetLoadBalancersV2Tags(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {

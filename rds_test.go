@@ -172,7 +172,7 @@ func TestGetDBInstances(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		instances, err := c.GetDBInstances(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(instances, tt.expectedInstances) {
@@ -333,7 +333,7 @@ func TestGetDBInstancesTags(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		tags, err := c.GetDBInstancesTags(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {
