@@ -1,11 +1,10 @@
 package billing
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 )
 
 type Injector interface {
@@ -14,10 +13,10 @@ type Injector interface {
 }
 
 type billingInjector struct {
-	dynamoSvc *dynamodb.DynamoDB
+	dynamoSvc dynamodbiface.DynamoDBAPI
 }
 
-func NewInjector(dynamoSvc *dynamodb.DynamoDB) Injector {
+func NewInjector(dynamoSvc dynamodbiface.DynamoDBAPI) Injector {
 	return &billingInjector{
 		dynamoSvc: dynamoSvc,
 	}
@@ -50,6 +49,5 @@ func (i *billingInjector) CreateReport(filename string, hash string) error {
 		ReturnConsumedCapacity: aws.String("TOTAL"),
 	}
 	_, err := i.dynamoSvc.PutItem(input)
-	fmt.Printf("Item: %v\n", input)
 	return err
 }

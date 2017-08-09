@@ -3,8 +3,11 @@ package billing
 import (
 	"fmt"
 
+	"errors"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cycloidio/raws"
 )
@@ -16,14 +19,14 @@ type Checker interface {
 
 type billingChecker struct {
 	s3Connector raws.AWSReader
-	dynSvc      *dynamodb.DynamoDB
+	dynSvc      dynamodbiface.DynamoDBAPI
 	s3Bucket    string
 	filename    string
 	oldMd5      string
 	newMd5      string
 }
 
-func NewChecker(s3connector raws.AWSReader, dynamoDB *dynamodb.DynamoDB, bucket string, filename string) Checker {
+func NewChecker(s3connector raws.AWSReader, dynamoDB dynamodbiface.DynamoDBAPI, bucket string, filename string) Checker {
 	return &billingChecker{
 		s3Connector: s3connector,
 		s3Bucket:    bucket,
@@ -70,7 +73,7 @@ func (c *billingChecker) getS3Entry() error {
 		return fmt.Errorf("Found too many objects matching (%d)", len(objectsOutput))
 	}
 	if objectsOutput[0].Contents == nil || len(objectsOutput[0].Contents) == 0 {
-		return fmt.Errorf("s3 entry doesn't have 'Contents' attribute.")
+		return errors.New("s3 entry doesn't have 'Contents' attribute.")
 	}
 	etag := *objectsOutput[0].Contents[0].ETag
 	c.newMd5 = etag[1 : len(etag)-1]

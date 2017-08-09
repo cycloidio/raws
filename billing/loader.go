@@ -17,7 +17,11 @@ import (
 	"github.com/twinj/uuid"
 )
 
-type Loader struct {
+type Loader interface {
+	ProcessFile(reportName string, billingFile string)
+}
+
+type billingLoader struct {
 	reportName  string
 	report      *billingReport
 	reportFd    *os.File
@@ -27,8 +31,8 @@ type Loader struct {
 	injector    Injector
 }
 
-func NewLoader(injector Injector, concurrency int) *Loader {
-	return &Loader{
+func NewLoader(injector Injector, concurrency int) Loader {
+	return &billingLoader{
 		concurrency: concurrency,
 		wg:          sync.WaitGroup{},
 		json:        []byte{},
@@ -36,7 +40,7 @@ func NewLoader(injector Injector, concurrency int) *Loader {
 	}
 }
 
-func (l *Loader) ProcessFile(reportName string, billingFile string) {
+func (l *billingLoader) ProcessFile(reportName string, billingFile string) {
 	l.reportName = reportName
 	l.report = l.openBillingReport(billingFile)
 	defer l.reportFd.Close()
@@ -98,7 +102,7 @@ type billingRecord struct {
 	Tags             map[string]string
 }
 
-func (l *Loader) parseRecord(in chan []string, out chan *billingRecord, report *billingReport) {
+func (l *billingLoader) parseRecord(in chan []string, out chan *billingRecord, report *billingReport) {
 	var tagMatcher = regexp.MustCompile("(user|aws):.*")
 	var fieldTypes = map[string]func(s string, report *billingReport) interface{}{
 		"PayerAccountId":  l.parseUint,
@@ -135,7 +139,7 @@ func (l *Loader) parseRecord(in chan []string, out chan *billingRecord, report *
 	l.wg.Done()
 }
 
-func (l *Loader) assignField(record *billingRecord, field string, value interface{}, tag bool) error {
+func (l *billingLoader) assignField(record *billingRecord, field string, value interface{}, tag bool) error {
 	if tag == false {
 		recordField := reflect.ValueOf(record).Elem().FieldByName(field)
 		if !recordField.IsValid() {
@@ -157,7 +161,7 @@ func (l *Loader) assignField(record *billingRecord, field string, value interfac
 	return nil
 }
 
-func (l *Loader) openBillingReport(billingFile string) *billingReport {
+func (l *billingLoader) openBillingReport(billingFile string) *billingReport {
 	var dateMonthMatcher = regexp.MustCompile(`\d{4}-\d{2}`)
 
 	invoicePeriod, err := time.Parse("2006-02", dateMonthMatcher.FindString(billingFile))
@@ -183,27 +187,27 @@ func (l *Loader) openBillingReport(billingFile string) *billingReport {
 	return report
 }
 
-func (l *Loader) parseTag(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseTag(s string, report *billingReport) interface{} {
 	tagParts := strings.Split(s, ":")
 	return strings.Join(tagParts, "_")
 }
 
-func (l *Loader) parseInt(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseInt(s string, report *billingReport) interface{} {
 	value, _ := strconv.ParseInt(s, 0, 0)
 	return value
 }
 
-func (l *Loader) parseUint(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseUint(s string, report *billingReport) interface{} {
 	value, _ := strconv.ParseUint(s, 0, 0)
 	return value
 }
 
-func (l *Loader) parseFloat(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseFloat(s string, report *billingReport) interface{} {
 	value, _ := strconv.ParseFloat(s, 0)
 	return value
 }
 
-func (l *Loader) parseDate(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseDate(s string, report *billingReport) interface{} {
 	var returnTime time.Time
 	var err error
 	switch s {
@@ -218,7 +222,7 @@ func (l *Loader) parseDate(s string, report *billingReport) interface{} {
 	return returnTime.Format(time.RFC3339)
 }
 
-func (l *Loader) saveRecord(in chan *billingRecord) {
+func (l *billingLoader) saveRecord(in chan *billingRecord) {
 	for record := range in {
 		record.ReportName = l.reportName
 		record.Id = uuid.NewV4().String()

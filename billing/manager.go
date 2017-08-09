@@ -30,7 +30,7 @@ type BillingManager struct {
 	s3Account     *AwsConfig
 	checker       Checker
 	downloader    Downloader
-	loader        *Loader
+	loader        Loader
 	injector      Injector
 }
 
@@ -38,14 +38,6 @@ type AwsConfig struct {
 	AccessKey string
 	SecretKey string
 	Region    string
-}
-
-func (m *BillingManager) getS3Filename() string {
-	const (
-		filenamePattern = "-aws-billing-detailed-line-items-with-resources-and-tags-"
-		fileExtension   = ".csv.zip"
-	)
-	return m.s3Connector.GetAccountID() + filenamePattern + m.date + fileExtension
 }
 
 func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error) {
@@ -58,7 +50,7 @@ func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error)
 	if err != nil {
 		return nil, err
 	}
-	svc, err := InitDynamoService(dynamoAccount)
+	svc, err := initDynamoService(dynamoAccount)
 	if err != nil {
 		return nil, err
 	}
@@ -69,25 +61,6 @@ func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error)
 		dynamoAccount: dynamoAccount,
 		dynamoSvc:     svc,
 	}, nil
-}
-
-func InitDynamoService(config *AwsConfig) (*dynamodb.DynamoDB, error) {
-	var token string = ""
-
-	creds := credentials.NewStaticCredentials(config.AccessKey, config.SecretKey, token)
-	_, err := creds.Get()
-	if err != nil {
-		return nil, err
-	}
-	session := session.Must(
-		session.NewSession(&aws.Config{
-			Region:      aws.String(config.Region),
-			DisableSSL:  aws.Bool(false),
-			MaxRetries:  aws.Int(3),
-			Credentials: creds,
-		}),
-	)
-	return dynamodb.New(session), nil
 }
 
 func (m *BillingManager) Import(date string, bucket string) error {
@@ -134,4 +107,31 @@ func (m *BillingManager) Import(date string, bucket string) error {
 		return err
 	}
 	return nil
+}
+
+func initDynamoService(config *AwsConfig) (*dynamodb.DynamoDB, error) {
+	var token string = ""
+
+	creds := credentials.NewStaticCredentials(config.AccessKey, config.SecretKey, token)
+	_, err := creds.Get()
+	if err != nil {
+		return nil, err
+	}
+	session := session.Must(
+		session.NewSession(&aws.Config{
+			Region:      aws.String(config.Region),
+			DisableSSL:  aws.Bool(false),
+			MaxRetries:  aws.Int(3),
+			Credentials: creds,
+		}),
+	)
+	return dynamodb.New(session), nil
+}
+
+func (m *BillingManager) getS3Filename() string {
+	const (
+		filenamePattern = "-aws-billing-detailed-line-items-with-resources-and-tags-"
+		fileExtension   = ".csv.zip"
+	)
+	return m.s3Connector.GetAccountID() + filenamePattern + m.date + fileExtension
 }
