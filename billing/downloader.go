@@ -12,26 +12,22 @@ import (
 )
 
 type Downloader interface {
-	Download(dest string) (string, error)
+	Download(bucket string, filename string, dest string) (string, error)
 }
 
 type billingDownloader struct {
 	connector    raws.AWSReader
-	s3Bucket     string
-	filename     string
 	fileFullPath string
 }
 
-func NewDownloader(s3Connector raws.AWSReader, bucket, filename string) Downloader {
+func NewDownloader(s3Connector raws.AWSReader) Downloader {
 	return &billingDownloader{
 		connector: s3Connector,
-		filename:  filename,
-		s3Bucket:  bucket,
 	}
 }
 
-func (d *billingDownloader) Download(dest string) (string, error) {
-	fullPath, err := d.getAndCreateOutputPath(dest)
+func (d *billingDownloader) Download(bucket string, filename string, dest string) (string, error) {
+	fullPath, err := d.getAndCreateOutputPath(filename, dest)
 	if err != nil {
 		return "", fmt.Errorf("Error while identifying destination's path: %v", err)
 	}
@@ -42,8 +38,8 @@ func (d *billingDownloader) Download(dest string) (string, error) {
 	}
 	defer fd.Close()
 	s3input := &s3.GetObjectInput{
-		Bucket: aws.String(d.s3Bucket),
-		Key:    aws.String(d.filename)}
+		Bucket: aws.String(bucket),
+		Key:    aws.String(filename)}
 	_, err = d.connector.DownloadObject(fd, s3input)
 	if err != nil {
 		return "", fmt.Errorf("Error while downloading file: %+v", err)
@@ -51,7 +47,7 @@ func (d *billingDownloader) Download(dest string) (string, error) {
 	return d.fileFullPath, nil
 }
 
-func (d *billingDownloader) getAndCreateOutputPath(dest string) (string, error) {
+func (d *billingDownloader) getAndCreateOutputPath(filename string, dest string) (string, error) {
 	fi, err := os.Stat(dest)
 	if err != nil {
 		// Case when the destination doesn't exist
@@ -64,7 +60,7 @@ func (d *billingDownloader) getAndCreateOutputPath(dest string) (string, error) 
 				return "", osErr
 			}
 			if strings.Contains(filepath.Dir(dest), filepath.Base(dest)) {
-				return dest + d.filename, nil
+				return dest + filename, nil
 			} else {
 				return dest, nil
 			}
@@ -76,7 +72,7 @@ func (d *billingDownloader) getAndCreateOutputPath(dest string) (string, error) 
 	// otherwise if it is a file, we simply returns it.
 	mode := fi.Mode()
 	if mode.IsDir() {
-		return dest + d.filename, nil
+		return dest + filename, nil
 	}
 	return dest, nil
 }

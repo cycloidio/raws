@@ -24,7 +24,7 @@ type mockChecker struct {
 	aps string
 }
 
-func (m mockChecker) Check() (bool, error) {
+func (m mockChecker) Check(bucket string, filename string) (bool, error) {
 	return m.cb, m.ce
 }
 
@@ -40,7 +40,7 @@ type mockDownloader struct {
 	de error
 }
 
-func (m mockDownloader) Download(dest string) (string, error) {
+func (m mockDownloader) Download(bucket string, filename string, dest string) (string, error) {
 	return m.ds, m.de
 }
 

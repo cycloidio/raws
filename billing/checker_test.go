@@ -13,6 +13,10 @@ import (
 )
 
 func TestBillingChecker_Check(t *testing.T) {
+	const (
+		givenFilename = "test-file"
+		givenBucket   = "test-bucket"
+	)
 	tests := []struct {
 		name           string
 		mockedDyn      mockDynamodb
@@ -126,7 +130,7 @@ func TestBillingChecker_Check(t *testing.T) {
 				s3Connector: tt.mockedS3,
 				dynSvc:      tt.mockedDyn,
 			}
-			needCheck, err := c.Check()
+			needCheck, err := c.Check(givenBucket, givenFilename)
 			checkErrors(t, tt.name, i, err, tt.expectedError)
 			if needCheck != tt.expectedCheck {
 				t.Errorf("%s [%d] - Check boolean doesn't match: received=%t | expected=%t",
@@ -185,6 +189,10 @@ func TestBillingChecker_AlreadyPresent(t *testing.T) {
 }
 
 func TestBillingChecker_getS3Entry(t *testing.T) {
+	const (
+		givenFilename = "test-file"
+		givenBucket   = "test-bucket"
+	)
 	tests := []struct {
 		name          string
 		mockedS3      mockAWSReader
@@ -241,7 +249,7 @@ func TestBillingChecker_getS3Entry(t *testing.T) {
 			c := &billingChecker{
 				s3Connector: tt.mockedS3,
 			}
-			err := c.getS3Entry()
+			err := c.getS3Entry(givenBucket, givenFilename)
 			checkErrors(t, tt.name, i, err, tt.expectedError)
 			if !reflect.DeepEqual(c.newMd5, tt.expectedMD5) {
 				t.Errorf("%s [%d] - s3 md5: received=%q | expected=%q",
@@ -252,6 +260,9 @@ func TestBillingChecker_getS3Entry(t *testing.T) {
 }
 
 func TestBillingChecker_getDynamoEntry(t *testing.T) {
+	const (
+		givenFilename = "test-file"
+	)
 	tests := []struct {
 		name          string
 		mockedDyn     mockDynamodb
@@ -306,7 +317,7 @@ func TestBillingChecker_getDynamoEntry(t *testing.T) {
 			c := &billingChecker{
 				dynSvc: tt.mockedDyn,
 			}
-			err := c.getDynamoEntry()
+			err := c.getDynamoEntry(givenFilename)
 			checkErrors(t, tt.name, i, err, tt.expectedError)
 			if !reflect.DeepEqual(c.oldMd5, tt.expectedMD5) {
 				t.Errorf("%s [%d] - dynamodb md5: received=%q | expected=%q",

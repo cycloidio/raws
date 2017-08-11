@@ -10,16 +10,12 @@ import (
 )
 
 func TestNewDownloader(t *testing.T) {
-	var bucket = "test-bucket"
-	var filename = "test-file"
 	var mockedS3 raws.AWSReader = mockAWSReader{}
 
 	d := &billingDownloader{
 		connector: mockedS3,
-		s3Bucket:  bucket,
-		filename:  filename,
 	}
-	cd := NewDownloader(mockedS3, bucket, filename)
+	cd := NewDownloader(mockedS3)
 	if !reflect.DeepEqual(d, cd) {
 		t.Errorf("NewDownloader: received=%+v | expected=%+v",
 			cd, d)
@@ -31,6 +27,7 @@ func TestBillingDownloader_Download(t *testing.T) {
 		tempDownloadDir string = "/billingDownloader/"
 		tempFilename    string = "test.csv.zip"
 		givenFilename   string = "bd.csv.zip"
+		givenBucket     string = "fake-bucket"
 	)
 	var tempDir string = os.TempDir() + tempDownloadDir
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
@@ -69,10 +66,8 @@ func TestBillingDownloader_Download(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			d := &billingDownloader{
 				connector: tt.mockS3,
-				filename:  givenFilename,
-				s3Bucket:  "",
 			}
-			path, err := d.Download(tt.destination)
+			path, err := d.Download(givenBucket, givenFilename, tt.destination)
 			checkErrors(t, tt.name, i, err, tt.expectedError)
 			if path != tt.expectedPath {
 				t.Errorf("%s [%d] - incorrect returned path: received=%q | expected=%q",
@@ -136,10 +131,8 @@ func TestBillingDownloader_getAndCreateOutputPath(t *testing.T) {
 
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			d := &billingDownloader{
-				filename: givenFilename,
-			}
-			path, err := d.getAndCreateOutputPath(tt.destination)
+			d := &billingDownloader{}
+			path, err := d.getAndCreateOutputPath(givenFilename, tt.destination)
 			checkErrors(t, tt.name, i, err, tt.expectedError)
 			if path != tt.expectedPath {
 				t.Errorf("%s [%d] - incorrect path: received=%q | expected=%q",

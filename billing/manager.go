@@ -41,7 +41,7 @@ type AwsConfig struct {
 }
 
 func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error) {
-	c, err := raws.NewAWSReader(
+	connector, err := raws.NewAWSReader(
 		s3Account.AccessKey,
 		s3Account.SecretKey,
 		[]string{s3Account.Region},
@@ -54,12 +54,16 @@ func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error)
 	if err != nil {
 		return nil, err
 	}
-
+	injector := NewInjector(svc)
 	return &BillingManager{
-		s3Connector:   c,
+		s3Connector:   connector,
 		s3Account:     s3Account,
 		dynamoAccount: dynamoAccount,
 		dynamoSvc:     svc,
+		checker:       NewChecker(connector, svc),
+		downloader:    NewDownloader(connector),
+		injector:      injector,
+		loader:        NewLoader(injector, 2),
 	}, nil
 }
 
@@ -69,8 +73,7 @@ func (m *BillingManager) Import(date string, bucket string) error {
 		unzipPath    = "/tmp/billing-reports-unzip/"
 	)
 	m.date = date
-	m.checker = NewChecker(m.s3Connector, m.dynamoSvc, bucket, m.getS3Filename())
-	needImport, err := m.checker.Check()
+	needImport, err := m.checker.Check(bucket, m.getS3Filename())
 	if err != nil {
 		fmt.Printf("Error during check: %v", err)
 		return err
@@ -81,8 +84,7 @@ func (m *BillingManager) Import(date string, bucket string) error {
 	} else {
 		fmt.Printf("File %s needs import.\n", m.getS3Filename())
 	}
-	m.downloader = NewDownloader(m.s3Connector, bucket, m.getS3Filename())
-	downloadedFile, err := m.downloader.Download(downloadPath)
+	downloadedFile, err := m.downloader.Download(bucket, m.getS3Filename(), downloadPath)
 	if err != nil {
 		return err
 	}
@@ -92,8 +94,6 @@ func (m *BillingManager) Import(date string, bucket string) error {
 		return err
 	}
 	fmt.Printf("File %s succesfuly unzipped.\n", filePath)
-	m.injector = NewInjector(m.dynamoSvc)
-	m.loader = NewLoader(m.injector, 2)
 	fmt.Printf("File %s being imported...\n", m.getS3Filename())
 	m.loader.ProcessFile(m.getS3Filename(), filePath)
 	fmt.Println("done!")

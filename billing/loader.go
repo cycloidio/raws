@@ -230,10 +230,10 @@ func (l *billingLoader) saveRecord(in chan *billingRecord) {
 		if err == nil {
 			fmt.Printf("%s ===================\n", string(val))
 		}
-		err = l.injector.CreateRecord(record)
-		if err != nil {
-			fmt.Printf("Error during import: %v\n", err)
-		}
+		//		err = l.injector.CreateRecord(record)
+		//if err != nil {
+		//	fmt.Printf("Error during import: %v\n", err)
+		//}
 	}
 	l.wg.Done()
 }

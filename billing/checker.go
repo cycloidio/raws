@@ -13,36 +13,32 @@ import (
 )
 
 type Checker interface {
-	Check() (bool, error)
+	Check(bucket string, filename string) (bool, error)
 	AlreadyPresent() (bool, string)
 }
 
 type billingChecker struct {
 	s3Connector raws.AWSReader
 	dynSvc      dynamodbiface.DynamoDBAPI
-	s3Bucket    string
-	filename    string
 	oldMd5      string
 	newMd5      string
 }
 
-func NewChecker(s3connector raws.AWSReader, dynamoDB dynamodbiface.DynamoDBAPI, bucket string, filename string) Checker {
+func NewChecker(s3connector raws.AWSReader, dynamoDB dynamodbiface.DynamoDBAPI) Checker {
 	return &billingChecker{
 		s3Connector: s3connector,
-		s3Bucket:    bucket,
-		filename:    filename,
 		dynSvc:      dynamoDB,
 		oldMd5:      "",
 		newMd5:      "",
 	}
 }
 
-func (c *billingChecker) Check() (bool, error) {
-	err := c.getDynamoEntry()
+func (c *billingChecker) Check(bucket string, filename string) (bool, error) {
+	err := c.getDynamoEntry(filename)
 	if err != nil {
 		return false, err
 	}
-	err = c.getS3Entry()
+	err = c.getS3Entry(bucket, filename)
 	if err != nil {
 		return false, err
 	}
@@ -59,10 +55,10 @@ func (c *billingChecker) AlreadyPresent() (bool, string) {
 	return false, c.newMd5
 }
 
-func (c *billingChecker) getS3Entry() error {
+func (c *billingChecker) getS3Entry(bucket string, filename string) error {
 	inputs := &s3.ListObjectsInput{
-		Bucket: aws.String(c.s3Bucket),
-		Prefix: aws.String(c.filename),
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(filename),
 	}
 
 	objectsOutput, err := c.s3Connector.ListObjects(inputs)
@@ -80,11 +76,11 @@ func (c *billingChecker) getS3Entry() error {
 	return nil
 }
 
-func (c *billingChecker) getDynamoEntry() error {
+func (c *billingChecker) getDynamoEntry(filename string) error {
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			billingReportNameField: {
-				S: aws.String(c.filename),
+				S: aws.String(filename),
 			},
 		},
 		TableName: aws.String(billingReportTableName),
