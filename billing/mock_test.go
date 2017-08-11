@@ -38,10 +38,18 @@ type mockDownloader struct {
 	// Download returned elements
 	ds string
 	de error
+
+	// Unzip returned elements
+	us string
+	ue error
 }
 
 func (m mockDownloader) Download(bucket string, filename string, dest string) (string, error) {
 	return m.ds, m.de
+}
+
+func (m mockDownloader) Unzip(src string, dest string) (string, error) {
+	return m.us, m.ue
 }
 
 type mockLoader struct {

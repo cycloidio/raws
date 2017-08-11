@@ -89,7 +89,7 @@ func (m *BillingManager) Import(date string, bucket string) error {
 		return err
 	}
 	fmt.Printf("File %s succesfuly downloaded.\n", downloadedFile)
-	filePath, err := Unzip(downloadedFile, unzipPath)
+	filePath, err := m.downloader.Unzip(downloadedFile, unzipPath)
 	if err != nil {
 		return err
 	}
