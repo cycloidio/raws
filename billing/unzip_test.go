@@ -1,17 +1,17 @@
 package billing
 
 import (
-	"testing"
-	"os"
 	"errors"
+	"os"
+	"testing"
 )
 
 func TestUnzip(t *testing.T) {
 	const (
 		zipNoSuchFile = "./test/no-such-file.zip"
-		zipDirPath = "./test/test-dir.zip"
-		zipFilePath = "./test/test.txt.zip"
-		zipFile = "test.txt"
+		zipDirPath    = "./test/test-dir.zip"
+		zipFilePath   = "./test/test.txt.zip"
+		zipFile       = "test.txt"
 	)
 	var tempDir string = os.TempDir() + "/"
 

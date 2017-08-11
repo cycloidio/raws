@@ -51,11 +51,13 @@ func TestBillingInjector_CreateReport(t *testing.T) {
 	}
 
 	for j, tt := range tests {
-		i := &billingInjector{
-			dynamoSvc: tt.mockedDyn,
-		}
-		err := i.CreateReport(tt.filename, tt.hash)
-		checkErrors(t, tt.name, j, err, tt.expectedError)
+		t.Run(tt.name, func(t *testing.T) {
+			i := &billingInjector{
+				dynamoSvc: tt.mockedDyn,
+			}
+			err := i.CreateReport(tt.filename, tt.hash)
+			checkErrors(t, tt.name, j, err, tt.expectedError)
+		})
 	}
 }
 
@@ -85,10 +87,12 @@ func TestBillingInjector_CreateRecord(t *testing.T) {
 	}
 
 	for j, tt := range tests {
-		i := &billingInjector{
-			dynamoSvc: tt.mockedDyn,
-		}
-		err := i.CreateRecord(tt.record)
-		checkErrors(t, tt.name, j, err, tt.expectedError)
+		t.Run(tt.name, func(t *testing.T) {
+			i := &billingInjector{
+				dynamoSvc: tt.mockedDyn,
+			}
+			err := i.CreateRecord(tt.record)
+			checkErrors(t, tt.name, j, err, tt.expectedError)
+		})
 	}
 }

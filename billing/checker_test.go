@@ -121,24 +121,26 @@ func TestBillingChecker_Check(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		c := &billingChecker{
-			s3Connector: tt.mockedS3,
-			dynSvc:      tt.mockedDyn,
-		}
-		needCheck, err := c.Check()
-		checkErrors(t, tt.name, i, err, tt.expectedError)
-		if needCheck != tt.expectedCheck {
-			t.Errorf("%s [%d] - Check boolean doesn't match: received=%t | expected=%t",
-				tt.name, i, needCheck, tt.expectedCheck)
-		}
-		if c.oldMd5 != tt.expectedDynMD5 {
-			t.Errorf("%s [%d] - Check old md5 doesn't match: received=%q | expected=%q",
-				tt.name, i, c.oldMd5, tt.expectedDynMD5)
-		}
-		if c.newMd5 != tt.expectedS3MD5 {
-			t.Errorf("%s [%d] - Check new md5 doesn't match: received=%q | expected=%q",
-				tt.name, i, c.newMd5, tt.expectedS3MD5)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			c := &billingChecker{
+				s3Connector: tt.mockedS3,
+				dynSvc:      tt.mockedDyn,
+			}
+			needCheck, err := c.Check()
+			checkErrors(t, tt.name, i, err, tt.expectedError)
+			if needCheck != tt.expectedCheck {
+				t.Errorf("%s [%d] - Check boolean doesn't match: received=%t | expected=%t",
+					tt.name, i, needCheck, tt.expectedCheck)
+			}
+			if c.oldMd5 != tt.expectedDynMD5 {
+				t.Errorf("%s [%d] - Check old md5 doesn't match: received=%q | expected=%q",
+					tt.name, i, c.oldMd5, tt.expectedDynMD5)
+			}
+			if c.newMd5 != tt.expectedS3MD5 {
+				t.Errorf("%s [%d] - Check new md5 doesn't match: received=%q | expected=%q",
+					tt.name, i, c.newMd5, tt.expectedS3MD5)
+			}
+		})
 	}
 }
 
@@ -164,19 +166,21 @@ func TestBillingChecker_AlreadyPresent(t *testing.T) {
 		},
 	}
 	for i, tt := range tests {
-		c := &billingChecker{
-			oldMd5: tt.oldMd5,
-			newMd5: tt.newMd5,
-		}
-		present, md5 := c.AlreadyPresent()
-		if present != tt.expectedPresence {
-			t.Errorf("%s [%d] - presence invalid: received=%t | expected=%t",
-				tt.name, i, present, tt.expectedPresence)
-		}
-		if md5 != tt.expectedMd5 {
-			t.Errorf("%s [%d] - md5 incorrect: received=%q | expected=%q",
-				tt.name, i, md5, tt.expectedMd5)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			c := &billingChecker{
+				oldMd5: tt.oldMd5,
+				newMd5: tt.newMd5,
+			}
+			present, md5 := c.AlreadyPresent()
+			if present != tt.expectedPresence {
+				t.Errorf("%s [%d] - presence invalid: received=%t | expected=%t",
+					tt.name, i, present, tt.expectedPresence)
+			}
+			if md5 != tt.expectedMd5 {
+				t.Errorf("%s [%d] - md5 incorrect: received=%q | expected=%q",
+					tt.name, i, md5, tt.expectedMd5)
+			}
+		})
 	}
 }
 
@@ -233,15 +237,17 @@ func TestBillingChecker_getS3Entry(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &billingChecker{
-			s3Connector: tt.mockedS3,
-		}
-		err := c.getS3Entry()
-		checkErrors(t, tt.name, i, err, tt.expectedError)
-		if !reflect.DeepEqual(c.newMd5, tt.expectedMD5) {
-			t.Errorf("%s [%d] - s3 md5: received=%q | expected=%q",
-				tt.name, i, c.newMd5, tt.expectedMD5)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			c := &billingChecker{
+				s3Connector: tt.mockedS3,
+			}
+			err := c.getS3Entry()
+			checkErrors(t, tt.name, i, err, tt.expectedError)
+			if !reflect.DeepEqual(c.newMd5, tt.expectedMD5) {
+				t.Errorf("%s [%d] - s3 md5: received=%q | expected=%q",
+					tt.name, i, c.newMd5, tt.expectedMD5)
+			}
+		})
 	}
 }
 
@@ -296,14 +302,16 @@ func TestBillingChecker_getDynamoEntry(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &billingChecker{
-			dynSvc: tt.mockedDyn,
-		}
-		err := c.getDynamoEntry()
-		checkErrors(t, tt.name, i, err, tt.expectedError)
-		if !reflect.DeepEqual(c.oldMd5, tt.expectedMD5) {
-			t.Errorf("%s [%d] - dynamodb md5: received=%q | expected=%q",
-				tt.name, i, c.oldMd5, tt.expectedMD5)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			c := &billingChecker{
+				dynSvc: tt.mockedDyn,
+			}
+			err := c.getDynamoEntry()
+			checkErrors(t, tt.name, i, err, tt.expectedError)
+			if !reflect.DeepEqual(c.oldMd5, tt.expectedMD5) {
+				t.Errorf("%s [%d] - dynamodb md5: received=%q | expected=%q",
+					tt.name, i, c.oldMd5, tt.expectedMD5)
+			}
+		})
 	}
 }

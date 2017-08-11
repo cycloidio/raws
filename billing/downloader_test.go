@@ -66,17 +66,19 @@ func TestBillingDownloader_Download(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		d := &billingDownloader{
-			connector: tt.mockS3,
-			filename:  givenFilename,
-			s3Bucket:  "",
-		}
-		path, err := d.Download(tt.destination)
-		checkErrors(t, tt.name, i, err, tt.expectedError)
-		if path != tt.expectedPath {
-			t.Errorf("%s [%d] - incorrect returned path: received=%q | expected=%q",
-				tt.name, i, path, tt.expectedPath)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			d := &billingDownloader{
+				connector: tt.mockS3,
+				filename:  givenFilename,
+				s3Bucket:  "",
+			}
+			path, err := d.Download(tt.destination)
+			checkErrors(t, tt.name, i, err, tt.expectedError)
+			if path != tt.expectedPath {
+				t.Errorf("%s [%d] - incorrect returned path: received=%q | expected=%q",
+					tt.name, i, path, tt.expectedPath)
+			}
+		})
 	}
 
 	if removeErr := os.RemoveAll(tempDir); removeErr != nil {
@@ -133,23 +135,25 @@ func TestBillingDownloader_getAndCreateOutputPath(t *testing.T) {
 	}
 
 	for i, tt := range tests {
-		d := &billingDownloader{
-			filename: givenFilename,
-		}
-		path, err := d.getAndCreateOutputPath(tt.destination)
-		checkErrors(t, tt.name, i, err, tt.expectedError)
-		if path != tt.expectedPath {
-			t.Errorf("%s [%d] - incorrect path: received=%q | expected=%q",
-				tt.name, i, path, tt.expectedPath)
-		}
-		_, statErr := os.Stat(path)
-		if statErr != nil {
-			if exists := os.IsNotExist(err); exists != tt.expectExist {
-				t.Errorf("Error path should exist: %q", path)
+		t.Run(tt.name, func(t *testing.T) {
+			d := &billingDownloader{
+				filename: givenFilename,
 			}
-		} else if statErr == nil && tt.expectExist == false {
-			t.Errorf("Error path shouldn't exist: %q", path)
-		}
+			path, err := d.getAndCreateOutputPath(tt.destination)
+			checkErrors(t, tt.name, i, err, tt.expectedError)
+			if path != tt.expectedPath {
+				t.Errorf("%s [%d] - incorrect path: received=%q | expected=%q",
+					tt.name, i, path, tt.expectedPath)
+			}
+			_, statErr := os.Stat(path)
+			if statErr != nil {
+				if exists := os.IsNotExist(err); exists != tt.expectExist {
+					t.Errorf("Error path should exist: %q", path)
+				}
+			} else if statErr == nil && tt.expectExist == false {
+				t.Errorf("Error path shouldn't exist: %q", path)
+			}
+		})
 	}
 
 	if removeErr := os.RemoveAll(tempDir); removeErr != nil {
