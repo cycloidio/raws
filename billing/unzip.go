@@ -68,5 +68,13 @@ func Unzip(src string, dest string) (string, error) {
 		}
 	}
 
-	return unzipFullPath, nil
+	fi, err := os.Stat(unzipFullPath)
+	if err != nil {
+		return dest, nil
+	}
+	mode := fi.Mode()
+	if !mode.IsDir() {
+		return unzipFullPath, nil
+	}
+	return dest, nil
 }
