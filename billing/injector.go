@@ -28,6 +28,9 @@ func (i *billingInjector) CreateRecord(record *billingRecord) error {
 		return err
 	}
 
+	if record.RecordId == "0" || record.RecordId == "" {
+		return nil
+	}
 	_, err = i.dynamoSvc.PutItem(&dynamodb.PutItemInput{
 		TableName: aws.String(billingRecordTableName),
 		Item:      av,

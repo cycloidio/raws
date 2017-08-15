@@ -2,69 +2,63 @@ package billing
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"reflect"
 	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
+
+	"encoding/json"
 
 	"github.com/twinj/uuid"
 )
 
 type Loader interface {
-	ProcessFile(reportName string, billingFile string)
+	ProcessFile(reportName string, billingFile string) error
 }
 
-type billingLoader struct {
-	reportName  string
-	report      *billingReport
-	reportFd    *os.File
-	concurrency int
-	wg          sync.WaitGroup
-	json        []byte
-	injector    Injector
-}
-
-func NewLoader(injector Injector, concurrency int) Loader {
+func NewLoader(injector Injector) Loader {
 	return &billingLoader{
-		concurrency: concurrency,
-		wg:          sync.WaitGroup{},
-		json:        []byte{},
-		injector:    injector,
+		json:     []byte{},
+		injector: injector,
 	}
 }
 
-func (l *billingLoader) ProcessFile(reportName string, billingFile string) {
+func (l *billingLoader) ProcessFile(reportName string, billingFile string) error {
+	var end = false
+
 	l.reportName = reportName
 	l.report = l.openBillingReport(billingFile)
 	defer l.reportFd.Close()
 
-	valuesSink := make(chan []string)
-	reportSinks := make([]chan *billingRecord, 0, 0)
-
-	for i := 0; i < runtime.GOMAXPROCS(l.concurrency); i++ {
-		reportSink := make(chan *billingRecord)
-		reportSinks = append(reportSinks, reportSink)
-		l.wg.Add(2)
-		go l.parseRecord(valuesSink, reportSink, l.report)
-		go l.saveRecord(reportSink)
-	}
-
-	for {
-		values, err := l.report.csvReader.Read()
-		if err == io.EOF {
-			break
+	for end == false {
+		record := &billingRecord{}
+		values, readErr := l.report.csvReader.Read()
+		if readErr == io.EOF {
+			end = true
+		} else if readErr != nil {
+			fmt.Printf("error while reading %s: %v", l.reportName, readErr)
+			continue
 		}
-		valuesSink <- values
+		if parseErr := l.parseRecord(values, record, l.report); parseErr != nil {
+			continue
+		}
+		if saveErr := l.saveRecord(record, end); saveErr != nil {
+			return saveErr
+		}
 	}
-	close(valuesSink)
-	l.wg.Wait()
+	return nil
+}
+
+type billingLoader struct {
+	reportName string
+	report     *billingReport
+	reportFd   *os.File
+	json       []byte
+	injector   Injector
 }
 
 type billingReport struct {
@@ -102,9 +96,9 @@ type billingRecord struct {
 	Tags             map[string]string
 }
 
-func (l *billingLoader) parseRecord(in chan []string, out chan *billingRecord, report *billingReport) {
+func (l *billingLoader) parseRecord(in []string, out *billingRecord, report *billingReport) error {
 	var tagMatcher = regexp.MustCompile("(user|aws):.*")
-	var fieldTypes = map[string]func(s string, report *billingReport) interface{}{
+	var fieldTypes = map[string]func(s string, report *billingReport) (interface{}, error){
 		"PayerAccountId":  l.parseUint,
 		"LinkedAccountId": l.parseUint,
 		"RecordInt":       l.parseUint,
@@ -120,23 +114,39 @@ func (l *billingLoader) parseRecord(in chan []string, out chan *billingRecord, r
 		"UnBlendedCost":   l.parseFloat,
 	}
 
-	for values := range in {
-		var record = &billingRecord{}
-		record.Tags = make(map[string]string)
-		for i, field := range report.Fields {
-			if f, ok := fieldTypes[field]; ok {
-				l.assignField(record, field, f(values[i], report), false)
-			} else if tagMatcher.MatchString(field) {
-				value := map[string]string{l.parseTag(field, report).(string): values[i]}
-				l.assignField(record, field, value, true)
-			} else {
-				l.assignField(record, field, values[i], false)
+	if len(in) == 0 {
+		return nil
+	}
+	out.Tags = make(map[string]string)
+	for i, field := range report.Fields {
+		if i < 0 || i > len(in) {
+			continue
+		}
+		if f, ok := fieldTypes[field]; ok {
+			value, err := f(in[i], report)
+			if err != nil {
+				return err
+			}
+			err = l.assignField(out, field, value, false)
+			if err != nil {
+				return err
+			}
+		} else if tagMatcher.MatchString(field) {
+			key, err := l.parseTag(field, report)
+			if err != nil {
+				return err
+			}
+			value := map[string]string{key.(string): in[i]}
+			if err := l.assignField(out, field, value, true); err != nil {
+				return err
+			}
+		} else {
+			if err := l.assignField(out, field, in[i], false); err != nil {
+				return err
 			}
 		}
-		out <- record
 	}
-	close(out)
-	l.wg.Done()
+	return nil
 }
 
 func (l *billingLoader) assignField(record *billingRecord, field string, value interface{}, tag bool) error {
@@ -187,27 +197,24 @@ func (l *billingLoader) openBillingReport(billingFile string) *billingReport {
 	return report
 }
 
-func (l *billingLoader) parseTag(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseTag(s string, report *billingReport) (interface{}, error) {
 	tagParts := strings.Split(s, ":")
-	return strings.Join(tagParts, "_")
+	return strings.Join(tagParts, "_"), nil
 }
 
-func (l *billingLoader) parseInt(s string, report *billingReport) interface{} {
-	value, _ := strconv.ParseInt(s, 0, 0)
-	return value
+func (l *billingLoader) parseInt(s string, report *billingReport) (interface{}, error) {
+	return strconv.ParseInt(s, 0, 0)
 }
 
-func (l *billingLoader) parseUint(s string, report *billingReport) interface{} {
-	value, _ := strconv.ParseUint(s, 0, 0)
-	return value
+func (l *billingLoader) parseUint(s string, report *billingReport) (interface{}, error) {
+	return strconv.ParseUint(s, 0, 0)
 }
 
-func (l *billingLoader) parseFloat(s string, report *billingReport) interface{} {
-	value, _ := strconv.ParseFloat(s, 0)
-	return value
+func (l *billingLoader) parseFloat(s string, report *billingReport) (interface{}, error) {
+	return strconv.ParseFloat(s, 0)
 }
 
-func (l *billingLoader) parseDate(s string, report *billingReport) interface{} {
+func (l *billingLoader) parseDate(s string, report *billingReport) (interface{}, error) {
 	var returnTime time.Time
 	var err error
 	switch s {
@@ -216,10 +223,10 @@ func (l *billingLoader) parseDate(s string, report *billingReport) interface{} {
 	default:
 		returnTime, err = time.Parse("2006-01-02 15:04:05", s)
 		if err != nil {
-			panic(err.Error())
+			return nil, err
 		}
 	}
-	return returnTime.Format(time.RFC3339)
+	return returnTime.Format(time.RFC3339), nil
 }
 
 func (l *billingLoader) saveRecord(in chan *billingRecord) {
@@ -235,5 +242,4 @@ func (l *billingLoader) saveRecord(in chan *billingRecord) {
 		//	fmt.Printf("Error during import: %v\n", err)
 		//}
 	}
-	l.wg.Done()
 }

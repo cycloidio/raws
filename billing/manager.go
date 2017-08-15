@@ -19,7 +19,8 @@ const (
 )
 
 type Manager interface {
-	Import(date string, bucket string) error
+	ImportFromS3(date string, bucket string) error
+	ImportFromFile(reportName string, filepath string) error
 }
 
 type BillingManager struct {
@@ -63,11 +64,11 @@ func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error)
 		checker:       NewChecker(connector, svc),
 		downloader:    NewDownloader(connector),
 		injector:      injector,
-		loader:        NewLoader(injector, 2),
+		loader:        NewLoader(injector),
 	}, nil
 }
 
-func (m *BillingManager) Import(date string, bucket string) error {
+func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 	const (
 		downloadPath = "/tmp/billing-reports-download/"
 		unzipPath    = "/tmp/billing-reports-unzip/"
@@ -97,14 +98,36 @@ func (m *BillingManager) Import(date string, bucket string) error {
 	fmt.Printf("File %s being imported...\n", m.getS3Filename())
 	m.loader.ProcessFile(m.getS3Filename(), filePath)
 	fmt.Println("done!")
-	_, hash := m.checker.AlreadyPresent()
+	present, hash := m.checker.AlreadyPresent()
 	fmt.Println("Report entry being created...")
+	if present {
+		return nil
+	}
 	err = m.injector.CreateReport(m.getS3Filename(), hash)
-	if err == nil {
-		fmt.Println("done!")
-	} else {
+	if err != nil {
 		fmt.Printf("Error during entry creation: %v\n", err)
 		return err
+	} else {
+		fmt.Println("done!")
+	}
+	return nil
+}
+
+func (m *BillingManager) ImportFromFile(reportName string, filepath string) error {
+	fmt.Printf("File %s being imported...\n", filepath)
+	m.loader.ProcessFile(reportName, filepath)
+	fmt.Println("done!")
+	present, hash := m.checker.AlreadyPresent()
+	fmt.Println("Report entry being created...")
+	if present {
+		return nil
+	}
+	err := m.injector.CreateReport(reportName, hash)
+	if err != nil {
+		fmt.Printf("Error during entry creation: %v\n", err)
+		return err
+	} else {
+		fmt.Println("done!")
 	}
 	return nil
 }
