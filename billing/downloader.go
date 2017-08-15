@@ -46,7 +46,7 @@ func (d *billingDownloader) Download(bucket string, filename string, dest string
 		Key:    aws.String(filename)}
 	_, err = d.connector.DownloadObject(fd, s3input)
 	if err != nil {
-		return "", fmt.Errorf("Error while downloading file: %+v", err)
+		return "", NewS3Error(fmt.Errorf("Error while downloading file: %+v", err))
 	}
 	return d.fileFullPath, nil
 }

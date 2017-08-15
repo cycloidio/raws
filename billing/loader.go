@@ -11,46 +11,84 @@ import (
 	"strings"
 	"time"
 
-	"encoding/json"
-
 	"github.com/twinj/uuid"
 )
 
 type Loader interface {
 	ProcessFile(reportName string, billingFile string) error
+	TerminateProcessFile()
+	GetStats() *stats
 }
 
 func NewLoader(injector Injector) Loader {
 	return &billingLoader{
 		json:     []byte{},
 		injector: injector,
+		result:   newStats(),
+		reportFd: nil,
 	}
 }
 
 func (l *billingLoader) ProcessFile(reportName string, billingFile string) error {
+	var openErr error = nil
 	var end = false
 
-	l.reportName = reportName
-	l.report = l.openBillingReport(billingFile)
-	defer l.reportFd.Close()
-
+	if l.reportFd == nil {
+		l.reportName = reportName
+		l.report, openErr = l.openBillingReport(billingFile)
+		if openErr != nil {
+			return openErr
+		}
+	}
 	for end == false {
+		l.result.read++
 		record := &billingRecord{}
 		values, readErr := l.report.csvReader.Read()
 		if readErr == io.EOF {
 			end = true
 		} else if readErr != nil {
-			fmt.Printf("error while reading %s: %v", l.reportName, readErr)
-			continue
+			l.result.warnings++
+			l.result.warningLines = append(l.result.warningLines, l.result.read)
+			return NewCSVError(readErr)
 		}
 		if parseErr := l.parseRecord(values, record, l.report); parseErr != nil {
-			continue
+			l.result.warnings++
+			l.result.warningLines = append(l.result.warningLines, l.result.read)
+			return NewConvertError(parseErr)
 		}
 		if saveErr := l.saveRecord(record, end); saveErr != nil {
-			return saveErr
+			l.result.failed++
+			l.result.failedLines = append(l.result.failedLines, l.result.read)
+			return NewDynamoDBError(saveErr)
 		}
 	}
 	return nil
+}
+
+func (l *billingLoader) TerminateProcessFile() {
+	l.reportFd.Close()
+}
+
+func (l *billingLoader) GetStats() *stats {
+	return l.result
+}
+
+func newStats() *stats {
+	return &stats{
+		read:         1,
+		warnings:     0,
+		failed:       0,
+		warningLines: []int{},
+		failedLines:  []int{},
+	}
+}
+
+type stats struct {
+	read         int
+	warnings     int
+	failed       int
+	warningLines []int
+	failedLines  []int
 }
 
 type billingLoader struct {
@@ -59,6 +97,7 @@ type billingLoader struct {
 	reportFd   *os.File
 	json       []byte
 	injector   Injector
+	result     *stats
 }
 
 type billingReport struct {
@@ -171,16 +210,16 @@ func (l *billingLoader) assignField(record *billingRecord, field string, value i
 	return nil
 }
 
-func (l *billingLoader) openBillingReport(billingFile string) *billingReport {
+func (l *billingLoader) openBillingReport(billingFile string) (*billingReport, error) {
 	var dateMonthMatcher = regexp.MustCompile(`\d{4}-\d{2}`)
 
 	invoicePeriod, err := time.Parse("2006-02", dateMonthMatcher.FindString(billingFile))
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	file, err := os.Open(billingFile)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	l.reportFd = file
 	reader := csv.NewReader(file)
@@ -191,10 +230,10 @@ func (l *billingLoader) openBillingReport(billingFile string) *billingReport {
 
 	fields, err := reader.Read()
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
 	report.Fields = fields
-	return report
+	return report, nil
 }
 
 func (l *billingLoader) parseTag(s string, report *billingReport) (interface{}, error) {
@@ -229,17 +268,12 @@ func (l *billingLoader) parseDate(s string, report *billingReport) (interface{},
 	return returnTime.Format(time.RFC3339), nil
 }
 
-func (l *billingLoader) saveRecord(in chan *billingRecord) {
-	for record := range in {
-		record.ReportName = l.reportName
-		record.Id = uuid.NewV4().String()
-		val, err := json.MarshalIndent(*record, "", "  ")
-		if err == nil {
-			fmt.Printf("%s ===================\n", string(val))
-		}
-		//		err = l.injector.CreateRecord(record)
-		//if err != nil {
-		//	fmt.Printf("Error during import: %v\n", err)
-		//}
+func (l *billingLoader) saveRecord(in *billingRecord, flush bool) error {
+	in.ReportName = l.reportName
+	in.Id = uuid.NewV4().String()
+	err := l.injector.CreateRecord(in, flush)
+	if err != nil {
+		return err
 	}
+	return nil
 }
