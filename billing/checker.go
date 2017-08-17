@@ -36,11 +36,11 @@ func NewChecker(s3connector raws.AWSReader, dynamoDB dynamodbiface.DynamoDBAPI) 
 func (c *billingChecker) Check(bucket string, filename string) (bool, error) {
 	err := c.getDynamoEntry(filename)
 	if err != nil {
-		return false, NewDynamoDBError(err)
+		return false, err
 	}
 	err = c.getS3Entry(bucket, filename)
 	if err != nil {
-		return false, NewS3Error(err)
+		return false, err
 	}
 	if c.newMd5 == c.oldMd5 {
 		return false, nil
@@ -63,7 +63,7 @@ func (c *billingChecker) getS3Entry(bucket string, filename string) error {
 
 	objectsOutput, err := c.s3Connector.ListObjects(inputs)
 	if err != nil {
-		return NewS3Error(err)
+		return err
 	}
 	if len(objectsOutput) != 1 {
 		return fmt.Errorf("Found too many objects matching (%d)", len(objectsOutput))
@@ -87,7 +87,7 @@ func (c *billingChecker) getDynamoEntry(filename string) error {
 	}
 	result, err := c.dynSvc.GetItem(input)
 	if err != nil {
-		return NewDynamoDBError(err)
+		return err
 	}
 	if result == nil || len(result.Item) == 0 {
 		return nil

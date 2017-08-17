@@ -3,20 +3,14 @@ package billing
 import (
 	"os"
 
+	"io"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/cycloidio/raws"
 	log "github.com/sirupsen/logrus"
-)
-
-const (
-	billingReportTableName = "billing-reports"
-	billingReportNameField = "name"
-	billingReportMd5Field  = "md5"
-
-	billingRecordTableName = "billing-records"
 )
 
 func init() {
@@ -26,12 +20,13 @@ func init() {
 		QuoteEmptyFields: true,
 	})
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 }
 
 type Manager interface {
 	ImportFromS3(date string, bucket string) error
 	ImportFromFile(reportName string, filepath string) error
+	SetLogger(textFormat *log.TextFormatter, file *io.Writer, level *log.Level)
 }
 
 type BillingManager struct {
@@ -79,16 +74,29 @@ func NewManager(dynamoAccount *AwsConfig, s3Account *AwsConfig) (Manager, error)
 	}, nil
 }
 
+func (m *BillingManager) SetLogger(textFormat *log.TextFormatter, file *io.Writer, level *log.Level) {
+	if textFormat != nil {
+		log.SetFormatter(textFormat)
+	}
+	if file != nil {
+		log.SetOutput(*file)
+	}
+	if level != nil {
+		log.SetLevel(*level)
+	}
+}
+
 func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 	const (
 		downloadPath = "/tmp/billing-reports-download/"
 		unzipPath    = "/tmp/billing-reports-unzip/"
 	)
 	var processErr error = nil
+	var processRecordIds []string = nil
 	m.date = date
 
 	log.Infof("Manager - starting to import %s from S3...", m.getS3Filename())
-	defer log.Infof("Manager - import from S3 done.", m.getS3Filename())
+	defer log.Info("Manager - import from S3 done.")
 	needImport, err := m.checker.Check(bucket, m.getS3Filename())
 	if err != nil {
 		log.Errorf("Checker - error during check: %v", err)
@@ -101,24 +109,27 @@ func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 	log.Info("Checker - file needs import.")
 	downloadedFile, err := m.downloader.Download(bucket, m.getS3Filename(), downloadPath)
 	if err != nil {
-		log.Infof("Downloader - error duing download: %v", err)
+		log.Errorf("Downloader - error during download: %v", err)
 		return err
 	}
 	log.Info("Downloader - file succesfuly downloaded.")
 	filePath, err := m.downloader.Unzip(downloadedFile, unzipPath)
 	if err != nil {
-		log.Infof("Downloader - file couldn't be unzipped: %v", err)
+		log.Errorf("Downloader - file couldn't be unzipped: %v", err)
 		return err
 	}
 	log.Info("Downloader - file succesfuly unzipped.")
 	log.Info("Loader - starting to import file (might take a while)...")
 	for processErr == nil {
-		processErr = m.loader.ProcessFile(m.getS3Filename(), filePath)
+		processRecordIds, processErr = m.loader.ProcessFile(m.getS3Filename(), filePath)
 		if processErr == nil {
 			break
 		}
 		if IsDynamoDBError(processErr) {
-			log.Errorf("Loader - couldn't inject: %v", processErr)
+			log.Errorf("Loader - couldn't inject following records:")
+			for _, recordId := range processRecordIds {
+				log.Errorf("Loader - FAILED: %s - %s", recordId, m.getS3Filename())
+			}
 		} else if IsConvertError(processErr) {
 			log.Warningf("Loader - conversion issue: %v", processErr)
 		} else if IsCSVError(processErr) {
@@ -128,6 +139,7 @@ func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 			return processErr
 		}
 		processErr = nil
+		processRecordIds = nil
 	}
 	m.loader.TerminateProcessFile()
 	log.Info("Loader - ...done!")
@@ -143,22 +155,30 @@ func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 	} else {
 		log.Info("Injector - ...done!")
 	}
+	stats := m.loader.GetStats()
+	log.Infof("Manager - loaded %d/%d: warnings: %d, failed: %d",
+		stats.loaded, stats.read,
+		stats.warnings, stats.failed)
 	return nil
 }
 
 func (m *BillingManager) ImportFromFile(reportName string, filePath string) error {
 	var processErr error = nil
+	var processRecordIds []string = nil
 
 	log.Infof("Manager - starting to import %s from local file...", reportName)
 	defer log.Infof("Manager - import from local file done.")
 	log.Info("Loader - starting to import file (might take a while)...")
 	for {
-		processErr = m.loader.ProcessFile(m.getS3Filename(), filePath)
+		processRecordIds, processErr = m.loader.ProcessFile(m.getS3Filename(), filePath)
 		if processErr == nil {
 			break
 		}
 		if IsDynamoDBError(processErr) {
-			log.Errorf("Loader - couldn't inject: %v", processErr)
+			log.Errorf("Loader - couldn't inject following records:")
+			for _, recordId := range processRecordIds {
+				log.Errorf("Loader - FAILED: %s - %s", recordId, m.getS3Filename())
+			}
 		} else if IsConvertError(processErr) {
 			log.Warningf("Loader - conversion issue: %v", processErr)
 		} else if IsCSVError(processErr) {
@@ -168,13 +188,13 @@ func (m *BillingManager) ImportFromFile(reportName string, filePath string) erro
 			return processErr
 		}
 		processErr = nil
+		processRecordIds = nil
 	}
 	m.loader.TerminateProcessFile()
 	log.Info("Loader - ...done!")
 	stats := m.loader.GetStats()
-	percentage := (stats.read - stats.warnings - stats.failed) * 100.0 / stats.read
-	log.Infof("Manager - injected %.2f%%: read: %d, warnings: %d, failed: %d",
-		float64(percentage), stats.read,
+	log.Infof("Manager - loaded %d/%d: warnings: %d, failed: %d",
+		stats.loaded, stats.read,
 		stats.warnings, stats.failed)
 	return nil
 }

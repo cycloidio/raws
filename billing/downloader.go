@@ -46,7 +46,7 @@ func (d *billingDownloader) Download(bucket string, filename string, dest string
 		Key:    aws.String(filename)}
 	_, err = d.connector.DownloadObject(fd, s3input)
 	if err != nil {
-		return "", NewS3Error(fmt.Errorf("Error while downloading file: %+v", err))
+		return "", fmt.Errorf("Error while downloading file: %+v", err)
 	}
 	return d.fileFullPath, nil
 }
@@ -100,13 +100,13 @@ func (d *billingDownloader) Unzip(src string, dest string) (string, error) {
 
 	// Closure to address file descriptors issue with all the deferred .Close() methods
 	extractAndWriteFile := func(f *zip.File) error {
-		rc, err := f.Open()
-		if err != nil {
-			return err
+		rc, fileErr := f.Open()
+		if fileErr != nil {
+			return fileErr
 		}
 		defer func() {
-			if err := rc.Close(); err != nil {
-				panic(err)
+			if closeErr := rc.Close(); closeErr != nil {
+				panic(closeErr)
 			}
 		}()
 
@@ -116,9 +116,9 @@ func (d *billingDownloader) Unzip(src string, dest string) (string, error) {
 			os.MkdirAll(path, f.Mode())
 		} else {
 			os.MkdirAll(filepath.Dir(path), f.Mode())
-			f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
-			if err != nil {
-				return err
+			f, openErr := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+			if openErr != nil {
+				return openErr
 			}
 			defer func() {
 				if closeErr := f.Close(); closeErr != nil {
@@ -126,18 +126,18 @@ func (d *billingDownloader) Unzip(src string, dest string) (string, error) {
 				}
 			}()
 
-			_, err = io.Copy(f, rc)
-			if err != nil {
-				return err
+			_, copyErr := io.Copy(f, rc)
+			if copyErr != nil {
+				return copyErr
 			}
 		}
 		return nil
 	}
 
 	for _, f := range r.File {
-		err := extractAndWriteFile(f)
-		if err != nil {
-			return "", err
+		writeErr := extractAndWriteFile(f)
+		if writeErr != nil {
+			return "", writeErr
 		}
 	}
 

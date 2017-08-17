@@ -11,11 +11,12 @@ import (
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/twinj/uuid"
 )
 
 type Loader interface {
-	ProcessFile(reportName string, billingFile string) error
+	ProcessFile(reportName string, billingFile string) ([]string, error)
 	TerminateProcessFile()
 	GetStats() *stats
 }
@@ -29,7 +30,7 @@ func NewLoader(injector Injector) Loader {
 	}
 }
 
-func (l *billingLoader) ProcessFile(reportName string, billingFile string) error {
+func (l *billingLoader) ProcessFile(reportName string, billingFile string) ([]string, error) {
 	var openErr error = nil
 	var end = false
 
@@ -37,7 +38,7 @@ func (l *billingLoader) ProcessFile(reportName string, billingFile string) error
 		l.reportName = reportName
 		l.report, openErr = l.openBillingReport(billingFile)
 		if openErr != nil {
-			return openErr
+			return nil, openErr
 		}
 	}
 	for end == false {
@@ -48,21 +49,17 @@ func (l *billingLoader) ProcessFile(reportName string, billingFile string) error
 			end = true
 		} else if readErr != nil {
 			l.result.warnings++
-			l.result.warningLines = append(l.result.warningLines, l.result.read)
-			return NewCSVError(readErr)
+			return nil, NewCSVError(readErr)
 		}
 		if parseErr := l.parseRecord(values, record, l.report); parseErr != nil {
 			l.result.warnings++
-			l.result.warningLines = append(l.result.warningLines, l.result.read)
-			return NewConvertError(parseErr)
+			return nil, NewConvertError(parseErr)
 		}
-		if saveErr := l.saveRecord(record, end); saveErr != nil {
-			l.result.failed++
-			l.result.failedLines = append(l.result.failedLines, l.result.read)
-			return NewDynamoDBError(saveErr)
+		if recordIds, saveErr := l.saveRecords(record, end); saveErr != nil {
+			return recordIds, saveErr
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 func (l *billingLoader) TerminateProcessFile() {
@@ -75,25 +72,24 @@ func (l *billingLoader) GetStats() *stats {
 
 func newStats() *stats {
 	return &stats{
-		read:         1,
-		warnings:     0,
-		failed:       0,
-		warningLines: []int{},
-		failedLines:  []int{},
+		read:     1,
+		loaded:   0,
+		warnings: 0,
+		failed:   0,
 	}
 }
 
 type stats struct {
-	read         int
-	warnings     int
-	failed       int
-	warningLines []int
-	failedLines  []int
+	read     int
+	loaded   int
+	warnings int
+	failed   int
 }
 
 type billingLoader struct {
 	reportName string
 	report     *billingReport
+	records    []*billingRecord
 	reportFd   *os.File
 	json       []byte
 	injector   Injector
@@ -158,9 +154,6 @@ func (l *billingLoader) parseRecord(in []string, out *billingRecord, report *bil
 	}
 	out.Tags = make(map[string]string)
 	for i, field := range report.Fields {
-		if i < 0 || i > len(in) {
-			continue
-		}
 		if f, ok := fieldTypes[field]; ok {
 			value, err := f(in[i], report)
 			if err != nil {
@@ -184,6 +177,9 @@ func (l *billingLoader) parseRecord(in []string, out *billingRecord, report *bil
 				return err
 			}
 		}
+	}
+	if out.RecordId == "0" || out.RecordId == "" {
+		return fmt.Errorf("no recordId found for this entry: %v", in)
 	}
 	return nil
 }
@@ -268,12 +264,23 @@ func (l *billingLoader) parseDate(s string, report *billingReport) (interface{},
 	return returnTime.Format(time.RFC3339), nil
 }
 
-func (l *billingLoader) saveRecord(in *billingRecord, flush bool) error {
-	in.ReportName = l.reportName
-	in.Id = uuid.NewV4().String()
-	err := l.injector.CreateRecord(in, flush)
-	if err != nil {
-		return err
+func (l *billingLoader) saveRecords(in *billingRecord, flush bool) ([]string, error) {
+	if len(l.records) < l.injector.MaxRecords() {
+		in.ReportName = l.reportName
+		in.Id = uuid.NewV4().String()
+		l.records = append(l.records, in)
 	}
-	return nil
+	if len(l.records) == l.injector.MaxRecords() || flush == true {
+		recordIds, processed, err := l.injector.CreateRecords(l.records)
+		if err != nil {
+			log.Debugf("Loader - failed loading: %v - %v", recordIds, err)
+		} else {
+			log.Debugf("Loader - Successfully loaded: %d items", processed)
+		}
+		l.records = nil
+		l.result.failed += len(recordIds)
+		l.result.loaded += processed
+		return recordIds, err
+	}
+	return nil, nil
 }

@@ -54,10 +54,25 @@ func (m mockDownloader) Unzip(src string, dest string) (string, error) {
 
 type mockLoader struct {
 	Loader
+
+	// ProcessFile returned elements
+	pfs []string
+	pfe error
+
+	// GetStats returned elements
+	gss *stats
 }
 
-func (m mockLoader) ProcessFile(reportName string, billingFile string) {
+func (m mockLoader) ProcessFile(reportName string, billingFile string) ([]string, error) {
+	return m.pfs, m.pfe
+}
+
+func (m mockLoader) TerminateProcessFile() {
 	return
+}
+
+func (m mockLoader) GetStats() *stats {
+	return m.gss
 }
 
 type mockInjector struct {
@@ -68,13 +83,30 @@ type mockInjector struct {
 
 	// CreateReport returned element
 	crpe error
+
+	// CreateRecords returned elements
+	crss []string
+	crsi int
+	crse error
+
+	// MaxRecords returned element
+	mri int
 }
 
 func (m mockInjector) CreateRecord(record *billingRecord) error {
 	return m.crde
 }
+
+func (m mockInjector) CreateRecords(records []*billingRecord) ([]string, int, error) {
+	return m.crss, m.crsi, m.crse
+}
+
 func (m mockInjector) CreateReport(filename string, hash string) error {
 	return m.crpe
+}
+
+func (m mockInjector) MaxRecords() int {
+	return m.mri
 }
 
 // mockAWSReader used for testing purposes
@@ -106,9 +138,9 @@ func (m mockAWSReader) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, o
 }
 
 func checkErrors(t *testing.T, name string, index int, err error, expected error) {
-	if err != nil && !reflect.DeepEqual(err, expected) {
-		t.Errorf("%s [%d] - errors: received=%+v | expected=%+v",
-			name, index, err.Error(), expected.Error())
+	if !reflect.DeepEqual(err, expected) {
+		t.Errorf("%s [%d] - error: received=%+v | expected=%+v",
+			name, index, err, expected)
 	}
 }
 
@@ -122,6 +154,10 @@ type mockDynamodb struct {
 	// PutItem returned elements
 	pio *dynamodb.PutItemOutput
 	pie error
+
+	// BatchWriteItem returned elements
+	bwio *dynamodb.BatchWriteItemOutput
+	bwie error
 }
 
 func (m mockDynamodb) GetItem(*dynamodb.GetItemInput) (*dynamodb.GetItemOutput, error) {
@@ -130,4 +166,8 @@ func (m mockDynamodb) GetItem(*dynamodb.GetItemInput) (*dynamodb.GetItemOutput, 
 
 func (m mockDynamodb) PutItem(*dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
 	return m.pio, m.pie
+}
+
+func (m mockDynamodb) BatchWriteItem(*dynamodb.BatchWriteItemInput) (*dynamodb.BatchWriteItemOutput, error) {
+	return m.bwio, m.bwie
 }

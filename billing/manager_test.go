@@ -2,10 +2,11 @@ package billing
 
 import (
 	"errors"
+	"io/ioutil"
 	"testing"
 )
 
-func TestBillingManager_Import(t *testing.T) {
+func TestBillingManager_ImportFromS3(t *testing.T) {
 	const (
 		date   = "2017-01"
 		bucket = "test-bucket"
@@ -37,7 +38,16 @@ func TestBillingManager_Import(t *testing.T) {
 				crde: nil,
 				crpe: nil,
 			},
-			mockedLoader:  mockLoader{},
+			mockedLoader: mockLoader{
+				pfe: nil,
+				pfs: nil,
+				gss: &stats{
+					loaded:   10,
+					read:     10,
+					warnings: 0,
+					failed:   0,
+				},
+			},
 			expectedError: nil,
 		},
 		{name: "errors during Check",
@@ -54,9 +64,7 @@ func TestBillingManager_Import(t *testing.T) {
 			},
 			mockedDownloader: mockDownloader{
 				ds: "",
-				de: nil,
-				us: "",
-				ue: errors.New("error during download"),
+				de: errors.New("error during download"),
 			},
 			expectedError: errors.New("error during download"),
 		},
@@ -102,7 +110,8 @@ func TestBillingManager_Import(t *testing.T) {
 				loader:      tt.mockedLoader,
 				injector:    tt.mockedInjector,
 			}
-			err := m.Import(date, bucket)
+			m.SetLogger(nil, &ioutil.Discard, nil)
+			err := m.ImportFromS3(date, bucket)
 			checkErrors(t, tt.name, i, err, tt.expectedError)
 		})
 	}
