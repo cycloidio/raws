@@ -29,11 +29,11 @@ func TestBillingDownloader_Download(t *testing.T) {
 		givenFilename   string = "bd.csv.zip"
 		givenBucket     string = "fake-bucket"
 	)
-	var tempDir string = os.TempDir() + tempDownloadDir
+	var tempDir = os.TempDir() + tempDownloadDir
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		t.Errorf("Error while creating temporary dir: %q - %v", tempDir, err)
 	}
-	var tempFile string = tempDir + tempFilename
+	var tempFile = tempDir + tempFilename
 
 	tests := []struct {
 		name          string
@@ -88,11 +88,11 @@ func TestBillingDownloader_Unzip(t *testing.T) {
 		zipFilePath   = "./test/test.txt.zip"
 		zipFile       = "test.txt"
 	)
-	var tempDir string = os.TempDir() + "/"
+	var tempDir = os.TempDir() + "/"
 
 	t.Run("unzip directories and file", func(t *testing.T) {
-		var expectedPath string = tempDir
-		var expectedError error = nil
+		var expectedPath = tempDir
+		var expectedError error
 
 		d := &billingDownloader{}
 		path, err := d.Unzip(zipDirPath, tempDir)
@@ -105,8 +105,8 @@ func TestBillingDownloader_Unzip(t *testing.T) {
 	})
 
 	t.Run("unzip simple file", func(t *testing.T) {
-		var expectedPath string = tempDir + zipFile
-		var expectedError error = nil
+		var expectedPath = tempDir + zipFile
+		var expectedError error
 
 		d := &billingDownloader{}
 		path, err := d.Unzip(zipFilePath, tempDir)
@@ -119,9 +119,9 @@ func TestBillingDownloader_Unzip(t *testing.T) {
 	})
 
 	t.Run("unzip no such file", func(t *testing.T) {
-		var expectedPath string = ""
-		var expectedError error = errors.New("open ./test/no-such-file.zip: no such file or directory")
+		var expectedPath = ""
 
+		expectedError := errors.New("open ./test/no-such-file.zip: no such file or directory")
 		d := &billingDownloader{}
 		path, err := d.Unzip(zipNoSuchFile, tempDir)
 		if path != expectedPath {
@@ -135,15 +135,15 @@ func TestBillingDownloader_Unzip(t *testing.T) {
 
 func TestBillingDownloader_getAndCreateOutputPath(t *testing.T) {
 	const (
-		tempDownloadDir string = "/billingDownloader/"
-		tempFilename    string = "test.csv.zip"
-		givenFilename   string = "bd.csv.zip"
+		tempDownloadDir = "/billingDownloader/"
+		tempFilename    = "test.csv.zip"
+		givenFilename   = "bd.csv.zip"
 	)
-	var tempDir string = os.TempDir() + tempDownloadDir
+	var tempDir = os.TempDir() + tempDownloadDir
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		t.Errorf("Error while creating temporary dir: %q - %v", tempDir, err)
 	}
-	var tempFile string = tempDir + tempFilename
+	var tempFile = tempDir + tempFilename
 	if _, err := os.Create(tempFile); err != nil {
 		t.Errorf("Error while creating temporary file: %q - %v", tempFile, err)
 	}

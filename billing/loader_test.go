@@ -176,7 +176,7 @@ func TestBillingLoader_parseRecord(t *testing.T) {
 			"2015-04-30 14:00:00", "2015-04-30 15:00:00", "0.01101368", "0.0000000000",
 			"0.00000000", "0.0000000000", "0.00000000", "E29NSV4ST80EBC", "prod", "test",
 		}
-		var expectedError error = nil
+		var expectedError error
 		var expectedRecord = &billingRecord{
 			InvoiceID:        "52511536",
 			PayerAccountId:   661913936052,
@@ -236,7 +236,7 @@ func TestBillingLoader_parseRecord(t *testing.T) {
 			"2015-04-30 14:00:00", "2015-04-30 15:00:00", "0.01101368", "0.0000000000",
 			"0.00000000", "0.0000000000", "0.00000000", "E29NSV4ST80EBC", "prod", "test",
 		}
-		var expectedError error = fmt.Errorf("no recordId found for this entry: %v", inputs)
+		var expectedError = fmt.Errorf("no recordId found for this entry: %v", inputs)
 		var expectedRecord = &billingRecord{
 			InvoiceID:        "52511536",
 			PayerAccountId:   661913936052,

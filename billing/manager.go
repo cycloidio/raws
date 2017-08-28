@@ -91,8 +91,8 @@ func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 		downloadPath = "/tmp/billing-reports-download/"
 		unzipPath    = "/tmp/billing-reports-unzip/"
 	)
-	var processErr error = nil
-	var processRecordIds []string = nil
+	var processErr error
+	var processRecordIds []string
 	m.date = date
 
 	log.Infof("Manager - starting to import %s from S3...", m.getS3Filename())
@@ -163,8 +163,8 @@ func (m *BillingManager) ImportFromS3(date string, bucket string) error {
 }
 
 func (m *BillingManager) ImportFromFile(reportName string, filePath string) error {
-	var processErr error = nil
-	var processRecordIds []string = nil
+	var processErr error
+	var processRecordIds []string
 
 	log.Infof("Manager - starting to import %s from local file...", reportName)
 	defer log.Infof("Manager - import from local file done.")
@@ -200,7 +200,7 @@ func (m *BillingManager) ImportFromFile(reportName string, filePath string) erro
 }
 
 func initDynamoService(config *AwsConfig) (*dynamodb.DynamoDB, error) {
-	var token string = ""
+	var token string
 
 	creds := credentials.NewStaticCredentials(config.AccessKey, config.SecretKey, token)
 	_, err := creds.Get()

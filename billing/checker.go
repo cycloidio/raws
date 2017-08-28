@@ -66,10 +66,10 @@ func (c *billingChecker) getS3Entry(bucket string, filename string) error {
 		return err
 	}
 	if len(objectsOutput) != 1 {
-		return fmt.Errorf("Found too many objects matching (%d)", len(objectsOutput))
+		return fmt.Errorf("found too many objects matching (%d)", len(objectsOutput))
 	}
 	if objectsOutput[0].Contents == nil || len(objectsOutput[0].Contents) == 0 {
-		return errors.New("s3 entry doesn't have 'Contents' attribute.")
+		return errors.New("s3 entry doesn't have 'Contents' attribute")
 	}
 	etag := *objectsOutput[0].Contents[0].ETag
 	c.newMd5 = etag[1 : len(etag)-1]
@@ -96,5 +96,5 @@ func (c *billingChecker) getDynamoEntry(filename string) error {
 		c.oldMd5 = *val.S
 		return nil
 	}
-	return fmt.Errorf("No '%s' field present for the entity.", billingReportMd5Field)
+	return fmt.Errorf("no '%s' field present for the entity", billingReportMd5Field)
 }

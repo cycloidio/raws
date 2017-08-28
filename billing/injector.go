@@ -46,9 +46,9 @@ func (i *billingInjector) MaxRecords() int {
 }
 
 func (i *billingInjector) CreateRecords(records []*billingRecord) ([]string, int, error) {
-	var dynErr error = nil
-	var result *dynamodb.BatchWriteItemOutput = nil
-	var initial int = 0
+	var dynErr error
+	var result *dynamodb.BatchWriteItemOutput
+	var initial int
 
 	err := i.createRequest(records)
 	if err != nil {
@@ -77,7 +77,7 @@ func (i *billingInjector) CreateRecords(records []*billingRecord) ([]string, int
 func (i *billingInjector) CreateRecord(record *billingRecord) error {
 	av, err := dynamodbattribute.MarshalMap(record)
 	if err != nil {
-		i.errorsCount += 1
+		i.errorsCount++
 		return NewDynamoDBError(err)
 	}
 
@@ -86,7 +86,7 @@ func (i *billingInjector) CreateRecord(record *billingRecord) error {
 		Item:      av,
 	})
 	if err != nil {
-		i.errorsCount += 1
+		i.errorsCount++
 		return NewDynamoDBError(err)
 	}
 	return nil
@@ -116,7 +116,7 @@ func (i *billingInjector) CreateReport(filename string, hash string) error {
 }
 
 func (i *billingInjector) createRecordIdList(records []*billingRecord) []string {
-	var recordIds []string = nil
+	var recordIds []string
 
 	for _, record := range records {
 		if record.RecordId == "0" || record.RecordId == "" {
@@ -128,7 +128,7 @@ func (i *billingInjector) createRecordIdList(records []*billingRecord) []string 
 }
 
 func (i *billingInjector) createRecordIdListFromRequest() []string {
-	var recordIds []string = nil
+	var recordIds []string
 
 	for _, req := range i.requests[billingRecordTableName] {
 		if req.PutRequest != nil || req.PutRequest.Item != nil {

@@ -114,7 +114,7 @@ type mockAWSReader struct {
 	raws.AWSReader
 
 	// GetAccountID returned element
-	accountID string
+	accountId string
 
 	// ListObjects returned elements
 	loo []*s3.ListObjectsOutput
@@ -126,7 +126,7 @@ type mockAWSReader struct {
 }
 
 func (m mockAWSReader) GetAccountID() string {
-	return m.accountID
+	return m.accountId
 }
 
 func (m mockAWSReader) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, raws.Errs) {

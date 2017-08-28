@@ -90,7 +90,7 @@ func TestBillingChecker_Check(t *testing.T) {
 				gee: nil,
 			},
 			expectedCheck:  false,
-			expectedError:  fmt.Errorf("No '%s' field present for the entity.", billingReportMd5Field),
+			expectedError:  fmt.Errorf("no '%s' field present for the entity", billingReportMd5Field),
 			expectedS3MD5:  "",
 			expectedDynMD5: "",
 		},
@@ -233,7 +233,7 @@ func TestBillingChecker_getS3Entry(t *testing.T) {
 				loe: nil,
 			},
 			expectedMD5:   "",
-			expectedError: errors.New("Found too many objects matching (2)"),
+			expectedError: errors.New("found too many objects matching (2)"),
 		},
 		{name: "content is nil",
 			mockedS3: mockAWSReader{
@@ -241,7 +241,7 @@ func TestBillingChecker_getS3Entry(t *testing.T) {
 				loe: nil,
 			},
 			expectedMD5:   "",
-			expectedError: errors.New("s3 entry doesn't have 'Contents' attribute."),
+			expectedError: errors.New("s3 entry doesn't have 'Contents' attribute"),
 		}}
 
 	for i, tt := range tests {
@@ -309,7 +309,7 @@ func TestBillingChecker_getDynamoEntry(t *testing.T) {
 				gee: nil,
 			},
 			expectedMD5:   "",
-			expectedError: fmt.Errorf("No '%s' field present for the entity.", billingReportMd5Field),
+			expectedError: fmt.Errorf("no '%s' field present for the entity", billingReportMd5Field),
 		}}
 
 	for i, tt := range tests {

@@ -11,8 +11,8 @@ func TestBillingManager_ImportFromS3(t *testing.T) {
 		date   = "2017-01"
 		bucket = "test-bucket"
 	)
-	var awsReader mockAWSReader = mockAWSReader{
-		accountID: "111111111111",
+	var awsReader = mockAWSReader{
+		accountId: "111111111111",
 	}
 
 	tests := []struct {
@@ -118,12 +118,12 @@ func TestBillingManager_ImportFromS3(t *testing.T) {
 }
 
 func TestBillingManager_getS3Filename(t *testing.T) {
-	var accountId string = "111111111"
-	var date string = "2000-01"
-	var expectFilename string = accountId + "-aws-billing-detailed-line-items-with-resources-and-tags-" + date + ".csv.zip"
+	var accountId = "111111111"
+	var date = "2000-01"
+	var expectFilename = accountId + "-aws-billing-detailed-line-items-with-resources-and-tags-" + date + ".csv.zip"
 
 	mockedReader := mockAWSReader{
-		accountID: accountId,
+		accountId: accountId,
 	}
 	m := BillingManager{
 		date:        date,

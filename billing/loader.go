@@ -31,7 +31,7 @@ func NewLoader(injector Injector) Loader {
 }
 
 func (l *billingLoader) ProcessFile(reportName string, billingFile string) ([]string, error) {
-	var openErr error = nil
+	var openErr error
 	var end = false
 
 	if l.reportFd == nil {
@@ -188,14 +188,14 @@ func (l *billingLoader) assignField(record *billingRecord, field string, value i
 	if tag == false {
 		recordField := reflect.ValueOf(record).Elem().FieldByName(field)
 		if !recordField.IsValid() {
-			return fmt.Errorf("No such field '%s'", field)
+			return fmt.Errorf("no such field '%s'", field)
 		}
 		if !recordField.CanSet() {
-			return fmt.Errorf("Field '%s' cannot be set.", field)
+			return fmt.Errorf("field '%s' cannot be set", field)
 		}
 		valueTyped := reflect.ValueOf(value)
 		if recordField.Type() != valueTyped.Type() {
-			return fmt.Errorf("Field '%s' didn't have type %s.", field, valueTyped.Type().Name())
+			return fmt.Errorf("field '%s' didn't have type %s", field, valueTyped.Type().Name())
 		}
 		recordField.Set(valueTyped)
 	} else {
