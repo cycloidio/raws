@@ -5,7 +5,7 @@ import (
 )
 
 // Returns all Elasticache clusters based on the input given
-func (c *Connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, Errs) {
+func (c *connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, Errs) {
 	var errs Errs
 	var elasticCacheClusters []*elasticache.DescribeCacheClustersOutput
 
@@ -24,7 +24,7 @@ func (c *Connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClust
 }
 
 // Returns a list of tags of Elasticache resources based on its ARN
-func (c *Connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, Errs) {
+func (c *connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, Errs) {
 	var errs Errs
 	var elastiCacheTags []*elasticache.TagListMessage
 

@@ -1,0 +1,2 @@
+"InvoiceID","PayerAccountId","LinkedAccountId","RecordType","RecordId","ProductName","RateId","SubscriptionId","PricingPlanId","UsageType","Operation","AvailabilityZone","ReservedInstance","ItemDescription","UsageStartDate","UsageEndDate","UsageQuantity","BlendedRate","BlendedCost","UnBlendedRate","UnBlendedCost","ResourceId"
+"661913936052",,"StatementTotal",,,,,,,,,,"Total statement amount for period 2015-04-01 00:00:00 - 2015-04-30 23:59:59",,,,,"49.81",,"49.81",

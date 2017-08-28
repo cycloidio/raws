@@ -5,7 +5,7 @@ import (
 )
 
 // Returns all DB instances based on the input given
-func (c *Connector) GetDBInstances(input *rds.DescribeDBInstancesInput) ([]*rds.DescribeDBInstancesOutput, Errs) {
+func (c *connector) GetDBInstances(input *rds.DescribeDBInstancesInput) ([]*rds.DescribeDBInstancesOutput, Errs) {
 	var errs Errs
 	var instances []*rds.DescribeDBInstancesOutput
 
@@ -25,7 +25,7 @@ func (c *Connector) GetDBInstances(input *rds.DescribeDBInstancesInput) ([]*rds.
 
 // Returns a list of tags from an ARN, extra filters for tags can also be provided
 // For more information, please see: https://docs.aws.amazon.com/sdk-for-go/api/service/rds/#Filter
-func (c *Connector) GetDBInstancesTags(input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, Errs) {
+func (c *connector) GetDBInstancesTags(input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, Errs) {
 	var errs Errs
 	var rdsTags []*rds.ListTagsForResourceOutput
 

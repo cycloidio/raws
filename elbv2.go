@@ -5,7 +5,7 @@ import (
 )
 
 // Returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
-func (c *Connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.DescribeLoadBalancersOutput, Errs) {
+func (c *connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.DescribeLoadBalancersOutput, Errs) {
 	var errs Errs
 	var elbs []*elbv2.DescribeLoadBalancersOutput
 
@@ -24,7 +24,7 @@ func (c *Connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) 
 }
 
 // Returns a list of Tags based on the input from the different regions
-func (c *Connector) GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*elbv2.DescribeTagsOutput, Errs) {
+func (c *connector) GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*elbv2.DescribeTagsOutput, Errs) {
 	var errs Errs
 	var elbTags []*elbv2.DescribeTagsOutput
 

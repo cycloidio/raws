@@ -1,40 +1,72 @@
 package raws
 
 import (
-	"path/filepath"
-
-	"fmt"
-
 	"errors"
+	"fmt"
+	"io"
+	"path/filepath"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
+	"github.com/aws/aws-sdk-go/service/elasticache"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
+	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
+	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
 
-// The Connector provides easy access to AWS SDK calls.
+// AWSReader is the interface defining all methods that need to be implemented
+type AWSReader interface {
+	GetAccountID() string
+	GetRegions() []string
+	GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs)
+	GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs)
+	GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs)
+	GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([]*ec2.DescribeSecurityGroupsOutput, Errs)
+	GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs)
+	GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs)
+	GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs)
+	GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, Errs)
+	GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, Errs)
+	GetLoadBalancers(input *elb.DescribeLoadBalancersInput) ([]*elb.DescribeLoadBalancersOutput, Errs)
+	GetLoadBalancersTags(input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, Errs)
+	GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.DescribeLoadBalancersOutput, Errs)
+	GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*elbv2.DescribeTagsOutput, Errs)
+	GetDBInstances(input *rds.DescribeDBInstancesInput) ([]*rds.DescribeDBInstancesOutput, Errs)
+	GetDBInstancesTags(input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, Errs)
+	ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs)
+	GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs)
+	ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs)
+	DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error)
+	GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs)
+}
+
+// The connector provides easy access to AWS SDK calls.
 //
 // By using it, calls can be made directly through multiple regions, and will filter only data that belongs to you.
 // For example, when fetching the list of AMI, or snapshots.
 //
-// In order to start making calls, only calling NewConnector is required.
-type Connector struct {
+// In order to start making calls, only calling NewAWSReader is required.
+type connector struct {
 	regions   []string
 	svcs      []*serviceConnector
 	creds     *credentials.Credentials
 	accountID *string
 }
 
-// NewConnector returns an object which also contains the accountID and extend the different regions to use.
+// NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
 //
 // The accountID is helpful to return only the AMI or snapshots that belong to the account.
 //
@@ -46,8 +78,8 @@ type Connector struct {
 //
 // The connections are not all established while instancing, but the various sessions are, this way connections are only
 // made for services that are called, otherwise only the sessions remain.
-func NewConnector(accessKey string, secretKey string, regions []string, config *aws.Config) (*Connector, error) {
-	var c Connector = Connector{}
+func NewAWSReader(accessKey string, secretKey string, regions []string, config *aws.Config) (AWSReader, error) {
+	var c connector = connector{}
 
 	creds, ec2, sts, err := configureAWS(accessKey, secretKey)
 	if err != nil {
@@ -64,15 +96,26 @@ func NewConnector(accessKey string, secretKey string, regions []string, config *
 	return &c, nil
 }
 
+// GetAccountID returns the current ID for the account used
+func (c *connector) GetAccountID() string {
+	return *c.accountID
+}
+
+// GetRegions return the currently used regions for the Connector
+func (c *connector) GetRegions() []string {
+	return c.regions
+}
+
 type serviceConnector struct {
-	region      string
-	session     *session.Session
-	ec2         ec2iface.EC2API
-	elb         elbiface.ELBAPI
-	elbv2       elbv2iface.ELBV2API
-	rds         rdsiface.RDSAPI
-	s3          s3iface.S3API
-	elasticache elasticacheiface.ElastiCacheAPI
+	region       string
+	session      *session.Session
+	ec2          ec2iface.EC2API
+	elb          elbiface.ELBAPI
+	elbv2        elbv2iface.ELBV2API
+	rds          rdsiface.RDSAPI
+	s3           s3iface.S3API
+	s3downloader s3manageriface.DownloaderAPI
+	elasticache  elasticacheiface.ElastiCacheAPI
 }
 
 func configureAWS(accessKey string, secretKey string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
@@ -102,7 +145,7 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	return creds, ec2.New(session), sts.New(session), nil
 }
 
-func (c *Connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) error {
+func (c *connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) error {
 	if len(enabledRegions) == 0 {
 		return errors.New("at least one region name is required")
 	}
@@ -123,7 +166,7 @@ func (c *Connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) err
 	return nil
 }
 
-func (c *Connector) setAccountID(sts stsiface.STSAPI) error {
+func (c *connector) setAccountID(sts stsiface.STSAPI) error {
 	resp, err := sts.GetCallerIdentity(nil)
 	if err != nil {
 		return err
@@ -132,7 +175,7 @@ func (c *Connector) setAccountID(sts stsiface.STSAPI) error {
 	return nil
 }
 
-func (c *Connector) setServices(config *aws.Config) {
+func (c *connector) setServices(config *aws.Config) {
 	if config != nil {
 		config.Credentials = c.creds
 	} else {
