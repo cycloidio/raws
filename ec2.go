@@ -5,7 +5,7 @@ import (
 )
 
 // Returns all EC2 instances based on the input given
-func (c *Connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs) {
+func (c *connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs) {
 	var errs Errs
 	var instances []*ec2.DescribeInstancesOutput
 
@@ -24,7 +24,7 @@ func (c *Connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.Desc
 }
 
 // Returns all EC2 VPCs based on the input given
-func (c *Connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs) {
+func (c *connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs) {
 	var errs Errs
 	var vpcs []*ec2.DescribeVpcsOutput
 
@@ -43,7 +43,7 @@ func (c *Connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOu
 }
 
 // Returns all EC2 AMI belonging to the Account ID based on the input given
-func (c *Connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs) {
+func (c *connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs) {
 	var errs Errs
 	var images []*ec2.DescribeImagesOutput
 
@@ -66,7 +66,7 @@ func (c *Connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeIm
 }
 
 // Returns all EC2 security groups based on the input given
-func (c *Connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([]*ec2.DescribeSecurityGroupsOutput, Errs) {
+func (c *connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([]*ec2.DescribeSecurityGroupsOutput, Errs) {
 	var errs Errs
 	var secgroups []*ec2.DescribeSecurityGroupsOutput
 
@@ -85,7 +85,7 @@ func (c *Connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([
 }
 
 // Returns all EC2 subnets based on the input given
-func (c *Connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs) {
+func (c *connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs) {
 	var errs Errs
 	var subnets []*ec2.DescribeSubnetsOutput
 
@@ -104,7 +104,7 @@ func (c *Connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.Describe
 }
 
 // Returns all EC2 volumes based on the input given
-func (c *Connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs) {
+func (c *connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs) {
 	var errs Errs
 	var volumes []*ec2.DescribeVolumesOutput
 
@@ -123,7 +123,7 @@ func (c *Connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.Describe
 }
 
 // Returns all snapshots belonging to the Account ID based on the input given
-func (c *Connector) GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs) {
+func (c *connector) GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs) {
 	var errs Errs
 	var snapshots []*ec2.DescribeSnapshotsOutput
 

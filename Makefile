@@ -7,6 +7,7 @@ GOFILES_NOVENDOR := $(shell find . -type f -name '*.go' -not -path "./vendor/*" 
 .PHONY: get-deps
 get-deps:
 	go get -t ./...
+	go get golang.org/x/tools/cmd/goimports
 
 .PHONY: clean
 clean:

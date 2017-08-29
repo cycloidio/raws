@@ -10,7 +10,7 @@ import (
 	"github.com/cycloidio/raws"
 )
 
-func callEC2(c *raws.Connector) {
+func callEC2(c raws.AWSReader) {
 	instances, _ := c.GetInstances(nil)
 	fmt.Println(instances)
 	vpcs, _ := c.GetVpcs(nil)
@@ -27,21 +27,21 @@ func callEC2(c *raws.Connector) {
 	fmt.Println(snapshots)
 }
 
-func callELB(c *raws.Connector) {
+func callELB(c raws.AWSReader) {
 	elbs, _ := c.GetLoadBalancers(nil)
 	fmt.Println(elbs)
 	tags, _ := c.GetLoadBalancersTags(nil)
 	fmt.Println(tags)
 }
 
-func callELBv2(c *raws.Connector) {
+func callELBv2(c raws.AWSReader) {
 	elbs, _ := c.GetLoadBalancersV2(nil)
 	fmt.Println(elbs)
 	tags, _ := c.GetLoadBalancersV2Tags(nil)
 	fmt.Println(tags)
 }
 
-func callRDS(c *raws.Connector) {
+func callRDS(c raws.AWSReader) {
 	instances, _ := c.GetDBInstances(nil)
 	fmt.Println(instances)
 	i := &rds.ListTagsForResourceInput{
@@ -51,7 +51,7 @@ func callRDS(c *raws.Connector) {
 	fmt.Println(tags)
 }
 
-func callElastiCache(c *raws.Connector) {
+func callElastiCache(c raws.AWSReader) {
 	clusters, _ := c.GetElasticCacheCluster(nil)
 
 	fmt.Println(clusters)
@@ -62,14 +62,14 @@ func callElastiCache(c *raws.Connector) {
 	fmt.Println(tags)
 }
 
-func callS3(c *raws.Connector) {
-	buckets, _ := c.GetBuckets(nil)
+func callS3(c raws.AWSReader) {
+	buckets, _ := c.ListBuckets(nil)
 	fmt.Println(buckets)
 	i := &s3.GetBucketTaggingInput{Bucket: aws.String("MY_BUCKET")}
 	bucketsTags, _ := c.GetBucketTags(i)
 	fmt.Println(bucketsTags)
 	i2 := &s3.ListObjectsInput{Bucket: aws.String("MY_BUCKET")}
-	objects, _ := c.GetObjects(i2)
+	objects, _ := c.ListObjects(i2)
 	fmt.Println(objects)
 	i3 := &s3.GetObjectTaggingInput{
 		Bucket: aws.String("MY_BUCKET"),
@@ -84,7 +84,7 @@ func main() {
 	secretKey := ""
 	region := []string{"eu-*"}
 
-	c, err := raws.NewConnector(accessKey, secretKey, region, nil)
+	c, err := raws.NewAWSReader(accessKey, secretKey, region, nil)
 	if err != nil {
 		fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
 		return

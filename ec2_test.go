@@ -200,7 +200,7 @@ func TestGetInstances(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		instances, err := c.GetInstances(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(instances, tt.expectedInstances) {
@@ -331,7 +331,7 @@ func TestGetVpcs(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		vpcs, err := c.GetVpcs(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(vpcs, tt.expectedVpcs) {
@@ -462,7 +462,7 @@ func TestGetImages(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		images, err := c.GetImages(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(images, tt.expectedImages) {
@@ -593,7 +593,7 @@ func TestGetSecurityGroups(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		secGroups, err := c.GetSecurityGroups(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(secGroups, tt.expectedSecGroups) {
@@ -724,7 +724,7 @@ func TestGetSubnets(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		subnets, err := c.GetSubnets(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(subnets, tt.expectedSubnets) {
@@ -855,7 +855,7 @@ func TestGetVolumes(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		volumes, err := c.GetVolumes(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(volumes, tt.expectedVolumes) {
@@ -990,7 +990,7 @@ func TestGetSnapshots(t *testing.T) {
 		}}
 
 	for i, tt := range tests {
-		c := &Connector{svcs: tt.mocked}
+		c := &connector{svcs: tt.mocked}
 		snapshots, err := c.GetSnapshots(nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(snapshots, tt.expectedSnapshots) {
