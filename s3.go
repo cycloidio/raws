@@ -67,9 +67,12 @@ func (c *connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOu
 
 // DownloadObject downloads an object in a bucket based on the input given
 func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error) {
-	var err error = nil
-	var n int64 = 0
+	var err error
+	var n int64
 
+	if input.Bucket == nil || input.Key == nil {
+		return n, fmt.Errorf("couldn't download undefined object (keys or bucket not set)")
+	}
 	for _, svc := range c.svcs {
 		if svc.s3downloader == nil {
 			svc.s3downloader = s3manager.NewDownloader(svc.session)
@@ -79,7 +82,7 @@ func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, opti
 			return n, nil
 		}
 	}
-	return n, fmt.Errorf("Couldn't download '%+v' in any of '%+v' regions", input, c.GetRegions())
+	return n, fmt.Errorf("couldn't download '%s/%s' in any of '%+v' regions", *input.Bucket, *input.Key, c.GetRegions())
 }
 
 // Returns tags associated with S3 objects based on the input given
