@@ -81,7 +81,7 @@ type connector struct {
 func NewAWSReader(accessKey string, secretKey string, regions []string, config *aws.Config) (AWSReader, error) {
 	var c connector = connector{}
 
-	creds, ec2, sts, err := configureAWS(accessKey, secretKey)
+	creds, ec2s, sts, err := configureAWS(accessKey, secretKey)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func NewAWSReader(accessKey string, secretKey string, regions []string, config *
 	if err := c.setAccountID(sts); err != nil {
 		return nil, err
 	}
-	if err := c.setRegions(ec2, regions); err != nil {
+	if err := c.setRegions(ec2s, regions); err != nil {
 		return nil, err
 	}
 	c.setServices(config)
@@ -134,7 +134,7 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	session := session.Must(
+	sess := session.Must(
 		session.NewSession(&aws.Config{
 			Region:      aws.String(defaultRegion),
 			DisableSSL:  aws.Bool(false),
@@ -142,7 +142,7 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 			Credentials: creds,
 		}),
 	)
-	return creds, ec2.New(session), sts.New(session), nil
+	return creds, ec2.New(sess), sts.New(sess), nil
 }
 
 func (c *connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) error {
@@ -187,10 +187,10 @@ func (c *connector) setServices(config *aws.Config) {
 	}
 	for _, region := range c.regions {
 		config.Region = aws.String(region)
-		session := session.Must(session.NewSession(config))
+		sess := session.Must(session.NewSession(config))
 		svc := &serviceConnector{
 			region:  region,
-			session: session,
+			session: sess,
 		}
 		c.svcs = append(c.svcs, svc)
 	}
