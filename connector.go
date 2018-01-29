@@ -1,6 +1,7 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -78,7 +79,9 @@ type connector struct {
 //
 // The connections are not all established while instancing, but the various sessions are, this way connections are only
 // made for services that are called, otherwise only the sessions remain.
-func NewAWSReader(accessKey string, secretKey string, regions []string, config *aws.Config) (AWSReader, error) {
+func NewAWSReader(
+	ctx context.Context, accessKey string, secretKey string, regions []string, config *aws.Config,
+) (AWSReader, error) {
 	var c connector = connector{}
 
 	creds, ec2s, sts, err := configureAWS(accessKey, secretKey)
@@ -86,10 +89,10 @@ func NewAWSReader(accessKey string, secretKey string, regions []string, config *
 		return nil, err
 	}
 	c.creds = creds
-	if err := c.setAccountID(sts); err != nil {
+	if err := c.setAccountID(ctx, sts); err != nil {
 		return nil, err
 	}
-	if err := c.setRegions(ec2s, regions); err != nil {
+	if err := c.setRegions(ctx, ec2s, regions); err != nil {
 		return nil, err
 	}
 	c.setServices(config)
@@ -145,11 +148,11 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	return creds, ec2.New(sess), sts.New(sess), nil
 }
 
-func (c *connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) error {
+func (c *connector) setRegions(ctx context.Context, ec2 ec2iface.EC2API, enabledRegions []string) error {
 	if len(enabledRegions) == 0 {
 		return errors.New("at least one region name is required")
 	}
-	regions, err := ec2.DescribeRegions(nil)
+	regions, err := ec2.DescribeRegionsWithContext(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -166,8 +169,8 @@ func (c *connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) err
 	return nil
 }
 
-func (c *connector) setAccountID(sts stsiface.STSAPI) error {
-	resp, err := sts.GetCallerIdentity(nil)
+func (c *connector) setAccountID(ctx context.Context, sts stsiface.STSAPI) error {
+	resp, err := sts.GetCallerIdentityWithContext(ctx, nil)
 	if err != nil {
 		return err
 	}

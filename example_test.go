@@ -1,6 +1,7 @@
 package raws_test
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -96,7 +97,7 @@ func Example() {
 
 	region := []string{"eu-*"}
 
-	c, err := raws.NewAWSReader(accessKey, secretKey, region, nil)
+	c, err := raws.NewAWSReader(context.Background(), accessKey, secretKey, region, nil)
 	if err != nil {
 		fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
 		return

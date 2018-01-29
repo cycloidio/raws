@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 )
@@ -55,7 +56,12 @@ func (m mockEC2) DescribeInstances(*ec2.DescribeInstancesInput) (*ec2.DescribeIn
 	return m.dio, m.dierr
 }
 
+// TODO: #17 -  Delete this mock after all the refactoring be done
 func (m mockEC2) DescribeRegions(input *ec2.DescribeRegionsInput) (*ec2.DescribeRegionsOutput, error) {
+	return m.dro, m.drerr
+}
+
+func (m mockEC2) DescribeRegionsWithContext(_ aws.Context, _ *ec2.DescribeRegionsInput, _ ...request.Option) (*ec2.DescribeRegionsOutput, error) {
 	return m.dro, m.drerr
 }
 
