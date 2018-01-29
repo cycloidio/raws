@@ -1,11 +1,14 @@
 package raws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go/service/elasticache"
 )
 
-// Returns all Elasticache clusters based on the input given
-func (c *connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, Errs) {
+func (c *connector) GetElastiCacheCluster(
+	ctx context.Context, input *elasticache.DescribeCacheClustersInput,
+) ([]*elasticache.DescribeCacheClustersOutput, Errs) {
 	var errs Errs
 	var elasticCacheClusters []*elasticache.DescribeCacheClustersOutput
 
@@ -13,7 +16,7 @@ func (c *connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClust
 		if svc.elasticache == nil {
 			svc.elasticache = elasticache.New(svc.session)
 		}
-		elasticCacheCluster, err := svc.elasticache.DescribeCacheClusters(input)
+		elasticCacheCluster, err := svc.elasticache.DescribeCacheClustersWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, elasticache.ServiceName, err))
 		} else {
@@ -23,8 +26,9 @@ func (c *connector) GetElasticCacheCluster(input *elasticache.DescribeCacheClust
 	return elasticCacheClusters, errs
 }
 
-// Returns a list of tags of Elasticache resources based on its ARN
-func (c *connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, Errs) {
+func (c *connector) GetElastiCacheTags(
+	ctx context.Context, input *elasticache.ListTagsForResourceInput,
+) ([]*elasticache.TagListMessage, Errs) {
 	var errs Errs
 	var elastiCacheTags []*elasticache.TagListMessage
 
@@ -32,7 +36,7 @@ func (c *connector) GetElasticacheTags(input *elasticache.ListTagsForResourceInp
 		if svc.elasticache == nil {
 			svc.elasticache = elasticache.New(svc.session)
 		}
-		elasticacheTag, err := svc.elasticache.ListTagsForResource(input)
+		elasticacheTag, err := svc.elasticache.ListTagsForResourceWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, elasticache.ServiceName, err))
 		} else {

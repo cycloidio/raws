@@ -1,12 +1,14 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 	"reflect"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
 
@@ -39,11 +41,15 @@ type mockS3 struct {
 	doerr error
 }
 
-func (m mockS3) ListBuckets(*s3.ListBucketsInput) (*s3.ListBucketsOutput, error) {
+func (m mockS3) ListBucketsWithContext(
+	_ aws.Context, _ *s3.ListBucketsInput, _ ...request.Option,
+) (*s3.ListBucketsOutput, error) {
 	return m.lbo, m.lberr
 }
 
-func (m mockS3) GetBucketTagging(*s3.GetBucketTaggingInput) (*s3.GetBucketTaggingOutput, error) {
+func (m mockS3) GetBucketTaggingWithContext(
+	_ aws.Context, _ *s3.GetBucketTaggingInput, _ ...request.Option,
+) (*s3.GetBucketTaggingOutput, error) {
 	return m.gbto, m.gbterr
 }
 
@@ -55,15 +61,21 @@ type mockS3Downloader struct {
 	doerr error
 }
 
-func (m mockS3Downloader) Download(io.WriterAt, *s3.GetObjectInput, ...func(*s3manager.Downloader)) (int64, error) {
+func (m mockS3Downloader) DownloadWithContext(
+	_ aws.Context, _ io.WriterAt, _ *s3.GetObjectInput, _ ...func(*s3manager.Downloader),
+) (int64, error) {
 	return m.dob, m.doerr
 }
 
-func (m mockS3) ListObjects(*s3.ListObjectsInput) (*s3.ListObjectsOutput, error) {
+func (m mockS3) ListObjectsWithContext(
+	_ aws.Context, _ *s3.ListObjectsInput, _ ...request.Option,
+) (*s3.ListObjectsOutput, error) {
 	return m.loo, m.loerr
 }
 
-func (m mockS3) GetObjectTagging(*s3.GetObjectTaggingInput) (*s3.GetObjectTaggingOutput, error) {
+func (m mockS3) GetObjectTaggingWithContext(
+	_ aws.Context, _ *s3.GetObjectTaggingInput, _ ...request.Option,
+) (*s3.GetObjectTaggingOutput, error) {
 	return m.gotout, m.goterr
 }
 
@@ -187,9 +199,11 @@ func TestListBuckets(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		buckets, err := c.ListBuckets(nil)
+		buckets, err := c.ListBuckets(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(buckets, tt.expectedBuckets) {
 			t.Errorf("%s [%d] - S3 buckets: received=%+v | expected=%+v",
@@ -326,9 +340,11 @@ func TestGetBucketTags(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		tags, err := c.GetBucketTags(nil)
+		tags, err := c.GetBucketTags(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {
 			t.Errorf("%s [%d] - S3 buckets tags: received=%+v | expected=%+v",
@@ -440,9 +456,11 @@ func TestListObjets(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		objects, err := c.ListObjects(nil)
+		objects, err := c.ListObjects(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(objects, tt.expectedObjects) {
 			t.Errorf("%s [%d] - S3 objects: received=%+v | expected=%+v",
@@ -510,12 +528,14 @@ func TestDownloadObjet(t *testing.T) {
 		},
 	}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{
 			regions: tt.regions,
 			svcs:    tt.mocked,
 		}
-		bytes, err := c.DownloadObject(nil, tt.input, nil)
+		bytes, err := c.DownloadObject(ctx, nil, tt.input, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if tt.expectedBytes != bytes {
 			t.Errorf("%s [%d] - S3 download object: received=%+v | expected=%+v",
@@ -524,7 +544,7 @@ func TestDownloadObjet(t *testing.T) {
 	}
 }
 
-func TestObjectsTags(t *testing.T) {
+func TestGetObjectsTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
@@ -628,9 +648,11 @@ func TestObjectsTags(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		tags, err := c.GetObjectsTags(nil)
+		tags, err := c.GetObjectsTags(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {
 			t.Errorf("%s [%d] - S3 object tags: received=%+v | expected=%+v",

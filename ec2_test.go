@@ -1,6 +1,7 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -48,40 +49,49 @@ type mockEC2 struct {
 	dsnaperr error
 }
 
-func (m mockEC2) DescribeImages(*ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+func (m mockEC2) DescribeImagesWithContext(
+	_ aws.Context, _ *ec2.DescribeImagesInput, _ ...request.Option,
+) (*ec2.DescribeImagesOutput, error) {
 	return m.dimo, m.dimerr
 }
 
-func (m mockEC2) DescribeInstances(*ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
+func (m mockEC2) DescribeInstancesWithContext(_ aws.Context, _ *ec2.DescribeInstancesInput, _ ...request.Option) (*ec2.DescribeInstancesOutput, error) {
 	return m.dio, m.dierr
 }
 
-// TODO: #17 -  Delete this mock after all the refactoring be done
-func (m mockEC2) DescribeRegions(input *ec2.DescribeRegionsInput) (*ec2.DescribeRegionsOutput, error) {
+func (m mockEC2) DescribeRegionsWithContext(
+	_ aws.Context, _ *ec2.DescribeRegionsInput, _ ...request.Option,
+) (*ec2.DescribeRegionsOutput, error) {
 	return m.dro, m.drerr
 }
 
-func (m mockEC2) DescribeRegionsWithContext(_ aws.Context, _ *ec2.DescribeRegionsInput, _ ...request.Option) (*ec2.DescribeRegionsOutput, error) {
-	return m.dro, m.drerr
-}
-
-func (m mockEC2) DescribeSecurityGroups(*ec2.DescribeSecurityGroupsInput) (*ec2.DescribeSecurityGroupsOutput, error) {
+func (m mockEC2) DescribeSecurityGroupsWithContext(
+	_ aws.Context, _ *ec2.DescribeSecurityGroupsInput, _ ...request.Option,
+) (*ec2.DescribeSecurityGroupsOutput, error) {
 	return m.dsgo, m.dsgerr
 }
 
-func (m mockEC2) DescribeSnapshots(*ec2.DescribeSnapshotsInput) (*ec2.DescribeSnapshotsOutput, error) {
+func (m mockEC2) DescribeSnapshotsWithContext(
+	_ aws.Context, _ *ec2.DescribeSnapshotsInput, _ ...request.Option,
+) (*ec2.DescribeSnapshotsOutput, error) {
 	return m.dsnapo, m.dsnaperr
 }
 
-func (m mockEC2) DescribeSubnets(*ec2.DescribeSubnetsInput) (*ec2.DescribeSubnetsOutput, error) {
+func (m mockEC2) DescribeSubnetsWithContext(
+	_ aws.Context, _ *ec2.DescribeSubnetsInput, _ ...request.Option,
+) (*ec2.DescribeSubnetsOutput, error) {
 	return m.dso, m.dserr
 }
 
-func (m mockEC2) DescribeVolumes(*ec2.DescribeVolumesInput) (*ec2.DescribeVolumesOutput, error) {
+func (m mockEC2) DescribeVolumesWithContext(
+	_ aws.Context, _ *ec2.DescribeVolumesInput, _ ...request.Option,
+) (*ec2.DescribeVolumesOutput, error) {
 	return m.dvolo, m.dvolerr
 }
 
-func (m mockEC2) DescribeVpcs(*ec2.DescribeVpcsInput) (*ec2.DescribeVpcsOutput, error) {
+func (m mockEC2) DescribeVpcsWithContext(
+	_ aws.Context, _ *ec2.DescribeVpcsInput, _ ...request.Option,
+) (*ec2.DescribeVpcsOutput, error) {
 	return m.dvpco, m.dvpcerr
 }
 
@@ -205,9 +215,11 @@ func TestGetInstances(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		instances, err := c.GetInstances(nil)
+		instances, err := c.GetInstances(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(instances, tt.expectedInstances) {
 			t.Errorf("%s [%d] - EC2 instances: received=%+v | expected=%+v",
@@ -336,9 +348,11 @@ func TestGetVpcs(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		vpcs, err := c.GetVpcs(nil)
+		vpcs, err := c.GetVpcs(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(vpcs, tt.expectedVpcs) {
 			t.Errorf("%s [%d] - EC2 VPCs: received=%+v | expected=%+v",
@@ -467,9 +481,11 @@ func TestGetImages(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		images, err := c.GetImages(nil)
+		images, err := c.GetImages(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(images, tt.expectedImages) {
 			t.Errorf("%s [%d] - EC2 Images: received=%+v | expected=%+v",
@@ -598,9 +614,11 @@ func TestGetSecurityGroups(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		secGroups, err := c.GetSecurityGroups(nil)
+		secGroups, err := c.GetSecurityGroups(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(secGroups, tt.expectedSecGroups) {
 			t.Errorf("%s [%d] - EC2 security groups: received=%+v | expected=%+v",
@@ -729,9 +747,10 @@ func TestGetSubnets(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		subnets, err := c.GetSubnets(nil)
+		subnets, err := c.GetSubnets(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(subnets, tt.expectedSubnets) {
 			t.Errorf("%s [%d] - EC2 subnets: received=%+v | expected=%+v",
@@ -860,9 +879,11 @@ func TestGetVolumes(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		volumes, err := c.GetVolumes(nil)
+		volumes, err := c.GetVolumes(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(volumes, tt.expectedVolumes) {
 			t.Errorf("%s [%d] - EC2 volumes: received=%+v | expected=%+v",
@@ -995,9 +1016,11 @@ func TestGetSnapshots(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		snapshots, err := c.GetSnapshots(nil)
+		snapshots, err := c.GetSnapshots(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(snapshots, tt.expectedSnapshots) {
 			t.Errorf("%s [%d] - EC2 snapshots: received=%+v | expected=%+v",

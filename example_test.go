@@ -13,71 +13,95 @@ import (
 )
 
 func callEC2(c raws.AWSReader) {
-	instances, _ := c.GetInstances(nil)
+	var ctx = context.Background()
+
+	instances, _ := c.GetInstances(ctx, nil)
 	fmt.Println(instances)
-	vpcs, _ := c.GetVpcs(nil)
+
+	vpcs, _ := c.GetVpcs(ctx, nil)
 	fmt.Println(vpcs)
-	sg, _ := c.GetSecurityGroups(nil)
+
+	sg, _ := c.GetSecurityGroups(ctx, nil)
 	fmt.Println(sg)
-	subnets, _ := c.GetSubnets(nil)
+
+	subnets, _ := c.GetSubnets(ctx, nil)
 	fmt.Println(subnets)
-	images, _ := c.GetImages(nil)
+
+	images, _ := c.GetImages(ctx, nil)
 	fmt.Println(images)
-	volumes, _ := c.GetVolumes(nil)
+
+	volumes, _ := c.GetVolumes(ctx, nil)
 	fmt.Println(volumes)
-	snapshots, _ := c.GetSnapshots(nil)
+
+	snapshots, _ := c.GetSnapshots(ctx, nil)
 	fmt.Println(snapshots)
 }
 
 func callELB(c raws.AWSReader) {
-	elbs, _ := c.GetLoadBalancers(nil)
+	var ctx = context.Background()
+
+	elbs, _ := c.GetLoadBalancers(ctx, nil)
 	fmt.Println(elbs)
-	tags, _ := c.GetLoadBalancersTags(nil)
+
+	tags, _ := c.GetLoadBalancersTags(ctx, nil)
 	fmt.Println(tags)
 }
 
 func callELBv2(c raws.AWSReader) {
-	elbs, _ := c.GetLoadBalancersV2(nil)
+	var ctx = context.Background()
+
+	elbs, _ := c.GetLoadBalancersV2(ctx, nil)
 	fmt.Println(elbs)
-	tags, _ := c.GetLoadBalancersV2Tags(nil)
+
+	tags, _ := c.GetLoadBalancersV2Tags(ctx, nil)
 	fmt.Println(tags)
 }
 
 func callRDS(c raws.AWSReader) {
-	instances, _ := c.GetDBInstances(nil)
+	var ctx = context.Background()
+
+	instances, _ := c.GetDBInstances(ctx, nil)
 	fmt.Println(instances)
+
 	i := &rds.ListTagsForResourceInput{
 		ResourceName: aws.String("MY_RDS_ARN"),
 	}
-	tags, _ := c.GetDBInstancesTags(i)
+	tags, _ := c.GetDBInstancesTags(ctx, i)
 	fmt.Println(tags)
 }
 
 func callElastiCache(c raws.AWSReader) {
-	clusters, _ := c.GetElasticCacheCluster(nil)
+	var ctx = context.Background()
 
+	clusters, _ := c.GetElastiCacheCluster(ctx, nil)
 	fmt.Println(clusters)
+
 	i := &elasticache.ListTagsForResourceInput{
 		ResourceName: aws.String("MY_ELASTICACHE_ARN"),
 	}
-	tags, _ := c.GetElasticacheTags(i)
+	tags, _ := c.GetElastiCacheTags(ctx, i)
 	fmt.Println(tags)
 }
 
 func callS3(c raws.AWSReader) {
-	buckets, _ := c.ListBuckets(nil)
+	var ctx = context.Background()
+
+	buckets, _ := c.ListBuckets(ctx, nil)
 	fmt.Println(buckets)
+
 	i := &s3.GetBucketTaggingInput{Bucket: aws.String("MY_BUCKET")}
-	bucketsTags, _ := c.GetBucketTags(i)
+	bucketsTags, _ := c.GetBucketTags(ctx, i)
 	fmt.Println(bucketsTags)
+
 	i2 := &s3.ListObjectsInput{Bucket: aws.String("MY_BUCKET")}
-	objects, _ := c.ListObjects(i2)
+	objects, _ := c.ListObjects(ctx, i2)
 	fmt.Println(objects)
+
 	i3 := &s3.GetObjectTaggingInput{
 		Bucket: aws.String("MY_BUCKET"),
 		Key:    aws.String("MY_KEY"),
 	}
-	objectsTags, _ := c.GetObjectsTags(i3)
+	objectsTags, _ := c.GetObjectsTags(ctx, i3)
 	fmt.Println(objectsTags)
 }
 

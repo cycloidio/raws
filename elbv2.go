@@ -1,11 +1,14 @@
 package raws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go/service/elbv2"
 )
 
-// Returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
-func (c *connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.DescribeLoadBalancersOutput, Errs) {
+func (c *connector) GetLoadBalancersV2(
+	ctx context.Context, input *elbv2.DescribeLoadBalancersInput,
+) ([]*elbv2.DescribeLoadBalancersOutput, Errs) {
 	var errs Errs
 	var elbs []*elbv2.DescribeLoadBalancersOutput
 
@@ -13,7 +16,7 @@ func (c *connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) 
 		if svc.elbv2 == nil {
 			svc.elbv2 = elbv2.New(svc.session)
 		}
-		elb, err := svc.elbv2.DescribeLoadBalancers(input)
+		elb, err := svc.elbv2.DescribeLoadBalancersWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, elbv2.ServiceName, err))
 		} else {
@@ -23,8 +26,9 @@ func (c *connector) GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) 
 	return elbs, errs
 }
 
-// Returns a list of Tags based on the input from the different regions
-func (c *connector) GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*elbv2.DescribeTagsOutput, Errs) {
+func (c *connector) GetLoadBalancersV2Tags(
+	ctx context.Context, input *elbv2.DescribeTagsInput,
+) ([]*elbv2.DescribeTagsOutput, Errs) {
 	var errs Errs
 	var elbTags []*elbv2.DescribeTagsOutput
 
@@ -32,7 +36,7 @@ func (c *connector) GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*e
 		if svc.elbv2 == nil {
 			svc.elbv2 = elbv2.New(svc.session)
 		}
-		elbTag, err := svc.elbv2.DescribeTags(input)
+		elbTag, err := svc.elbv2.DescribeTagsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, elbv2.ServiceName, err))
 		} else {

@@ -1,11 +1,14 @@
 package raws
 
 import (
+	"context"
+
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
-// Returns all EC2 instances based on the input given
-func (c *connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs) {
+func (c *connector) GetInstances(
+	ctx context.Context, input *ec2.DescribeInstancesInput,
+) ([]*ec2.DescribeInstancesOutput, Errs) {
 	var errs Errs
 	var instances []*ec2.DescribeInstancesOutput
 
@@ -13,7 +16,7 @@ func (c *connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.Desc
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		instance, err := svc.ec2.DescribeInstances(input)
+		instance, err := svc.ec2.DescribeInstancesWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {
@@ -23,8 +26,7 @@ func (c *connector) GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.Desc
 	return instances, errs
 }
 
-// Returns all EC2 VPCs based on the input given
-func (c *connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs) {
+func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs) {
 	var errs Errs
 	var vpcs []*ec2.DescribeVpcsOutput
 
@@ -32,7 +34,7 @@ func (c *connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOu
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		vpc, err := svc.ec2.DescribeVpcs(input)
+		vpc, err := svc.ec2.DescribeVpcsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {
@@ -42,8 +44,7 @@ func (c *connector) GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOu
 	return vpcs, errs
 }
 
-// Returns all EC2 AMI belonging to the Account ID based on the input given
-func (c *connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs) {
+func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs) {
 	var errs Errs
 	var images []*ec2.DescribeImagesOutput
 
@@ -55,7 +56,7 @@ func (c *connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeIm
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		image, err := svc.ec2.DescribeImages(input)
+		image, err := svc.ec2.DescribeImagesWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {
@@ -65,8 +66,9 @@ func (c *connector) GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeIm
 	return images, errs
 }
 
-// Returns all EC2 security groups based on the input given
-func (c *connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([]*ec2.DescribeSecurityGroupsOutput, Errs) {
+func (c *connector) GetSecurityGroups(
+	ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
+) ([]*ec2.DescribeSecurityGroupsOutput, Errs) {
 	var errs Errs
 	var secgroups []*ec2.DescribeSecurityGroupsOutput
 
@@ -74,7 +76,7 @@ func (c *connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		secgroup, err := svc.ec2.DescribeSecurityGroups(input)
+		secgroup, err := svc.ec2.DescribeSecurityGroupsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {
@@ -84,8 +86,9 @@ func (c *connector) GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([
 	return secgroups, errs
 }
 
-// Returns all EC2 subnets based on the input given
-func (c *connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs) {
+func (c *connector) GetSubnets(
+	ctx context.Context, input *ec2.DescribeSubnetsInput,
+) ([]*ec2.DescribeSubnetsOutput, Errs) {
 	var errs Errs
 	var subnets []*ec2.DescribeSubnetsOutput
 
@@ -93,7 +96,7 @@ func (c *connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.Describe
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		subnet, err := svc.ec2.DescribeSubnets(input)
+		subnet, err := svc.ec2.DescribeSubnetsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {
@@ -103,8 +106,9 @@ func (c *connector) GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.Describe
 	return subnets, errs
 }
 
-// Returns all EC2 volumes based on the input given
-func (c *connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs) {
+func (c *connector) GetVolumes(
+	ctx context.Context, input *ec2.DescribeVolumesInput,
+) ([]*ec2.DescribeVolumesOutput, Errs) {
 	var errs Errs
 	var volumes []*ec2.DescribeVolumesOutput
 
@@ -112,7 +116,7 @@ func (c *connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.Describe
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		volume, err := svc.ec2.DescribeVolumes(input)
+		volume, err := svc.ec2.DescribeVolumesWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {
@@ -122,8 +126,9 @@ func (c *connector) GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.Describe
 	return volumes, errs
 }
 
-// Returns all snapshots belonging to the Account ID based on the input given
-func (c *connector) GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs) {
+func (c *connector) GetSnapshots(
+	ctx context.Context, input *ec2.DescribeSnapshotsInput,
+) ([]*ec2.DescribeSnapshotsOutput, Errs) {
 	var errs Errs
 	var snapshots []*ec2.DescribeSnapshotsOutput
 
@@ -135,7 +140,7 @@ func (c *connector) GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.Desc
 		if svc.ec2 == nil {
 			svc.ec2 = ec2.New(svc.session)
 		}
-		snapshot, err := svc.ec2.DescribeSnapshots(input)
+		snapshot, err := svc.ec2.DescribeSnapshotsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
 		} else {

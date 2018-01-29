@@ -1,12 +1,14 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"reflect"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
 )
@@ -23,11 +25,15 @@ type mockELBV2 struct {
 	dterr error
 }
 
-func (m mockELBV2) DescribeLoadBalancers(input *elbv2.DescribeLoadBalancersInput) (*elbv2.DescribeLoadBalancersOutput, error) {
+func (m mockELBV2) DescribeLoadBalancersWithContext(
+	_ aws.Context, _ *elbv2.DescribeLoadBalancersInput, _ ...request.Option,
+) (*elbv2.DescribeLoadBalancersOutput, error) {
 	return m.dlbo, m.dlberr
 }
 
-func (m mockELBV2) DescribeTags(input *elbv2.DescribeTagsInput) (*elbv2.DescribeTagsOutput, error) {
+func (m mockELBV2) DescribeTagsWithContext(
+	_ aws.Context, _ *elbv2.DescribeTagsInput, _ ...request.Option,
+) (*elbv2.DescribeTagsOutput, error) {
 	return m.dto, m.dterr
 }
 
@@ -170,9 +176,11 @@ func TestGetLoadBalancersV2(t *testing.T) {
 		},
 	}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		elbs, err := c.GetLoadBalancersV2(nil)
+		elbs, err := c.GetLoadBalancersV2(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(elbs, tt.expectedELBs) {
 			t.Errorf("%s [%d] - ELBs (v1): received=%+v | expected=%+v",
@@ -320,9 +328,11 @@ func TestGetLoadBalancersV2Tags(t *testing.T) {
 		},
 	}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		tags, err := c.GetLoadBalancersV2Tags(nil)
+		tags, err := c.GetLoadBalancersV2Tags(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {
 			t.Errorf("%s [%d] - tags: received=%+v | expected=%+v",

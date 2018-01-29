@@ -1,11 +1,13 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 )
@@ -22,11 +24,15 @@ type mockRDS struct {
 	ltfrerr error
 }
 
-func (m mockRDS) DescribeDBInstances(input *rds.DescribeDBInstancesInput) (*rds.DescribeDBInstancesOutput, error) {
+func (m mockRDS) DescribeDBInstancesWithContext(
+	_ aws.Context, _ *rds.DescribeDBInstancesInput, _ ...request.Option,
+) (*rds.DescribeDBInstancesOutput, error) {
 	return m.ddio, m.ddierr
 }
 
-func (m mockRDS) ListTagsForResource(input *rds.ListTagsForResourceInput) (*rds.ListTagsForResourceOutput, error) {
+func (m mockRDS) ListTagsForResourceWithContext(
+	_ aws.Context, _ *rds.ListTagsForResourceInput, _ ...request.Option,
+) (*rds.ListTagsForResourceOutput, error) {
 	return m.ltfro, m.ltfrerr
 }
 
@@ -171,9 +177,11 @@ func TestGetDBInstances(t *testing.T) {
 			},
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		instances, err := c.GetDBInstances(nil)
+		instances, err := c.GetDBInstances(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(instances, tt.expectedInstances) {
 			t.Errorf("%s [%d] - DB instances: received=%+v | expected=%+v",
@@ -332,9 +340,11 @@ func TestGetDBInstancesTags(t *testing.T) {
 		},
 	}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		tags, err := c.GetDBInstancesTags(nil)
+		tags, err := c.GetDBInstancesTags(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {
 			t.Errorf("%s [%d] - DB instances: received=%+v | expected=%+v",

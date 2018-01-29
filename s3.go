@@ -1,6 +1,7 @@
 package raws
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -8,8 +9,9 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
-// Returns all S3 buckets based on the input given
-func (c *connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs) {
+func (c *connector) ListBuckets(
+	ctx context.Context, input *s3.ListBucketsInput,
+) ([]*s3.ListBucketsOutput, Errs) {
 	var errs Errs
 	var bucketsList []*s3.ListBucketsOutput
 
@@ -17,7 +19,7 @@ func (c *connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOu
 		if svc.s3 == nil {
 			svc.s3 = s3.New(svc.session)
 		}
-		buckets, err := svc.s3.ListBuckets(input)
+		buckets, err := svc.s3.ListBucketsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, s3.ServiceName, err))
 		} else {
@@ -27,8 +29,9 @@ func (c *connector) ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOu
 	return bucketsList, errs
 }
 
-// Returns tags associated with S3 buckets based on the input given
-func (c *connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs) {
+func (c *connector) GetBucketTags(
+	ctx context.Context, input *s3.GetBucketTaggingInput,
+) ([]*s3.GetBucketTaggingOutput, Errs) {
 	var errs Errs
 	var bucketsTagList []*s3.GetBucketTaggingOutput
 
@@ -36,7 +39,7 @@ func (c *connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBuc
 		if svc.s3 == nil {
 			svc.s3 = s3.New(svc.session)
 		}
-		bucketsTags, err := svc.s3.GetBucketTagging(input)
+		bucketsTags, err := svc.s3.GetBucketTaggingWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, s3.ServiceName, err))
 		} else {
@@ -46,8 +49,9 @@ func (c *connector) GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBuc
 	return bucketsTagList, errs
 }
 
-// Returns a list of all S3 objects in a bucket based on the input given
-func (c *connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs) {
+func (c *connector) ListObjects(
+	ctx context.Context, input *s3.ListObjectsInput,
+) ([]*s3.ListObjectsOutput, Errs) {
 	var errs Errs
 	var objectsList []*s3.ListObjectsOutput
 
@@ -55,7 +59,7 @@ func (c *connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOu
 		if svc.s3 == nil {
 			svc.s3 = s3.New(svc.session)
 		}
-		buckets, err := svc.s3.ListObjects(input)
+		buckets, err := svc.s3.ListObjectsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, s3.ServiceName, err))
 		} else {
@@ -65,8 +69,9 @@ func (c *connector) ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOu
 	return objectsList, errs
 }
 
-// DownloadObject downloads an object in a bucket based on the input given
-func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error) {
+func (c *connector) DownloadObject(
+	ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader),
+) (int64, error) {
 	var err error
 	var n int64
 
@@ -77,7 +82,7 @@ func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, opti
 		if svc.s3downloader == nil {
 			svc.s3downloader = s3manager.NewDownloader(svc.session)
 		}
-		n, err = svc.s3downloader.Download(w, input, options...)
+		n, err = svc.s3downloader.DownloadWithContext(ctx, w, input, options...)
 		if err == nil {
 			return n, nil
 		}
@@ -85,8 +90,9 @@ func (c *connector) DownloadObject(w io.WriterAt, input *s3.GetObjectInput, opti
 	return n, fmt.Errorf("couldn't download '%s/%s' in any of '%+v' regions", *input.Bucket, *input.Key, c.GetRegions())
 }
 
-// Returns tags associated with S3 objects based on the input given
-func (c *connector) GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs) {
+func (c *connector) GetObjectsTags(
+	ctx context.Context, input *s3.GetObjectTaggingInput,
+) ([]*s3.GetObjectTaggingOutput, Errs) {
 	var errs Errs
 	var objectsTagsList []*s3.GetObjectTaggingOutput
 
@@ -94,7 +100,7 @@ func (c *connector) GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetOb
 		if svc.s3 == nil {
 			svc.s3 = s3.New(svc.session)
 		}
-		buckets, err := svc.s3.GetObjectTagging(input)
+		buckets, err := svc.s3.GetObjectTaggingWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewAPIError(svc.region, s3.ServiceName, err))
 		} else {
