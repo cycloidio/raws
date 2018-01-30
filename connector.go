@@ -33,7 +33,7 @@ type AWSReader interface {
 	// GetAccountID returns the current ID for the account used
 	GetAccountID() string
 
-	// GetRegions return the currently used regions for the Connector
+	// GetRegions returns the currently used regions for the Connector
 	GetRegions() []string
 
 	// GetInstances returns all EC2 instances based on the input given
