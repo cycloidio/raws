@@ -1,11 +1,13 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/elasticache"
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
 )
@@ -22,15 +24,19 @@ type mockElasticCache struct {
 	ltfrerr error
 }
 
-func (m mockElasticCache) DescribeCacheClusters(input *elasticache.DescribeCacheClustersInput) (*elasticache.DescribeCacheClustersOutput, error) {
+func (m mockElasticCache) DescribeCacheClustersWithContext(
+	_ aws.Context, _ *elasticache.DescribeCacheClustersInput, _ ...request.Option,
+) (*elasticache.DescribeCacheClustersOutput, error) {
 	return m.dcco, m.dccerr
 }
 
-func (m mockElasticCache) ListTagsForResource(input *elasticache.ListTagsForResourceInput) (*elasticache.TagListMessage, error) {
+func (m mockElasticCache) ListTagsForResourceWithContext(
+	_ aws.Context, _ *elasticache.ListTagsForResourceInput, _ ...request.Option,
+) (*elasticache.TagListMessage, error) {
 	return m.ltfro, m.ltfrerr
 }
 
-func TestGetElasticacheCluster(t *testing.T) {
+func TestGetElastiCacheCluster(t *testing.T) {
 	tests := []struct {
 		name             string
 		mocked           []*serviceConnector
@@ -169,9 +175,11 @@ func TestGetElasticacheCluster(t *testing.T) {
 		},
 	}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		cluster, err := c.GetElasticCacheCluster(nil)
+		cluster, err := c.GetElastiCacheCluster(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(cluster, tt.expectedClusters) {
 			t.Errorf("%s [%d] - clusters: received=%+v | expected=%+v",
@@ -180,7 +188,7 @@ func TestGetElasticacheCluster(t *testing.T) {
 	}
 }
 
-func TestGetElasticacheTags(t *testing.T) {
+func TestGetElastiCacheTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
@@ -327,9 +335,11 @@ func TestGetElasticacheTags(t *testing.T) {
 		},
 	}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		tags, err := c.GetElasticacheTags(nil)
+		tags, err := c.GetElastiCacheTags(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(tags, tt.expectedTags) {
 			t.Errorf("%s [%d] - tags: received=%+v | expected=%+v",

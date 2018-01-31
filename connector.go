@@ -1,6 +1,7 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -29,28 +30,87 @@ import (
 
 // AWSReader is the interface defining all methods that need to be implemented
 type AWSReader interface {
+	// GetAccountID returns the current ID for the account used
 	GetAccountID() string
+
+	// GetRegions returns the currently used regions for the Connector
 	GetRegions() []string
-	GetInstances(input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs)
-	GetVpcs(input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs)
-	GetImages(input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs)
-	GetSecurityGroups(input *ec2.DescribeSecurityGroupsInput) ([]*ec2.DescribeSecurityGroupsOutput, Errs)
-	GetSubnets(input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs)
-	GetVolumes(input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs)
-	GetSnapshots(input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs)
-	GetElasticCacheCluster(input *elasticache.DescribeCacheClustersInput) ([]*elasticache.DescribeCacheClustersOutput, Errs)
-	GetElasticacheTags(input *elasticache.ListTagsForResourceInput) ([]*elasticache.TagListMessage, Errs)
-	GetLoadBalancers(input *elb.DescribeLoadBalancersInput) ([]*elb.DescribeLoadBalancersOutput, Errs)
-	GetLoadBalancersTags(input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, Errs)
-	GetLoadBalancersV2(input *elbv2.DescribeLoadBalancersInput) ([]*elbv2.DescribeLoadBalancersOutput, Errs)
-	GetLoadBalancersV2Tags(input *elbv2.DescribeTagsInput) ([]*elbv2.DescribeTagsOutput, Errs)
-	GetDBInstances(input *rds.DescribeDBInstancesInput) ([]*rds.DescribeDBInstancesOutput, Errs)
-	GetDBInstancesTags(input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, Errs)
-	ListBuckets(input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs)
-	GetBucketTags(input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs)
-	ListObjects(input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs)
-	DownloadObject(w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader)) (int64, error)
-	GetObjectsTags(input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs)
+
+	// GetInstances returns all EC2 instances based on the input given
+	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs)
+
+	// GetVpcs returns all EC2 VPCs based on the input given
+	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs)
+
+	// GetImages returns all EC2 AMI belonging to the Account ID based on the input given
+	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs)
+
+	// GetSecurityGroups returns all EC2 security groups based on the input given
+	GetSecurityGroups(
+		ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
+	) ([]*ec2.DescribeSecurityGroupsOutput, Errs)
+
+	// GetSubnets returns all EC2 subnets based on the input given
+	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs)
+
+	// GetVolumes returns all EC2 volumes based on the input given
+	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs)
+
+	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given
+	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs)
+
+	// GetElastiCacheCluster returns all Elasticache clusters based on the input given
+	GetElastiCacheCluster(
+		ctx context.Context, input *elasticache.DescribeCacheClustersInput,
+	) ([]*elasticache.DescribeCacheClustersOutput, Errs)
+
+	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN
+	GetElastiCacheTags(
+		ctx context.Context, input *elasticache.ListTagsForResourceInput,
+	) ([]*elasticache.TagListMessage, Errs)
+
+	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions
+	GetLoadBalancers(
+		ctx context.Context, input *elb.DescribeLoadBalancersInput,
+	) ([]*elb.DescribeLoadBalancersOutput, Errs)
+
+	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions
+	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, Errs)
+
+	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
+	GetLoadBalancersV2(
+		ctx context.Context, input *elbv2.DescribeLoadBalancersInput,
+	) ([]*elbv2.DescribeLoadBalancersOutput, Errs)
+
+	// GetLoadBalancersV2Tags returns a list of Tags based on the input from the different regions
+	GetLoadBalancersV2Tags(
+		ctx context.Context, input *elbv2.DescribeTagsInput,
+	) ([]*elbv2.DescribeTagsOutput, Errs)
+
+	// GetDBInstances returns all DB instances based on the input given
+	GetDBInstances(
+		ctx context.Context, input *rds.DescribeDBInstancesInput,
+	) ([]*rds.DescribeDBInstancesOutput, Errs)
+
+	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided
+	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, Errs)
+
+	// ListBuckets returns all S3 buckets based on the input given
+	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, Errs)
+
+	// GetBucketTags returns tags associated with S3 buckets based on the input given
+	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, Errs)
+
+	// ListObjects returns a list of all S3 objects in a bucket based on the input given
+	ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs)
+
+	// DownloadObject downloads an object in a bucket based on the input given
+	DownloadObject(
+		ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader),
+	) (int64, error)
+
+	// GetObjectsTags returns tags associated with S3 objects based on the input given
+	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs)
 }
 
 // The connector provides easy access to AWS SDK calls.
@@ -78,7 +138,9 @@ type connector struct {
 //
 // The connections are not all established while instancing, but the various sessions are, this way connections are only
 // made for services that are called, otherwise only the sessions remain.
-func NewAWSReader(accessKey string, secretKey string, regions []string, config *aws.Config) (AWSReader, error) {
+func NewAWSReader(
+	ctx context.Context, accessKey string, secretKey string, regions []string, config *aws.Config,
+) (AWSReader, error) {
 	var c connector = connector{}
 
 	creds, ec2s, sts, err := configureAWS(accessKey, secretKey)
@@ -86,22 +148,20 @@ func NewAWSReader(accessKey string, secretKey string, regions []string, config *
 		return nil, err
 	}
 	c.creds = creds
-	if err := c.setAccountID(sts); err != nil {
+	if err := c.setAccountID(ctx, sts); err != nil {
 		return nil, err
 	}
-	if err := c.setRegions(ec2s, regions); err != nil {
+	if err := c.setRegions(ctx, ec2s, regions); err != nil {
 		return nil, err
 	}
 	c.setServices(config)
 	return &c, nil
 }
 
-// GetAccountID returns the current ID for the account used
 func (c *connector) GetAccountID() string {
 	return *c.accountID
 }
 
-// GetRegions return the currently used regions for the Connector
 func (c *connector) GetRegions() []string {
 	return c.regions
 }
@@ -145,11 +205,11 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	return creds, ec2.New(sess), sts.New(sess), nil
 }
 
-func (c *connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) error {
+func (c *connector) setRegions(ctx context.Context, ec2 ec2iface.EC2API, enabledRegions []string) error {
 	if len(enabledRegions) == 0 {
 		return errors.New("at least one region name is required")
 	}
-	regions, err := ec2.DescribeRegions(nil)
+	regions, err := ec2.DescribeRegionsWithContext(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -166,8 +226,8 @@ func (c *connector) setRegions(ec2 ec2iface.EC2API, enabledRegions []string) err
 	return nil
 }
 
-func (c *connector) setAccountID(sts stsiface.STSAPI) error {
-	resp, err := sts.GetCallerIdentity(nil)
+func (c *connector) setAccountID(ctx context.Context, sts stsiface.STSAPI) error {
+	resp, err := sts.GetCallerIdentityWithContext(ctx, nil)
 	if err != nil {
 		return err
 	}

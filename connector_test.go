@@ -1,6 +1,7 @@
 package raws
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -65,9 +66,11 @@ func TestConnector_setRegion(t *testing.T) {
 			expectedError:   errors.New("fail"),
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{}
-		err := c.setRegions(tt.mocked, tt.regionsInput)
+		err := c.setRegions(ctx, tt.mocked, tt.regionsInput)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(c.regions, tt.expectedRegions) {
 			t.Errorf("%s [%d] - regions: received=%+v | expected=%+v",
@@ -102,9 +105,11 @@ func TestConnector_setAccountID(t *testing.T) {
 			expectedError: errors.New("fail"),
 		}}
 
+	var ctx = context.Background()
+
 	for i, tt := range tests {
 		c := &connector{}
-		err := c.setAccountID(tt.mocked)
+		err := c.setAccountID(ctx, tt.mocked)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(c.accountID, tt.expectedID) {
 			t.Errorf("%s [%d] - accountID: received=%+v | expected=%+v",
