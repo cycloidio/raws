@@ -12,7 +12,7 @@ func TestErrs_Error(t *testing.T) {
 		expectedOutput string
 	}{{name: "empty error",
 		input:          Errs{},
-		expectedOutput: "0 error(s) occured: []",
+		expectedOutput: "",
 	},
 		{name: "one error",
 			input: Errs{
@@ -22,7 +22,8 @@ func TestErrs_Error(t *testing.T) {
 					service: "service-1",
 				},
 			},
-			expectedOutput: "1 error(s) occured: [[region-1 service-1]]",
+			expectedOutput: "1 error(s) occurred.\n\t" +
+				`region: region-1, service: service-1, Error message: "fail-1"`,
 		},
 		{name: "two errors",
 			input: Errs{
@@ -37,7 +38,9 @@ func TestErrs_Error(t *testing.T) {
 					service: "service-2",
 				},
 			},
-			expectedOutput: "2 error(s) occured: [[region-1 service-1] [region-2 service-2]]",
+			expectedOutput: "2 error(s) occurred.\n\t" +
+				"region: region-1, service: service-1, Error message: \"fail-1\"\n\t" +
+				`region: region-2, service: service-2, Error message: "fail-2"`,
 		}}
 
 	for i, tt := range tests {
@@ -60,7 +63,7 @@ func TestCallErr_Error(t *testing.T) {
 			region:  "region-1",
 			service: "service-1",
 		},
-		expectedOutput: "region-1: error while using 'service-1' service - fail-1",
+		expectedOutput: `region: region-1, service: service-1, Error message: "fail-1"`,
 	},
 		{name: "another error",
 			input: callErr{
@@ -68,7 +71,7 @@ func TestCallErr_Error(t *testing.T) {
 				region:  "region-2",
 				service: "service-2",
 			},
-			expectedOutput: "region-2: error while using 'service-2' service - fail-2",
+			expectedOutput: `region: region-2, service: service-2, Error message: "fail-2"`,
 		}}
 
 	for i, tt := range tests {
