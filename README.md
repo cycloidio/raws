@@ -11,6 +11,8 @@ Currently only a couple of the most used information is gathered, but adding ext
 
 Any contributions are welcome!
 
+**IMPORTANT** we are still experimenting the usage of this library, hence the public interface isn't stable as we have to see that the methods signatures fulfill the main goal of the library which is to simplify the AWS SDK to gather information. Because of this, the repo contains tags which define each version using [Semantic Versioning convention](https://semver.org/).
+
 ## Getting started
 
 ### Import the library
