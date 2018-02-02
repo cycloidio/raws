@@ -3,7 +3,6 @@ package raws_test
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/elasticache"
@@ -106,16 +105,9 @@ func callS3(c raws.AWSReader) {
 }
 
 func Example() {
-	var ok bool
-	var accessKey string
-	if accessKey, ok = os.LookupEnv("AWS_ACCESS_KEY"); !ok {
-		fmt.Println("Not AWS access key defined")
-		return
-	}
-
-	var secretKey string
-	if secretKey, ok = os.LookupEnv("AWS_SECRET_KEY"); !ok {
-		fmt.Println("Not AWS secret key defined")
+	var accessKey, secretKey, err = getAWSKeys()
+	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 
