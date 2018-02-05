@@ -107,7 +107,8 @@ func callS3(c raws.AWSReader) {
 func Example() {
 	var accessKey, secretKey, err = getAWSKeys()
 	if err != nil {
-		fmt.Println(err.Error())
+		// When no keys the example doesn't run, but if the env vars are set
+		// then it runs and make the AWS SDK calls.
 		return
 	}
 
@@ -125,4 +126,6 @@ func Example() {
 	callRDS(c)
 	callElastiCache(c)
 	callS3(c)
+
+	// Output
 }
