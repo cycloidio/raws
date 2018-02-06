@@ -2,6 +2,7 @@ package raws
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Interface defining an API error, this is handy as the region and service are saved
@@ -27,19 +28,26 @@ func NewAPIError(region string, service string, e error) Err {
 	}
 }
 
-// Error rerturns a string which summarize how many errors happened, in which regions and for which services.
+// Error returns a string which summarize how many errors happened and for
+// each error, the region, the service and  the error message reported by
+// AWS original error.
 func (e Errs) Error() string {
-	var output [][]string
+	if len(e) == 0 {
+		return ""
+	}
+
+	var details []string
 
 	for _, err := range e {
-		output = append(output, []string{err.Region(), err.Service()})
+		details = append(details, err.Error())
 	}
-	return fmt.Sprintf("%d error(s) occured: %s", len(e), output)
+
+	return fmt.Sprintf("%d error(s) occurred.\n\t%s", len(e), strings.Join(details, "\n\t"))
 }
 
 // Error returns a string containing the region, service as well as the original API error message.
 func (e *callErr) Error() string {
-	return fmt.Sprintf("%s: error while using '%s' service - %s",
+	return fmt.Sprintf("region: %s, service: %s, Error message: %q",
 		e.region,
 		e.service,
 		e.err.Error())
