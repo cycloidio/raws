@@ -87,9 +87,9 @@ func (c *connector) GetImages(
 
 func (c *connector) GetSecurityGroups(
 	ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
-) ([]*ec2.DescribeSecurityGroupsOutput, error) {
+) (map[string]ec2.DescribeSecurityGroupsOutput, error) {
 	var errs Errors
-	var secgroups []*ec2.DescribeSecurityGroupsOutput
+	var secgroups = map[string]ec2.DescribeSecurityGroupsOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.ec2 == nil {
@@ -99,7 +99,7 @@ func (c *connector) GetSecurityGroups(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			secgroups = append(secgroups, secgroup)
+			secgroups[svc.region] = *secgroup
 		}
 	}
 

@@ -498,7 +498,7 @@ func TestGetSecurityGroups(t *testing.T) {
 	tests := []struct {
 		name              string
 		mocked            []*serviceConnector
-		expectedSecGroups []*ec2.DescribeSecurityGroupsOutput
+		expectedSecGroups map[string]ec2.DescribeSecurityGroupsOutput
 		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -515,7 +515,7 @@ func TestGetSecurityGroups(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedSecGroups: nil,
+		expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -532,8 +532,8 @@ func TestGetSecurityGroups(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSecGroups: []*ec2.DescribeSecurityGroupsOutput{
-				{
+			expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{
+				"test": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("1"),
 					}},
@@ -566,13 +566,13 @@ func TestGetSecurityGroups(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSecGroups: []*ec2.DescribeSecurityGroupsOutput{
-				{
+			expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{
+				"test-1": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("2"),
 					}},
@@ -605,8 +605,8 @@ func TestGetSecurityGroups(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedSecGroups: []*ec2.DescribeSecurityGroupsOutput{
-				{
+			expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{
+				"test-2": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("2"),
 					}},

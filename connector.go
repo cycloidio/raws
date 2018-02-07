@@ -64,10 +64,11 @@ type AWSReader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) (map[string]ec2.DescribeImagesOutput, error)
 
-	// GetSecurityGroups returns all EC2 security groups based on the input given
+	// GetSecurityGroups returns all EC2 security groups based on the input given.
+	// Returned values are commented in the interface doc comment block.
 	GetSecurityGroups(
 		ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
-	) ([]*ec2.DescribeSecurityGroupsOutput, error)
+	) (map[string]ec2.DescribeSecurityGroupsOutput, error)
 
 	// GetSubnets returns all EC2 subnets based on the input given
 	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, error)
