@@ -31,7 +31,7 @@ func (c *connector) GetInstances(
 	return instances, nil
 }
 
-func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs) {
+func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error) {
 	var errs Errs
 	var vpcs []*ec2.DescribeVpcsOutput
 
@@ -46,7 +46,12 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 			vpcs = append(vpcs, vpc)
 		}
 	}
-	return vpcs, errs
+
+	if errs != nil {
+		return vpcs, errs
+	}
+
+	return vpcs, nil
 }
 
 func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs) {

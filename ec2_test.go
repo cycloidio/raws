@@ -233,7 +233,7 @@ func TestGetVpcs(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedVpcs  []*ec2.DescribeVpcsOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
