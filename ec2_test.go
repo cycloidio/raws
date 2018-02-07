@@ -111,7 +111,7 @@ func TestGetInstances(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -201,7 +201,7 @@ func TestGetInstances(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -244,7 +244,7 @@ func TestGetVpcs(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -334,7 +334,7 @@ func TestGetVpcs(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -377,7 +377,7 @@ func TestGetImages(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -467,7 +467,7 @@ func TestGetImages(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -510,7 +510,7 @@ func TestGetSecurityGroups(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -600,7 +600,7 @@ func TestGetSecurityGroups(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -643,7 +643,7 @@ func TestGetSubnets(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -733,7 +733,7 @@ func TestGetSubnets(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -775,7 +775,7 @@ func TestGetVolumes(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -865,7 +865,7 @@ func TestGetVolumes(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -912,7 +912,7 @@ func TestGetSnapshots(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -1002,7 +1002,7 @@ func TestGetSnapshots(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,

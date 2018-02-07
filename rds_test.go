@@ -80,8 +80,8 @@ func TestGetDBInstances(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test"),
 					region:  "test",
 					service: rds.ServiceName,
@@ -112,8 +112,8 @@ func TestGetDBInstances(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: rds.ServiceName,
@@ -236,8 +236,8 @@ func TestGetDBInstancesTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test"),
 					region:  "test",
 					service: rds.ServiceName,
@@ -320,8 +320,8 @@ func TestGetDBInstancesTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: rds.ServiceName,

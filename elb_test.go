@@ -53,7 +53,7 @@ func TestGetLoadBalancers(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: elb.ServiceName,
@@ -157,8 +157,8 @@ func TestGetLoadBalancers(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: elb.ServiceName,
@@ -205,7 +205,7 @@ func TestGetLoadBalancersTags(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: elb.ServiceName,
@@ -309,8 +309,8 @@ func TestGetLoadBalancersTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: elb.ServiceName,

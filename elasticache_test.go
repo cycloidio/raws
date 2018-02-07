@@ -79,7 +79,7 @@ func TestGetElastiCacheCluster(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test"),
 				region:  "test",
 				service: elasticache.ServiceName,
@@ -156,8 +156,8 @@ func TestGetElastiCacheCluster(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test"),
 					region:  "test-1",
 					service: elasticache.ServiceName,
@@ -234,8 +234,8 @@ func TestGetElastiCacheTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test"),
 					region:  "test",
 					service: elasticache.ServiceName,
@@ -315,8 +315,8 @@ func TestGetElastiCacheTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: elasticache.ServiceName,

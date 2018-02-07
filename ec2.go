@@ -9,7 +9,7 @@ import (
 func (c *connector) GetInstances(
 	ctx context.Context, input *ec2.DescribeInstancesInput,
 ) ([]*ec2.DescribeInstancesOutput, error) {
-	var errs Errs
+	var errs Errors
 	var instances []*ec2.DescribeInstancesOutput
 
 	for _, svc := range c.svcs {
@@ -18,7 +18,7 @@ func (c *connector) GetInstances(
 		}
 		instance, err := svc.ec2.DescribeInstancesWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			instances = append(instances, instance)
 		}
@@ -32,7 +32,7 @@ func (c *connector) GetInstances(
 }
 
 func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error) {
-	var errs Errs
+	var errs Errors
 	var vpcs []*ec2.DescribeVpcsOutput
 
 	for _, svc := range c.svcs {
@@ -41,7 +41,7 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 		}
 		vpc, err := svc.ec2.DescribeVpcsWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			vpcs = append(vpcs, vpc)
 		}
@@ -57,7 +57,7 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 func (c *connector) GetImages(
 	ctx context.Context, input *ec2.DescribeImagesInput,
 ) ([]*ec2.DescribeImagesOutput, error) {
-	var errs Errs
+	var errs Errors
 	var images []*ec2.DescribeImagesOutput
 
 	if input == nil {
@@ -70,7 +70,7 @@ func (c *connector) GetImages(
 		}
 		image, err := svc.ec2.DescribeImagesWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			images = append(images, image)
 		}
@@ -86,7 +86,7 @@ func (c *connector) GetImages(
 func (c *connector) GetSecurityGroups(
 	ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
 ) ([]*ec2.DescribeSecurityGroupsOutput, error) {
-	var errs Errs
+	var errs Errors
 	var secgroups []*ec2.DescribeSecurityGroupsOutput
 
 	for _, svc := range c.svcs {
@@ -95,7 +95,7 @@ func (c *connector) GetSecurityGroups(
 		}
 		secgroup, err := svc.ec2.DescribeSecurityGroupsWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			secgroups = append(secgroups, secgroup)
 		}
@@ -111,7 +111,7 @@ func (c *connector) GetSecurityGroups(
 func (c *connector) GetSubnets(
 	ctx context.Context, input *ec2.DescribeSubnetsInput,
 ) ([]*ec2.DescribeSubnetsOutput, error) {
-	var errs Errs
+	var errs Errors
 	var subnets []*ec2.DescribeSubnetsOutput
 
 	for _, svc := range c.svcs {
@@ -120,7 +120,7 @@ func (c *connector) GetSubnets(
 		}
 		subnet, err := svc.ec2.DescribeSubnetsWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			subnets = append(subnets, subnet)
 		}
@@ -136,7 +136,7 @@ func (c *connector) GetSubnets(
 func (c *connector) GetVolumes(
 	ctx context.Context, input *ec2.DescribeVolumesInput,
 ) ([]*ec2.DescribeVolumesOutput, error) {
-	var errs Errs
+	var errs Errors
 	var volumes []*ec2.DescribeVolumesOutput
 
 	for _, svc := range c.svcs {
@@ -145,7 +145,7 @@ func (c *connector) GetVolumes(
 		}
 		volume, err := svc.ec2.DescribeVolumesWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			volumes = append(volumes, volume)
 		}
@@ -161,7 +161,7 @@ func (c *connector) GetVolumes(
 func (c *connector) GetSnapshots(
 	ctx context.Context, input *ec2.DescribeSnapshotsInput,
 ) ([]*ec2.DescribeSnapshotsOutput, error) {
-	var errs Errs
+	var errs Errors
 	var snapshots []*ec2.DescribeSnapshotsOutput
 
 	if input == nil {
@@ -174,7 +174,7 @@ func (c *connector) GetSnapshots(
 		}
 		snapshot, err := svc.ec2.DescribeSnapshotsWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, ec2.ServiceName, err))
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
 			snapshots = append(snapshots, snapshot)
 		}

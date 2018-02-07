@@ -95,7 +95,7 @@ func TestListBuckets(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -185,7 +185,7 @@ func TestListBuckets(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,
@@ -228,7 +228,7 @@ func TestGetBucketTags(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -325,7 +325,7 @@ func TestGetBucketTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,
@@ -369,7 +369,7 @@ func TestListObjects(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -444,7 +444,7 @@ func TestListObjects(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,
@@ -560,7 +560,7 @@ func TestGetObjectsTags(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -636,7 +636,7 @@ func TestGetObjectsTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,

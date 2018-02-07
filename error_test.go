@@ -5,18 +5,18 @@ import (
 	"testing"
 )
 
-func TestErrs_Error(t *testing.T) {
+func TestErrors_Error(t *testing.T) {
 	tests := []struct {
 		name           string
-		input          Errs
+		input          Errors
 		expectedOutput string
 	}{{name: "empty error",
-		input:          Errs{},
+		input:          Errors{},
 		expectedOutput: "",
 	},
 		{name: "one error",
-			input: Errs{
-				&callErr{
+			input: Errors{
+				Error{
 					err:     errors.New("fail-1"),
 					region:  "region-1",
 					service: "service-1",
@@ -26,13 +26,13 @@ func TestErrs_Error(t *testing.T) {
 				`region: region-1, service: service-1, Error message: "fail-1"`,
 		},
 		{name: "two errors",
-			input: Errs{
-				&callErr{
+			input: Errors{
+				Error{
 					err:     errors.New("fail-1"),
 					region:  "region-1",
 					service: "service-1",
 				},
-				&callErr{
+				Error{
 					err:     errors.New("fail-2"),
 					region:  "region-2",
 					service: "service-2",
@@ -52,13 +52,13 @@ func TestErrs_Error(t *testing.T) {
 
 }
 
-func TestCallErr_Error(t *testing.T) {
+func TestError_Error(t *testing.T) {
 	tests := []struct {
 		name           string
-		input          callErr
+		input          Error
 		expectedOutput string
 	}{{name: "one error",
-		input: callErr{
+		input: Error{
 			err:     errors.New("fail-1"),
 			region:  "region-1",
 			service: "service-1",
@@ -66,7 +66,7 @@ func TestCallErr_Error(t *testing.T) {
 		expectedOutput: `region: region-1, service: service-1, Error message: "fail-1"`,
 	},
 		{name: "another error",
-			input: callErr{
+			input: Error{
 				err:     errors.New("fail-2"),
 				region:  "region-2",
 				service: "service-2",
@@ -82,13 +82,13 @@ func TestCallErr_Error(t *testing.T) {
 	}
 }
 
-func TestCallErr_Region(t *testing.T) {
+func TestError_Region(t *testing.T) {
 	tests := []struct {
 		name           string
-		input          callErr
+		input          Error
 		expectedRegion string
 	}{{name: "one error with one region",
-		input: callErr{
+		input: Error{
 			err:     errors.New("fail-1"),
 			region:  "region-1",
 			service: "service-1",
@@ -96,7 +96,7 @@ func TestCallErr_Region(t *testing.T) {
 		expectedRegion: "region-1",
 	},
 		{name: "one error with another region",
-			input: callErr{
+			input: Error{
 				err:     errors.New("fail-2"),
 				region:  "region-2",
 				service: "service-2",
@@ -112,13 +112,13 @@ func TestCallErr_Region(t *testing.T) {
 	}
 }
 
-func TestCallErr_Service(t *testing.T) {
+func TestError_Service(t *testing.T) {
 	tests := []struct {
 		name            string
-		input           callErr
+		input           Error
 		expectedService string
 	}{{name: "one error with one service",
-		input: callErr{
+		input: Error{
 			err:     errors.New("fail-1"),
 			region:  "region-1",
 			service: "service-1",
@@ -126,7 +126,7 @@ func TestCallErr_Service(t *testing.T) {
 		expectedService: "service-1",
 	},
 		{name: "one error with another service",
-			input: callErr{
+			input: Error{
 				err:     errors.New("fail-2"),
 				region:  "region-1",
 				service: "service-2",
