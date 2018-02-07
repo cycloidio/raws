@@ -41,7 +41,7 @@ func TestGetLoadBalancersV2(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedELBs  []*elbv2.DescribeLoadBalancersOutput
+		expectedELBs  map[string]elbv2.DescribeLoadBalancersOutput
 		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -58,7 +58,7 @@ func TestGetLoadBalancersV2(t *testing.T) {
 			region:  "test",
 			service: elbv2.ServiceName,
 		}},
-		expectedELBs: nil,
+		expectedELBs: map[string]elbv2.DescribeLoadBalancersOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -77,8 +77,8 @@ func TestGetLoadBalancersV2(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedELBs: []*elbv2.DescribeLoadBalancersOutput{
-				{
+			expectedELBs: map[string]elbv2.DescribeLoadBalancersOutput{
+				"test": {
 					LoadBalancers: []*elbv2.LoadBalancer{
 						{
 							LoadBalancerName: aws.String("1"),
@@ -117,15 +117,15 @@ func TestGetLoadBalancersV2(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedELBs: []*elbv2.DescribeLoadBalancersOutput{
-				{
+			expectedELBs: map[string]elbv2.DescribeLoadBalancersOutput{
+				"test-1": {
 					LoadBalancers: []*elbv2.LoadBalancer{
 						{
 							LoadBalancerName: aws.String("1"),
 						},
 					},
 				},
-				{
+				"test-2": {
 					LoadBalancers: []*elbv2.LoadBalancer{
 						{
 							LoadBalancerName: aws.String("2"),
@@ -164,8 +164,8 @@ func TestGetLoadBalancersV2(t *testing.T) {
 					service: elbv2.ServiceName,
 				},
 			},
-			expectedELBs: []*elbv2.DescribeLoadBalancersOutput{
-				{
+			expectedELBs: map[string]elbv2.DescribeLoadBalancersOutput{
+				"test-2": {
 					LoadBalancers: []*elbv2.LoadBalancer{
 						{
 							LoadBalancerName: aws.String("2"),

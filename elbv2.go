@@ -8,9 +8,9 @@ import (
 
 func (c *connector) GetLoadBalancersV2(
 	ctx context.Context, input *elbv2.DescribeLoadBalancersInput,
-) ([]*elbv2.DescribeLoadBalancersOutput, error) {
+) (map[string]elbv2.DescribeLoadBalancersOutput, error) {
 	var errs Errors
-	var elbs []*elbv2.DescribeLoadBalancersOutput
+	var elbs = map[string]elbv2.DescribeLoadBalancersOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.elbv2 == nil {
@@ -20,7 +20,7 @@ func (c *connector) GetLoadBalancersV2(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, elbv2.ServiceName, err))
 		} else {
-			elbs = append(elbs, elb)
+			elbs[svc.region] = *elb
 		}
 	}
 
