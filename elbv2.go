@@ -33,9 +33,9 @@ func (c *connector) GetLoadBalancersV2(
 
 func (c *connector) GetLoadBalancersV2Tags(
 	ctx context.Context, input *elbv2.DescribeTagsInput,
-) ([]*elbv2.DescribeTagsOutput, error) {
+) (map[string]elbv2.DescribeTagsOutput, error) {
 	var errs Errors
-	var elbTags []*elbv2.DescribeTagsOutput
+	var elbTags = map[string]elbv2.DescribeTagsOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.elbv2 == nil {
@@ -45,7 +45,7 @@ func (c *connector) GetLoadBalancersV2Tags(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, elbv2.ServiceName, err))
 		} else {
-			elbTags = append(elbTags, elbTag)
+			elbTags[svc.region] = *elbTag
 		}
 	}
 
