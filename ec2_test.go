@@ -763,7 +763,7 @@ func TestGetVolumes(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
-		expectedVolumes []*ec2.DescribeVolumesOutput
+		expectedVolumes map[string]ec2.DescribeVolumesOutput
 		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -780,7 +780,7 @@ func TestGetVolumes(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedVolumes: nil,
+		expectedVolumes: map[string]ec2.DescribeVolumesOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -797,8 +797,8 @@ func TestGetVolumes(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVolumes: []*ec2.DescribeVolumesOutput{
-				{
+			expectedVolumes: map[string]ec2.DescribeVolumesOutput{
+				"test": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("1"),
 					}},
@@ -831,13 +831,13 @@ func TestGetVolumes(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVolumes: []*ec2.DescribeVolumesOutput{
-				{
+			expectedVolumes: map[string]ec2.DescribeVolumesOutput{
+				"test-1": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("2"),
 					}},
@@ -870,8 +870,8 @@ func TestGetVolumes(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedVolumes: []*ec2.DescribeVolumesOutput{
-				{
+			expectedVolumes: map[string]ec2.DescribeVolumesOutput{
+				"test-2": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("2"),
 					}},

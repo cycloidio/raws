@@ -74,8 +74,9 @@ type AWSReader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) (map[string]ec2.DescribeSubnetsOutput, error)
 
-	// GetVolumes returns all EC2 volumes based on the input given
-	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, error)
+	// GetVolumes returns all EC2 volumes based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) (map[string]ec2.DescribeVolumesOutput, error)
 
 	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given
 	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, error)

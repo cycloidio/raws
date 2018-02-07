@@ -137,9 +137,9 @@ func (c *connector) GetSubnets(
 
 func (c *connector) GetVolumes(
 	ctx context.Context, input *ec2.DescribeVolumesInput,
-) ([]*ec2.DescribeVolumesOutput, error) {
+) (map[string]ec2.DescribeVolumesOutput, error) {
 	var errs Errors
-	var volumes []*ec2.DescribeVolumesOutput
+	var volumes = map[string]ec2.DescribeVolumesOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.ec2 == nil {
@@ -149,7 +149,7 @@ func (c *connector) GetVolumes(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			volumes = append(volumes, volume)
+			volumes[svc.region] = *volume
 		}
 	}
 
