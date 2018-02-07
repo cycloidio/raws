@@ -112,9 +112,9 @@ func (c *connector) GetSecurityGroups(
 
 func (c *connector) GetSubnets(
 	ctx context.Context, input *ec2.DescribeSubnetsInput,
-) ([]*ec2.DescribeSubnetsOutput, error) {
+) (map[string]ec2.DescribeSubnetsOutput, error) {
 	var errs Errors
-	var subnets []*ec2.DescribeSubnetsOutput
+	var subnets = map[string]ec2.DescribeSubnetsOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.ec2 == nil {
@@ -124,7 +124,7 @@ func (c *connector) GetSubnets(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			subnets = append(subnets, subnet)
+			subnets[svc.region] = *subnet
 		}
 	}
 

@@ -631,7 +631,7 @@ func TestGetSubnets(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
-		expectedSubnets []*ec2.DescribeSubnetsOutput
+		expectedSubnets map[string]ec2.DescribeSubnetsOutput
 		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -648,7 +648,7 @@ func TestGetSubnets(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedSubnets: nil,
+		expectedSubnets: map[string]ec2.DescribeSubnetsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -665,8 +665,8 @@ func TestGetSubnets(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSubnets: []*ec2.DescribeSubnetsOutput{
-				{
+			expectedSubnets: map[string]ec2.DescribeSubnetsOutput{
+				"test": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("1"),
 					}},
@@ -699,13 +699,13 @@ func TestGetSubnets(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSubnets: []*ec2.DescribeSubnetsOutput{
-				{
+			expectedSubnets: map[string]ec2.DescribeSubnetsOutput{
+				"test-1": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("2"),
 					}},
@@ -738,8 +738,8 @@ func TestGetSubnets(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedSubnets: []*ec2.DescribeSubnetsOutput{
-				{
+			expectedSubnets: map[string]ec2.DescribeSubnetsOutput{
+				"test-2": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("2"),
 					}},
