@@ -85,7 +85,7 @@ func (c *connector) GetImages(
 
 func (c *connector) GetSecurityGroups(
 	ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
-) ([]*ec2.DescribeSecurityGroupsOutput, Errs) {
+) ([]*ec2.DescribeSecurityGroupsOutput, error) {
 	var errs Errs
 	var secgroups []*ec2.DescribeSecurityGroupsOutput
 
@@ -100,7 +100,12 @@ func (c *connector) GetSecurityGroups(
 			secgroups = append(secgroups, secgroup)
 		}
 	}
-	return secgroups, errs
+
+	if errs != nil {
+		return secgroups, errs
+	}
+
+	return secgroups, nil
 }
 
 func (c *connector) GetSubnets(

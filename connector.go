@@ -48,7 +48,7 @@ type AWSReader interface {
 	// GetSecurityGroups returns all EC2 security groups based on the input given
 	GetSecurityGroups(
 		ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
-	) ([]*ec2.DescribeSecurityGroupsOutput, Errs)
+	) ([]*ec2.DescribeSecurityGroupsOutput, error)
 
 	// GetSubnets returns all EC2 subnets based on the input given
 	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs)
