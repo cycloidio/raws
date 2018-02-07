@@ -107,9 +107,9 @@ func (c *connector) DownloadObject(
 
 func (c *connector) GetObjectsTags(
 	ctx context.Context, input *s3.GetObjectTaggingInput,
-) ([]*s3.GetObjectTaggingOutput, error) {
+) (map[string]s3.GetObjectTaggingOutput, error) {
 	var errs Errors
-	var objectsTagsList []*s3.GetObjectTaggingOutput
+	var objectsTagsList = map[string]s3.GetObjectTaggingOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.s3 == nil {
@@ -119,7 +119,7 @@ func (c *connector) GetObjectsTags(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, s3.ServiceName, err))
 		} else {
-			objectsTagsList = append(objectsTagsList, buckets)
+			objectsTagsList[svc.region] = *buckets
 		}
 	}
 

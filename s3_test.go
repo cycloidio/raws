@@ -548,7 +548,7 @@ func TestGetObjectsTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedTags  []*s3.GetObjectTaggingOutput
+		expectedTags  map[string]s3.GetObjectTaggingOutput
 		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -565,7 +565,7 @@ func TestGetObjectsTags(t *testing.T) {
 			region:  "test",
 			service: s3.ServiceName,
 		}},
-		expectedTags: nil,
+		expectedTags: map[string]s3.GetObjectTaggingOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -580,8 +580,8 @@ func TestGetObjectsTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*s3.GetObjectTaggingOutput{
-				{
+			expectedTags: map[string]s3.GetObjectTaggingOutput{
+				"test": {
 					VersionId: aws.String("test"),
 				},
 			},
@@ -608,11 +608,11 @@ func TestGetObjectsTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*s3.GetObjectTaggingOutput{
-				{
+			expectedTags: map[string]s3.GetObjectTaggingOutput{
+				"test-1": {
 					VersionId: aws.String("test-1"),
 				},
-				{
+				"test-2": {
 					VersionId: aws.String("test-2"),
 				},
 			},
@@ -641,8 +641,8 @@ func TestGetObjectsTags(t *testing.T) {
 				region:  "test-1",
 				service: s3.ServiceName,
 			}},
-			expectedTags: []*s3.GetObjectTaggingOutput{
-				{
+			expectedTags: map[string]s3.GetObjectTaggingOutput{
+				"test-2": {
 					VersionId: aws.String("test-2"),
 				},
 			},

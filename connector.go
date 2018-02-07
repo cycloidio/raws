@@ -145,8 +145,9 @@ type AWSReader interface {
 		ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader),
 	) (int64, error)
 
-	// GetObjectsTags returns tags associated with S3 objects based on the input given
-	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, error)
+	// GetObjectsTags returns tags associated with S3 objects based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) (map[string]s3.GetObjectTaggingOutput, error)
 }
 
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
