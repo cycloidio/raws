@@ -36,7 +36,7 @@ func (c *connector) ListBuckets(
 
 func (c *connector) GetBucketTags(
 	ctx context.Context, input *s3.GetBucketTaggingInput,
-) ([]*s3.GetBucketTaggingOutput, Errs) {
+) ([]*s3.GetBucketTaggingOutput, error) {
 	var errs Errs
 	var bucketsTagList []*s3.GetBucketTaggingOutput
 
@@ -51,7 +51,12 @@ func (c *connector) GetBucketTags(
 			bucketsTagList = append(bucketsTagList, bucketsTags)
 		}
 	}
-	return bucketsTagList, errs
+
+	if errs != nil {
+		return bucketsTagList, errs
+	}
+
+	return bucketsTagList, nil
 }
 
 func (c *connector) ListObjects(
