@@ -232,7 +232,7 @@ func TestGetVpcs(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedVpcs  []*ec2.DescribeVpcsOutput
+		expectedVpcs  map[string]ec2.DescribeVpcsOutput
 		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -249,7 +249,7 @@ func TestGetVpcs(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedVpcs: nil,
+		expectedVpcs: map[string]ec2.DescribeVpcsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -266,8 +266,8 @@ func TestGetVpcs(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVpcs: []*ec2.DescribeVpcsOutput{
-				{
+			expectedVpcs: map[string]ec2.DescribeVpcsOutput{
+				"test": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("1"),
 					}},
@@ -300,13 +300,13 @@ func TestGetVpcs(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVpcs: []*ec2.DescribeVpcsOutput{
-				{
+			expectedVpcs: map[string]ec2.DescribeVpcsOutput{
+				"test-1": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("2"),
 					}},
@@ -339,8 +339,8 @@ func TestGetVpcs(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedVpcs: []*ec2.DescribeVpcsOutput{
-				{
+			expectedVpcs: map[string]ec2.DescribeVpcsOutput{
+				"test-2": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("2"),
 					}},

@@ -31,9 +31,11 @@ func (c *connector) GetInstances(
 	return instances, nil
 }
 
-func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error) {
+func (c *connector) GetVpcs(
+	ctx context.Context, input *ec2.DescribeVpcsInput,
+) (map[string]ec2.DescribeVpcsOutput, error) {
 	var errs Errors
-	var vpcs []*ec2.DescribeVpcsOutput
+	var vpcs = map[string]ec2.DescribeVpcsOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.ec2 == nil {
@@ -43,7 +45,7 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			vpcs = append(vpcs, vpc)
+			vpcs[svc.region] = *vpc
 		}
 	}
 

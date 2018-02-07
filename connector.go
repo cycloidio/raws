@@ -56,8 +56,9 @@ type AWSReader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (map[string]ec2.DescribeInstancesOutput, error)
 
-	// GetVpcs returns all EC2 VPCs based on the input given
-	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error)
+	// GetVpcs returns all EC2 VPCs based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (map[string]ec2.DescribeVpcsOutput, error)
 
 	// GetImages returns all EC2 AMI belonging to the Account ID based on the input given
 	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, error)
