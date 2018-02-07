@@ -162,9 +162,9 @@ func (c *connector) GetVolumes(
 
 func (c *connector) GetSnapshots(
 	ctx context.Context, input *ec2.DescribeSnapshotsInput,
-) ([]*ec2.DescribeSnapshotsOutput, error) {
+) (map[string]ec2.DescribeSnapshotsOutput, error) {
 	var errs Errors
-	var snapshots []*ec2.DescribeSnapshotsOutput
+	var snapshots = map[string]ec2.DescribeSnapshotsOutput{}
 
 	if input == nil {
 		input = &ec2.DescribeSnapshotsInput{}
@@ -178,7 +178,7 @@ func (c *connector) GetSnapshots(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			snapshots = append(snapshots, snapshot)
+			snapshots[svc.region] = *snapshot
 		}
 	}
 

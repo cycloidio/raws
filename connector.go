@@ -78,8 +78,9 @@ type AWSReader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) (map[string]ec2.DescribeVolumesOutput, error)
 
-	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given
-	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, error)
+	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (map[string]ec2.DescribeSnapshotsOutput, error)
 
 	// GetElastiCacheCluster returns all Elasticache clusters based on the input given
 	GetElastiCacheCluster(
