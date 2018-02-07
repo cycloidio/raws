@@ -94,10 +94,11 @@ type AWSReader interface {
 		ctx context.Context, input *elasticache.ListTagsForResourceInput,
 	) (map[string]elasticache.TagListMessage, error)
 
-	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions
+	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancers(
 		ctx context.Context, input *elb.DescribeLoadBalancersInput,
-	) ([]*elb.DescribeLoadBalancersOutput, error)
+	) (map[string]elb.DescribeLoadBalancersOutput, error)
 
 	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions
 	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, error)
