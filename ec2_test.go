@@ -366,7 +366,7 @@ func TestGetImages(t *testing.T) {
 		name           string
 		mocked         []*serviceConnector
 		expectedImages []*ec2.DescribeImagesOutput
-		expectedError  Errs
+		expectedError  error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{

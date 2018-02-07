@@ -43,7 +43,7 @@ type AWSReader interface {
 	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error)
 
 	// GetImages returns all EC2 AMI belonging to the Account ID based on the input given
-	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs)
+	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, error)
 
 	// GetSecurityGroups returns all EC2 security groups based on the input given
 	GetSecurityGroups(

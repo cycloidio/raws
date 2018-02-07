@@ -54,7 +54,9 @@ func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (
 	return vpcs, nil
 }
 
-func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, Errs) {
+func (c *connector) GetImages(
+	ctx context.Context, input *ec2.DescribeImagesInput,
+) ([]*ec2.DescribeImagesOutput, error) {
 	var errs Errs
 	var images []*ec2.DescribeImagesOutput
 
@@ -73,7 +75,12 @@ func (c *connector) GetImages(ctx context.Context, input *ec2.DescribeImagesInpu
 			images = append(images, image)
 		}
 	}
-	return images, errs
+
+	if errs != nil {
+		return images, errs
+	}
+
+	return images, nil
 }
 
 func (c *connector) GetSecurityGroups(
