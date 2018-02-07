@@ -357,7 +357,7 @@ func TestListObjects(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
-		expectedObjects []*s3.ListObjectsOutput
+		expectedObjects map[string]s3.ListObjectsOutput
 		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -374,7 +374,7 @@ func TestListObjects(t *testing.T) {
 			region:  "test",
 			service: s3.ServiceName,
 		}},
-		expectedObjects: nil,
+		expectedObjects: map[string]s3.ListObjectsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -389,8 +389,8 @@ func TestListObjects(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedObjects: []*s3.ListObjectsOutput{
-				{
+			expectedObjects: map[string]s3.ListObjectsOutput{
+				"test": {
 					Name: aws.String("test"),
 				},
 			},
@@ -417,11 +417,11 @@ func TestListObjects(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedObjects: []*s3.ListObjectsOutput{
-				{
+			expectedObjects: map[string]s3.ListObjectsOutput{
+				"test-1": {
 					Name: aws.String("test-1"),
 				},
-				{
+				"test-2": {
 					Name: aws.String("test-2"),
 				},
 			},
@@ -449,8 +449,8 @@ func TestListObjects(t *testing.T) {
 				region:  "test-1",
 				service: s3.ServiceName,
 			}},
-			expectedObjects: []*s3.ListObjectsOutput{
-				{
+			expectedObjects: map[string]s3.ListObjectsOutput{
+				"test-2": {
 					Name: aws.String("test-2"),
 				},
 			},

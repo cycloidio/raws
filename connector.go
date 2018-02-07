@@ -136,8 +136,9 @@ type AWSReader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) (map[string]s3.GetBucketTaggingOutput, error)
 
-	// ListObjects returns a list of all S3 objects in a bucket based on the input given
-	ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, error)
+	// ListObjects returns a list of all S3 objects in a bucket based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	ListObjects(ctx context.Context, input *s3.ListObjectsInput) (map[string]s3.ListObjectsOutput, error)
 
 	// DownloadObject downloads an object in a bucket based on the input given
 	DownloadObject(
