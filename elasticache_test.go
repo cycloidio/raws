@@ -192,7 +192,7 @@ func TestGetElastiCacheTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedTags  []*elasticache.TagListMessage
+		expectedTags  map[string]elasticache.TagListMessage
 		expectedError error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
@@ -211,8 +211,8 @@ func TestGetElastiCacheTags(t *testing.T) {
 			},
 		},
 		expectedError: nil,
-		expectedTags: []*elasticache.TagListMessage{
-			{
+		expectedTags: map[string]elasticache.TagListMessage{
+			"test": {
 				TagList: []*elasticache.Tag{
 					{
 						Key:   aws.String("test"),
@@ -241,7 +241,7 @@ func TestGetElastiCacheTags(t *testing.T) {
 					service: elasticache.ServiceName,
 				},
 			},
-			expectedTags: nil,
+			expectedTags: map[string]elasticache.TagListMessage{},
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
@@ -273,8 +273,8 @@ func TestGetElastiCacheTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*elasticache.TagListMessage{
-				{
+			expectedTags: map[string]elasticache.TagListMessage{
+				"test-1": {
 					TagList: []*elasticache.Tag{
 						{
 							Key:   aws.String("test"),
@@ -282,7 +282,7 @@ func TestGetElastiCacheTags(t *testing.T) {
 						},
 					},
 				},
-				{
+				"test-2": {
 					TagList: []*elasticache.Tag{
 						{
 							Key:   aws.String("test"),
@@ -322,8 +322,8 @@ func TestGetElastiCacheTags(t *testing.T) {
 					service: elasticache.ServiceName,
 				},
 			},
-			expectedTags: []*elasticache.TagListMessage{
-				{
+			expectedTags: map[string]elasticache.TagListMessage{
+				"test-2": {
 					TagList: []*elasticache.Tag{
 						{
 							Key:   aws.String("test"),

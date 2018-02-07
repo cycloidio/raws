@@ -88,10 +88,11 @@ type AWSReader interface {
 		ctx context.Context, input *elasticache.DescribeCacheClustersInput,
 	) (map[string]elasticache.DescribeCacheClustersOutput, error)
 
-	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN
+	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN.
+	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheTags(
 		ctx context.Context, input *elasticache.ListTagsForResourceInput,
-	) ([]*elasticache.TagListMessage, error)
+	) (map[string]elasticache.TagListMessage, error)
 
 	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions
 	GetLoadBalancers(

@@ -33,9 +33,9 @@ func (c *connector) GetElastiCacheCluster(
 
 func (c *connector) GetElastiCacheTags(
 	ctx context.Context, input *elasticache.ListTagsForResourceInput,
-) ([]*elasticache.TagListMessage, error) {
+) (map[string]elasticache.TagListMessage, error) {
 	var errs Errors
-	var elastiCacheTags []*elasticache.TagListMessage
+	var elastiCacheTags = map[string]elasticache.TagListMessage{}
 
 	for _, svc := range c.svcs {
 		if svc.elasticache == nil {
@@ -45,7 +45,7 @@ func (c *connector) GetElastiCacheTags(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, elasticache.ServiceName, err))
 		} else {
-			elastiCacheTags = append(elastiCacheTags, elasticacheTag)
+			elastiCacheTags[svc.region] = *elasticacheTag
 		}
 	}
 
