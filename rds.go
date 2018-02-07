@@ -33,7 +33,7 @@ func (c *connector) GetDBInstances(
 
 func (c *connector) GetDBInstancesTags(
 	ctx context.Context, input *rds.ListTagsForResourceInput,
-) ([]*rds.ListTagsForResourceOutput, Errs) {
+) ([]*rds.ListTagsForResourceOutput, error) {
 	var errs Errs
 	var rdsTags []*rds.ListTagsForResourceOutput
 
@@ -48,5 +48,10 @@ func (c *connector) GetDBInstancesTags(
 			rdsTags = append(rdsTags, rdsTag)
 		}
 	}
-	return rdsTags, errs
+
+	if errs != nil {
+		return rdsTags, errs
+	}
+
+	return rdsTags, nil
 }

@@ -195,7 +195,7 @@ func TestGetDBInstancesTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*rds.ListTagsForResourceOutput
-		expectedError Errs
+		expectedError error
 	}{
 		{name: "one region no error",
 			mocked: []*serviceConnector{
