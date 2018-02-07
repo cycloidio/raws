@@ -113,19 +113,6 @@ type AWSReader interface {
 	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, error)
 }
 
-// The connector provides easy access to AWS SDK calls.
-//
-// By using it, calls can be made directly through multiple regions, and will filter only data that belongs to you.
-// For example, when fetching the list of AMI, or snapshots.
-//
-// In order to start making calls, only calling NewAWSReader is required.
-type connector struct {
-	regions   []string
-	svcs      []*serviceConnector
-	creds     *credentials.Credentials
-	accountID *string
-}
-
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
 //
 // The accountID is helpful to return only the AMI or snapshots that belong to the account.
@@ -156,6 +143,19 @@ func NewAWSReader(
 	}
 	c.setServices(config)
 	return &c, nil
+}
+
+// The connector provides easy access to AWS SDK calls.
+//
+// By using it, calls can be made directly through multiple regions, and will filter only data that belongs to you.
+// For example, when fetching the list of AMI, or snapshots.
+//
+// In order to start making calls, only calling NewAWSReader is required.
+type connector struct {
+	regions   []string
+	svcs      []*serviceConnector
+	creds     *credentials.Credentials
+	accountID *string
 }
 
 func (c *connector) GetAccountID() string {
