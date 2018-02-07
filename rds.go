@@ -8,9 +8,9 @@ import (
 
 func (c *connector) GetDBInstances(
 	ctx context.Context, input *rds.DescribeDBInstancesInput,
-) ([]*rds.DescribeDBInstancesOutput, error) {
+) (map[string]rds.DescribeDBInstancesOutput, error) {
 	var errs Errors
-	var instances []*rds.DescribeDBInstancesOutput
+	var instances = map[string]rds.DescribeDBInstancesOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.rds == nil {
@@ -20,7 +20,7 @@ func (c *connector) GetDBInstances(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, rds.ServiceName, err))
 		} else {
-			instances = append(instances, instance)
+			instances[svc.region] = *instance
 		}
 	}
 

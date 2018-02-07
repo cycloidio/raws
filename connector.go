@@ -116,10 +116,11 @@ type AWSReader interface {
 		ctx context.Context, input *elbv2.DescribeTagsInput,
 	) (map[string]elbv2.DescribeTagsOutput, error)
 
-	// GetDBInstances returns all DB instances based on the input given
+	// GetDBInstances returns all DB instances based on the input given.
+	// Returned values are commented in the interface doc comment block.
 	GetDBInstances(
 		ctx context.Context, input *rds.DescribeDBInstancesInput,
-	) ([]*rds.DescribeDBInstancesOutput, error)
+	) (map[string]rds.DescribeDBInstancesOutput, error)
 
 	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided
 	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, error)
