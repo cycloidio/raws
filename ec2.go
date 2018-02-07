@@ -135,7 +135,7 @@ func (c *connector) GetSubnets(
 
 func (c *connector) GetVolumes(
 	ctx context.Context, input *ec2.DescribeVolumesInput,
-) ([]*ec2.DescribeVolumesOutput, Errs) {
+) ([]*ec2.DescribeVolumesOutput, error) {
 	var errs Errs
 	var volumes []*ec2.DescribeVolumesOutput
 
@@ -150,7 +150,12 @@ func (c *connector) GetVolumes(
 			volumes = append(volumes, volume)
 		}
 	}
-	return volumes, errs
+
+	if errs != nil {
+		return volumes, errs
+	}
+
+	return volumes, nil
 }
 
 func (c *connector) GetSnapshots(

@@ -764,7 +764,7 @@ func TestGetVolumes(t *testing.T) {
 		name            string
 		mocked          []*serviceConnector
 		expectedVolumes []*ec2.DescribeVolumesOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
