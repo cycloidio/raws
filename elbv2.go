@@ -8,7 +8,7 @@ import (
 
 func (c *connector) GetLoadBalancersV2(
 	ctx context.Context, input *elbv2.DescribeLoadBalancersInput,
-) ([]*elbv2.DescribeLoadBalancersOutput, Errs) {
+) ([]*elbv2.DescribeLoadBalancersOutput, error) {
 	var errs Errs
 	var elbs []*elbv2.DescribeLoadBalancersOutput
 
@@ -23,7 +23,12 @@ func (c *connector) GetLoadBalancersV2(
 			elbs = append(elbs, elb)
 		}
 	}
-	return elbs, errs
+
+	if errs != nil {
+		return elbs, errs
+	}
+
+	return elbs, nil
 }
 
 func (c *connector) GetLoadBalancersV2Tags(
