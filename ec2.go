@@ -8,9 +8,9 @@ import (
 
 func (c *connector) GetInstances(
 	ctx context.Context, input *ec2.DescribeInstancesInput,
-) ([]*ec2.DescribeInstancesOutput, error) {
+) (map[string]ec2.DescribeInstancesOutput, error) {
 	var errs Errors
-	var instances []*ec2.DescribeInstancesOutput
+	var instances = map[string]ec2.DescribeInstancesOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.ec2 == nil {
@@ -20,7 +20,7 @@ func (c *connector) GetInstances(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			instances = append(instances, instance)
+			instances[svc.region] = *instance
 		}
 	}
 

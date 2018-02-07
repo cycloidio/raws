@@ -29,6 +29,22 @@ import (
 )
 
 // AWSReader is the interface defining all methods that need to be implemented
+//
+// The next behavior commented in the below paragraph, applies to every method
+// which clearly match what's explained, for the sake of not repeating the same,
+// over and over.
+// The most of the methods defined by this interface, return their results in a
+// map. Those maps, have as keys, the AWS region which have been requested and
+// the values are the items returned by AWS for such region.
+// Because the methods may make calls to different regions, in case that there
+// is an error on a region, the returned map won't have any entry for such
+// region and such errors will be reported by the returned error, nonetheless
+// the items, got from the successful requests to other regions, will be
+// returned, with the meaning that the methods will return partial results, in
+// case of errors.
+// For avoiding by the callers the problem of if the returned map may be nil,
+// the function will always return a map instance, which will be of length 0
+// in case that there is not any successful request.
 type AWSReader interface {
 	// GetAccountID returns the current ID for the account used
 	GetAccountID() string
@@ -36,8 +52,9 @@ type AWSReader interface {
 	// GetRegions returns the currently used regions for the Connector
 	GetRegions() []string
 
-	// GetInstances returns all EC2 instances based on the input given
-	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, error)
+	// GetInstances returns all EC2 instances based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (map[string]ec2.DescribeInstancesOutput, error)
 
 	// GetVpcs returns all EC2 VPCs based on the input given
 	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error)

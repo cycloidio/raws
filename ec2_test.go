@@ -99,7 +99,7 @@ func TestGetInstances(t *testing.T) {
 	tests := []struct {
 		name              string
 		mocked            []*serviceConnector
-		expectedInstances []*ec2.DescribeInstancesOutput
+		expectedInstances map[string]ec2.DescribeInstancesOutput
 		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -116,7 +116,7 @@ func TestGetInstances(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedInstances: nil,
+		expectedInstances: map[string]ec2.DescribeInstancesOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -133,8 +133,8 @@ func TestGetInstances(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedInstances: []*ec2.DescribeInstancesOutput{
-				{
+			expectedInstances: map[string]ec2.DescribeInstancesOutput{
+				"test": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("xxx"),
 					}},
@@ -167,13 +167,13 @@ func TestGetInstances(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedInstances: []*ec2.DescribeInstancesOutput{
-				{
+			expectedInstances: map[string]ec2.DescribeInstancesOutput{
+				"test-1": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("xxx"),
 					}},
 				},
-				{
+				"test-2": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("yyy"),
 					}},
@@ -206,8 +206,8 @@ func TestGetInstances(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedInstances: []*ec2.DescribeInstancesOutput{
-				{
+			expectedInstances: map[string]ec2.DescribeInstancesOutput{
+				"test-2": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("yyy"),
 					}},
