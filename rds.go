@@ -8,7 +8,7 @@ import (
 
 func (c *connector) GetDBInstances(
 	ctx context.Context, input *rds.DescribeDBInstancesInput,
-) ([]*rds.DescribeDBInstancesOutput, Errs) {
+) ([]*rds.DescribeDBInstancesOutput, error) {
 	var errs Errs
 	var instances []*rds.DescribeDBInstancesOutput
 
@@ -23,7 +23,12 @@ func (c *connector) GetDBInstances(
 			instances = append(instances, instance)
 		}
 	}
-	return instances, errs
+
+	if errs != nil {
+		return instances, errs
+	}
+
+	return instances, nil
 }
 
 func (c *connector) GetDBInstancesTags(

@@ -41,7 +41,7 @@ func TestGetDBInstances(t *testing.T) {
 		name              string
 		mocked            []*serviceConnector
 		expectedInstances []*rds.DescribeDBInstancesOutput
-		expectedError     Errs
+		expectedError     error
 	}{{
 		name: "one region no error",
 		mocked: []*serviceConnector{
