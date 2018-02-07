@@ -33,7 +33,7 @@ func (c *connector) GetLoadBalancersV2(
 
 func (c *connector) GetLoadBalancersV2Tags(
 	ctx context.Context, input *elbv2.DescribeTagsInput,
-) ([]*elbv2.DescribeTagsOutput, Errs) {
+) ([]*elbv2.DescribeTagsOutput, error) {
 	var errs Errs
 	var elbTags []*elbv2.DescribeTagsOutput
 
@@ -48,5 +48,10 @@ func (c *connector) GetLoadBalancersV2Tags(
 			elbTags = append(elbTags, elbTag)
 		}
 	}
-	return elbTags, errs
+
+	if errs != nil {
+		return elbTags, errs
+	}
+
+	return elbTags, nil
 }

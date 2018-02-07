@@ -85,7 +85,7 @@ type AWSReader interface {
 	// GetLoadBalancersV2Tags returns a list of Tags based on the input from the different regions
 	GetLoadBalancersV2Tags(
 		ctx context.Context, input *elbv2.DescribeTagsInput,
-	) ([]*elbv2.DescribeTagsOutput, Errs)
+	) ([]*elbv2.DescribeTagsOutput, error)
 
 	// GetDBInstances returns all DB instances based on the input given
 	GetDBInstances(

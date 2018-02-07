@@ -194,7 +194,7 @@ func TestGetLoadBalancersV2Tags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*elbv2.DescribeTagsOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
