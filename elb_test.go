@@ -42,7 +42,7 @@ func TestGetLoadBalancers(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedELBs  []*elb.DescribeLoadBalancersOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
 			{
