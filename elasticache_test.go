@@ -41,7 +41,7 @@ func TestGetElastiCacheCluster(t *testing.T) {
 		name             string
 		mocked           []*serviceConnector
 		expectedClusters []*elasticache.DescribeCacheClustersOutput
-		expectedError    Errs
+		expectedError    error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
 			{

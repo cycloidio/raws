@@ -8,7 +8,7 @@ import (
 
 func (c *connector) GetElastiCacheCluster(
 	ctx context.Context, input *elasticache.DescribeCacheClustersInput,
-) ([]*elasticache.DescribeCacheClustersOutput, Errs) {
+) ([]*elasticache.DescribeCacheClustersOutput, error) {
 	var errs Errs
 	var elasticCacheClusters []*elasticache.DescribeCacheClustersOutput
 
@@ -23,7 +23,12 @@ func (c *connector) GetElastiCacheCluster(
 			elasticCacheClusters = append(elasticCacheClusters, elasticCacheCluster)
 		}
 	}
-	return elasticCacheClusters, errs
+
+	if errs != nil {
+		return elasticCacheClusters, errs
+	}
+
+	return elasticCacheClusters, nil
 }
 
 func (c *connector) GetElastiCacheTags(

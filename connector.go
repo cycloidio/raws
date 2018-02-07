@@ -62,7 +62,7 @@ type AWSReader interface {
 	// GetElastiCacheCluster returns all Elasticache clusters based on the input given
 	GetElastiCacheCluster(
 		ctx context.Context, input *elasticache.DescribeCacheClustersInput,
-	) ([]*elasticache.DescribeCacheClustersOutput, Errs)
+	) ([]*elasticache.DescribeCacheClustersOutput, error)
 
 	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN
 	GetElastiCacheTags(
