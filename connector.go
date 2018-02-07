@@ -37,7 +37,7 @@ type AWSReader interface {
 	GetRegions() []string
 
 	// GetInstances returns all EC2 instances based on the input given
-	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, Errs)
+	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, error)
 
 	// GetVpcs returns all EC2 VPCs based on the input given
 	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs)

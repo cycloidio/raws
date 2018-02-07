@@ -100,7 +100,7 @@ func TestGetInstances(t *testing.T) {
 		name              string
 		mocked            []*serviceConnector
 		expectedInstances []*ec2.DescribeInstancesOutput
-		expectedError     Errs
+		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{

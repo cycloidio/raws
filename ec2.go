@@ -8,7 +8,7 @@ import (
 
 func (c *connector) GetInstances(
 	ctx context.Context, input *ec2.DescribeInstancesInput,
-) ([]*ec2.DescribeInstancesOutput, Errs) {
+) ([]*ec2.DescribeInstancesOutput, error) {
 	var errs Errs
 	var instances []*ec2.DescribeInstancesOutput
 
@@ -23,7 +23,12 @@ func (c *connector) GetInstances(
 			instances = append(instances, instance)
 		}
 	}
-	return instances, errs
+
+	if errs != nil {
+		return instances, errs
+	}
+
+	return instances, nil
 }
 
 func (c *connector) GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, Errs) {
