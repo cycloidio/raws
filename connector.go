@@ -51,7 +51,7 @@ type AWSReader interface {
 	) ([]*ec2.DescribeSecurityGroupsOutput, error)
 
 	// GetSubnets returns all EC2 subnets based on the input given
-	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, Errs)
+	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, error)
 
 	// GetVolumes returns all EC2 volumes based on the input given
 	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, Errs)

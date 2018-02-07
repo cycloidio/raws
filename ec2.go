@@ -110,7 +110,7 @@ func (c *connector) GetSecurityGroups(
 
 func (c *connector) GetSubnets(
 	ctx context.Context, input *ec2.DescribeSubnetsInput,
-) ([]*ec2.DescribeSubnetsOutput, Errs) {
+) ([]*ec2.DescribeSubnetsOutput, error) {
 	var errs Errs
 	var subnets []*ec2.DescribeSubnetsOutput
 
@@ -125,7 +125,12 @@ func (c *connector) GetSubnets(
 			subnets = append(subnets, subnet)
 		}
 	}
-	return subnets, errs
+
+	if errs != nil {
+		return subnets, errs
+	}
+
+	return subnets, nil
 }
 
 func (c *connector) GetVolumes(

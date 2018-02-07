@@ -632,7 +632,7 @@ func TestGetSubnets(t *testing.T) {
 		name            string
 		mocked          []*serviceConnector
 		expectedSubnets []*ec2.DescribeSubnetsOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
