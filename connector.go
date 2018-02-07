@@ -122,8 +122,11 @@ type AWSReader interface {
 		ctx context.Context, input *rds.DescribeDBInstancesInput,
 	) (map[string]rds.DescribeDBInstancesOutput, error)
 
-	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided
-	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, error)
+	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
+	// Returned values are commented in the interface doc comment block.
+	GetDBInstancesTags(
+		ctx context.Context, input *rds.ListTagsForResourceInput,
+	) (map[string]rds.ListTagsForResourceOutput, error)
 
 	// ListBuckets returns all S3 buckets based on the input given
 	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, error)
