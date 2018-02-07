@@ -100,8 +100,9 @@ type AWSReader interface {
 		ctx context.Context, input *elb.DescribeLoadBalancersInput,
 	) (map[string]elb.DescribeLoadBalancersOutput, error)
 
-	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions
-	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, error)
+	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) (map[string]elb.DescribeTagsOutput, error)
 
 	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
 	GetLoadBalancersV2(
