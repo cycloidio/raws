@@ -353,12 +353,12 @@ func TestGetBucketTags(t *testing.T) {
 	}
 }
 
-func TestListObjets(t *testing.T) {
+func TestListObjects(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
 		expectedObjects []*s3.ListObjectsOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{

@@ -102,7 +102,7 @@ type AWSReader interface {
 	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, error)
 
 	// ListObjects returns a list of all S3 objects in a bucket based on the input given
-	ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, Errs)
+	ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, error)
 
 	// DownloadObject downloads an object in a bucket based on the input given
 	DownloadObject(

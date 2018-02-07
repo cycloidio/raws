@@ -61,7 +61,7 @@ func (c *connector) GetBucketTags(
 
 func (c *connector) ListObjects(
 	ctx context.Context, input *s3.ListObjectsInput,
-) ([]*s3.ListObjectsOutput, Errs) {
+) ([]*s3.ListObjectsOutput, error) {
 	var errs Errs
 	var objectsList []*s3.ListObjectsOutput
 
@@ -76,7 +76,12 @@ func (c *connector) ListObjects(
 			objectsList = append(objectsList, buckets)
 		}
 	}
-	return objectsList, errs
+
+	if errs != nil {
+		return objectsList, errs
+	}
+
+	return objectsList, nil
 }
 
 func (c *connector) DownloadObject(
