@@ -11,7 +11,7 @@ import (
 
 func (c *connector) ListBuckets(
 	ctx context.Context, input *s3.ListBucketsInput,
-) ([]*s3.ListBucketsOutput, Errs) {
+) ([]*s3.ListBucketsOutput, error) {
 	var errs Errs
 	var bucketsList []*s3.ListBucketsOutput
 
@@ -26,7 +26,12 @@ func (c *connector) ListBuckets(
 			bucketsList = append(bucketsList, buckets)
 		}
 	}
-	return bucketsList, errs
+
+	if errs != nil {
+		return bucketsList, errs
+	}
+
+	return bucketsList, nil
 }
 
 func (c *connector) GetBucketTags(

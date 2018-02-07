@@ -84,7 +84,7 @@ func TestListBuckets(t *testing.T) {
 		name            string
 		mocked          []*serviceConnector
 		expectedBuckets []*s3.ListBucketsOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
