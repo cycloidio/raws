@@ -108,7 +108,7 @@ func TestConnector_setAccountID(t *testing.T) {
 				gcierr: nil,
 			},
 			expectedID:    aws.String("1"),
-			expectedError: errors.New("at least one region name is required"),
+			expectedError: nil,
 		},
 		{name: "error while getting identity",
 			mocked: mockSTS{
