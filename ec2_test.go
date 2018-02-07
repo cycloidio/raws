@@ -365,7 +365,7 @@ func TestGetImages(t *testing.T) {
 	tests := []struct {
 		name           string
 		mocked         []*serviceConnector
-		expectedImages []*ec2.DescribeImagesOutput
+		expectedImages map[string]ec2.DescribeImagesOutput
 		expectedError  error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -382,7 +382,7 @@ func TestGetImages(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedImages: nil,
+		expectedImages: map[string]ec2.DescribeImagesOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -399,8 +399,8 @@ func TestGetImages(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedImages: []*ec2.DescribeImagesOutput{
-				{
+			expectedImages: map[string]ec2.DescribeImagesOutput{
+				"test": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test"),
 					}},
@@ -433,13 +433,13 @@ func TestGetImages(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedImages: []*ec2.DescribeImagesOutput{
-				{
+			expectedImages: map[string]ec2.DescribeImagesOutput{
+				"test-1": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test-1"),
 					}},
 				},
-				{
+				"test-2": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test-2"),
 					}},
@@ -472,8 +472,8 @@ func TestGetImages(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedImages: []*ec2.DescribeImagesOutput{
-				{
+			expectedImages: map[string]ec2.DescribeImagesOutput{
+				"test-2": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test-2"),
 					}},

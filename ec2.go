@@ -58,9 +58,9 @@ func (c *connector) GetVpcs(
 
 func (c *connector) GetImages(
 	ctx context.Context, input *ec2.DescribeImagesInput,
-) ([]*ec2.DescribeImagesOutput, error) {
+) (map[string]ec2.DescribeImagesOutput, error) {
 	var errs Errors
-	var images []*ec2.DescribeImagesOutput
+	var images = map[string]ec2.DescribeImagesOutput{}
 
 	if input == nil {
 		input = &ec2.DescribeImagesInput{}
@@ -74,7 +74,7 @@ func (c *connector) GetImages(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
 		} else {
-			images = append(images, image)
+			images[svc.region] = *image
 		}
 	}
 
