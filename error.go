@@ -110,3 +110,47 @@ func ErrorIn(region string, err error) error {
 		return nil
 	}
 }
+
+// ErrorFrom inspects err to find if there is an error in the service and returns
+// it or them (in case of multiple), otherwise it returns nil.
+// err must be of the type Error or Errors in order to be able to find if there
+// are errors in the region; if err is from other type, the function always
+// returns nil.
+// The returned error is a value of the type Error when only one error is found
+// in the region, or a value of the type Errors when multiple errors are found.
+func ErrorFrom(service string, err error) error {
+	switch e := err.(type) {
+	case Error:
+		if e.Service() == service {
+			return err
+		}
+
+		return nil
+	case *Error:
+		if e == nil {
+			return nil
+		}
+
+		if e.Service() == service {
+			return err
+		}
+
+		return nil
+	case Errors:
+		var errs Errors
+
+		for _, ei := range e {
+			if ei.Service() == service {
+				errs = append(errs, ei)
+			}
+		}
+
+		if len(errs) > 0 {
+			return errs
+		}
+
+		return nil
+	default:
+		return nil
+	}
+}
