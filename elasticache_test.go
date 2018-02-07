@@ -40,7 +40,7 @@ func TestGetElastiCacheCluster(t *testing.T) {
 	tests := []struct {
 		name             string
 		mocked           []*serviceConnector
-		expectedClusters []*elasticache.DescribeCacheClustersOutput
+		expectedClusters map[string]elasticache.DescribeCacheClustersOutput
 		expectedError    error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
@@ -59,8 +59,8 @@ func TestGetElastiCacheCluster(t *testing.T) {
 			},
 		},
 		expectedError: nil,
-		expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-			{
+		expectedClusters: map[string]elasticache.DescribeCacheClustersOutput{
+			"test": {
 				CacheClusters: []*elasticache.CacheCluster{
 					{
 						CacheClusterId: aws.String("1"),
@@ -84,7 +84,7 @@ func TestGetElastiCacheCluster(t *testing.T) {
 				region:  "test",
 				service: elasticache.ServiceName,
 			}},
-			expectedClusters: nil,
+			expectedClusters: map[string]elasticache.DescribeCacheClustersOutput{},
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
@@ -116,15 +116,15 @@ func TestGetElastiCacheCluster(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-				{
+			expectedClusters: map[string]elasticache.DescribeCacheClustersOutput{
+				"test-1": {
 					CacheClusters: []*elasticache.CacheCluster{
 						{
 							CacheClusterId: aws.String("1"),
 						},
 					},
 				},
-				{
+				"test-2": {
 					CacheClusters: []*elasticache.CacheCluster{
 						{
 							CacheClusterId: aws.String("2"),
@@ -163,8 +163,8 @@ func TestGetElastiCacheCluster(t *testing.T) {
 					service: elasticache.ServiceName,
 				},
 			},
-			expectedClusters: []*elasticache.DescribeCacheClustersOutput{
-				{
+			expectedClusters: map[string]elasticache.DescribeCacheClustersOutput{
+				"test-2": {
 					CacheClusters: []*elasticache.CacheCluster{
 						{
 							CacheClusterId: aws.String("2"),
