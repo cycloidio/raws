@@ -216,7 +216,7 @@ func TestGetBucketTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedTags  []*s3.GetBucketTaggingOutput
+		expectedTags  map[string]s3.GetBucketTaggingOutput
 		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -233,7 +233,7 @@ func TestGetBucketTags(t *testing.T) {
 			region:  "test",
 			service: s3.ServiceName,
 		}},
-		expectedTags: nil,
+		expectedTags: map[string]s3.GetBucketTaggingOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -251,8 +251,8 @@ func TestGetBucketTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*s3.GetBucketTaggingOutput{
-				{
+			expectedTags: map[string]s3.GetBucketTaggingOutput{
+				"test": {
 					TagSet: []*s3.Tag{{
 						Key:   aws.String("test"),
 						Value: aws.String("1"),
@@ -288,14 +288,14 @@ func TestGetBucketTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*s3.GetBucketTaggingOutput{
-				{
+			expectedTags: map[string]s3.GetBucketTaggingOutput{
+				"test-1": {
 					TagSet: []*s3.Tag{{
 						Key:   aws.String("test"),
 						Value: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					TagSet: []*s3.Tag{{
 						Key:   aws.String("test"),
 						Value: aws.String("2"),
@@ -330,8 +330,8 @@ func TestGetBucketTags(t *testing.T) {
 				region:  "test-1",
 				service: s3.ServiceName,
 			}},
-			expectedTags: []*s3.GetBucketTaggingOutput{
-				{
+			expectedTags: map[string]s3.GetBucketTaggingOutput{
+				"test-2": {
 					TagSet: []*s3.Tag{{
 						Key:   aws.String("test"),
 						Value: aws.String("2"),
