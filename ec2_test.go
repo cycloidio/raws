@@ -897,7 +897,7 @@ func TestGetSnapshots(t *testing.T) {
 		name              string
 		mocked            []*serviceConnector
 		expectedSnapshots []*ec2.DescribeSnapshotsOutput
-		expectedError     Errs
+		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{

@@ -160,7 +160,7 @@ func (c *connector) GetVolumes(
 
 func (c *connector) GetSnapshots(
 	ctx context.Context, input *ec2.DescribeSnapshotsInput,
-) ([]*ec2.DescribeSnapshotsOutput, Errs) {
+) ([]*ec2.DescribeSnapshotsOutput, error) {
 	var errs Errs
 	var snapshots []*ec2.DescribeSnapshotsOutput
 
@@ -179,5 +179,10 @@ func (c *connector) GetSnapshots(
 			snapshots = append(snapshots, snapshot)
 		}
 	}
-	return snapshots, errs
+
+	if errs != nil {
+		return snapshots, errs
+	}
+
+	return snapshots, nil
 }

@@ -57,7 +57,7 @@ type AWSReader interface {
 	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, error)
 
 	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given
-	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, Errs)
+	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, error)
 
 	// GetElastiCacheCluster returns all Elasticache clusters based on the input given
 	GetElastiCacheCluster(
