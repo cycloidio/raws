@@ -141,3 +141,132 @@ func TestError_Service(t *testing.T) {
 		}
 	}
 }
+
+func TestErrorIn(t *testing.T) {
+	t.Run("when the input error is nil", func(t *testing.T) {
+		var err = ErrorIn("some-region", nil)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+	})
+
+	t.Run("when the input error is of the type Error", func(t *testing.T) {
+		var inputErr = NewError("some-region", "some-service", errors.New("some error"))
+
+		var err = ErrorIn("other-region", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+
+		err = ErrorIn("some-region", inputErr)
+		if err == nil || err != inputErr {
+			t.Errorf("unexpected result. received=%+v | expected=%+v", err, inputErr)
+		}
+	})
+
+	t.Run("when the input error is of the type *Error", func(t *testing.T) {
+		var inputErr *Error
+
+		{
+			var err = NewError("some-region", "some-service", errors.New("some error"))
+			inputErr = &err
+		}
+
+		var err = ErrorIn("other-region", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+
+		err = ErrorIn("some-region", inputErr)
+		if err == nil || err != inputErr {
+			t.Errorf("unexpected result. received=%+v | expected=%+v", err, inputErr)
+		}
+
+		inputErr = nil
+		err = ErrorIn("other-region", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+	})
+
+	t.Run("when the input error is of the type Errors", func(t *testing.T) {
+		var inputErr = Errors{
+			NewError("region-1", "service-1", errors.New("some error")),
+			NewError("region-2", "service-2", errors.New("some error")),
+			NewError("region-3", "service-3", errors.New("some error")),
+		}
+
+		for _, ie := range inputErr {
+			var err = ErrorIn(ie.Region(), inputErr)
+			if err == nil {
+				t.Errorf("unexpected result. received=nil | expected=%+v", Errors{ie})
+				continue
+			}
+
+			var errs, ok = err.(Errors)
+			if !ok {
+				t.Errorf("unexpected return type. received=%T | expected=%T", errs, Errors{})
+				continue
+			}
+
+			if len(errs) != 1 || errs[0] != ie {
+				t.Errorf("unexpected result. received=%+v | expected=%+v", errs, Errors{ie})
+			}
+		}
+
+		inputErr = append(inputErr, NewError("region-3", "service-3.1", errors.New("another error")))
+		var err = ErrorIn("region-3", inputErr)
+		{
+			if err == nil {
+				t.Errorf("unexpected result. received=nil | expected=%+v", Errors{inputErr[2], inputErr[3]})
+				goto nextTest
+			}
+
+			var errs, ok = err.(Errors)
+			if !ok {
+				t.Errorf("unexpected return type. received=%T | expected=%T", errs, Errors{})
+				goto nextTest
+			}
+
+			if len(errs) != 2 || errs[0] != inputErr[2] || errs[1] != inputErr[3] {
+				t.Errorf(
+					"unexpected result. received=%+v | expected=%+v",
+					errs,
+					Errors{inputErr[2], inputErr[3]},
+				)
+			}
+		}
+
+	nextTest:
+		err = ErrorIn("region-5", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+
+		err = ErrorIn("region-1", Errors{})
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+
+		inputErr = nil
+		err = ErrorIn("region-1", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+	})
+
+	t.Run("when the input error is not of the type Error nor Errors", func(t *testing.T) {
+		var inputErr = errors.New("some error")
+
+		var err = ErrorIn("some-region", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+
+		inputErr = nil
+		err = ErrorIn("some-region", inputErr)
+		if err != nil {
+			t.Errorf("unexpected result. received=%+v | expected=nil", err)
+		}
+	})
+}
