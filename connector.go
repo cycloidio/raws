@@ -75,7 +75,7 @@ type AWSReader interface {
 	) ([]*elb.DescribeLoadBalancersOutput, error)
 
 	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions
-	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, Errs)
+	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, error)
 
 	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
 	GetLoadBalancersV2(
