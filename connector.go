@@ -110,7 +110,7 @@ type AWSReader interface {
 	) (int64, error)
 
 	// GetObjectsTags returns tags associated with S3 objects based on the input given
-	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, Errs)
+	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, error)
 }
 
 // The connector provides easy access to AWS SDK calls.

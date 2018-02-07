@@ -107,7 +107,7 @@ func (c *connector) DownloadObject(
 
 func (c *connector) GetObjectsTags(
 	ctx context.Context, input *s3.GetObjectTaggingInput,
-) ([]*s3.GetObjectTaggingOutput, Errs) {
+) ([]*s3.GetObjectTaggingOutput, error) {
 	var errs Errs
 	var objectsTagsList []*s3.GetObjectTaggingOutput
 
@@ -122,5 +122,10 @@ func (c *connector) GetObjectsTags(
 			objectsTagsList = append(objectsTagsList, buckets)
 		}
 	}
-	return objectsTagsList, errs
+
+	if errs != nil {
+		return objectsTagsList, errs
+	}
+
+	return objectsTagsList, nil
 }

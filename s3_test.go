@@ -549,7 +549,7 @@ func TestGetObjectsTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*s3.GetObjectTaggingOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
