@@ -193,7 +193,7 @@ func TestGetElastiCacheTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*elasticache.TagListMessage
-		expectedError Errs
+		expectedError error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
 			{
