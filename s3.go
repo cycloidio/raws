@@ -11,9 +11,9 @@ import (
 
 func (c *connector) ListBuckets(
 	ctx context.Context, input *s3.ListBucketsInput,
-) ([]*s3.ListBucketsOutput, error) {
+) (map[string]s3.ListBucketsOutput, error) {
 	var errs Errors
-	var bucketsList []*s3.ListBucketsOutput
+	var bucketsList = map[string]s3.ListBucketsOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.s3 == nil {
@@ -23,7 +23,7 @@ func (c *connector) ListBuckets(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, s3.ServiceName, err))
 		} else {
-			bucketsList = append(bucketsList, buckets)
+			bucketsList[svc.region] = *buckets
 		}
 	}
 

@@ -128,8 +128,9 @@ type AWSReader interface {
 		ctx context.Context, input *rds.ListTagsForResourceInput,
 	) (map[string]rds.ListTagsForResourceOutput, error)
 
-	// ListBuckets returns all S3 buckets based on the input given
-	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, error)
+	// ListBuckets returns all S3 buckets based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) (map[string]s3.ListBucketsOutput, error)
 
 	// GetBucketTags returns tags associated with S3 buckets based on the input given
 	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, error)
