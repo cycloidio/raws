@@ -84,7 +84,7 @@ func TestListBuckets(t *testing.T) {
 		name            string
 		mocked          []*serviceConnector
 		expectedBuckets []*s3.ListBucketsOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -95,7 +95,7 @@ func TestListBuckets(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -185,7 +185,7 @@ func TestListBuckets(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,
@@ -217,7 +217,7 @@ func TestGetBucketTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*s3.GetBucketTaggingOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -228,7 +228,7 @@ func TestGetBucketTags(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -325,7 +325,7 @@ func TestGetBucketTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,
@@ -353,12 +353,12 @@ func TestGetBucketTags(t *testing.T) {
 	}
 }
 
-func TestListObjets(t *testing.T) {
+func TestListObjects(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
 		expectedObjects []*s3.ListObjectsOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -369,7 +369,7 @@ func TestListObjets(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -444,7 +444,7 @@ func TestListObjets(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,
@@ -549,7 +549,7 @@ func TestGetObjectsTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*s3.GetObjectTaggingOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -560,7 +560,7 @@ func TestGetObjectsTags(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: s3.ServiceName,
@@ -636,7 +636,7 @@ func TestGetObjectsTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: s3.ServiceName,

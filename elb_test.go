@@ -42,7 +42,7 @@ func TestGetLoadBalancers(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedELBs  []*elb.DescribeLoadBalancersOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
 			{
@@ -53,7 +53,7 @@ func TestGetLoadBalancers(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: elb.ServiceName,
@@ -157,8 +157,8 @@ func TestGetLoadBalancers(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: elb.ServiceName,
@@ -194,7 +194,7 @@ func TestGetLoadBalancersTags(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedTags  []*elb.DescribeTagsOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -205,7 +205,7 @@ func TestGetLoadBalancersTags(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: elb.ServiceName,
@@ -309,8 +309,8 @@ func TestGetLoadBalancersTags(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{
-				&callErr{
+			expectedError: Errors{
+				Error{
 					err:     errors.New("error with test-1"),
 					region:  "test-1",
 					service: elb.ServiceName,

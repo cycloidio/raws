@@ -100,7 +100,7 @@ func TestGetInstances(t *testing.T) {
 		name              string
 		mocked            []*serviceConnector
 		expectedInstances []*ec2.DescribeInstancesOutput
-		expectedError     Errs
+		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -111,7 +111,7 @@ func TestGetInstances(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -201,7 +201,7 @@ func TestGetInstances(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -233,7 +233,7 @@ func TestGetVpcs(t *testing.T) {
 		name          string
 		mocked        []*serviceConnector
 		expectedVpcs  []*ec2.DescribeVpcsOutput
-		expectedError Errs
+		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -244,7 +244,7 @@ func TestGetVpcs(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -334,7 +334,7 @@ func TestGetVpcs(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -366,7 +366,7 @@ func TestGetImages(t *testing.T) {
 		name           string
 		mocked         []*serviceConnector
 		expectedImages []*ec2.DescribeImagesOutput
-		expectedError  Errs
+		expectedError  error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -377,7 +377,7 @@ func TestGetImages(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -467,7 +467,7 @@ func TestGetImages(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -499,7 +499,7 @@ func TestGetSecurityGroups(t *testing.T) {
 		name              string
 		mocked            []*serviceConnector
 		expectedSecGroups []*ec2.DescribeSecurityGroupsOutput
-		expectedError     Errs
+		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -510,7 +510,7 @@ func TestGetSecurityGroups(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -600,7 +600,7 @@ func TestGetSecurityGroups(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -632,7 +632,7 @@ func TestGetSubnets(t *testing.T) {
 		name            string
 		mocked          []*serviceConnector
 		expectedSubnets []*ec2.DescribeSubnetsOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -643,7 +643,7 @@ func TestGetSubnets(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -733,7 +733,7 @@ func TestGetSubnets(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -764,7 +764,7 @@ func TestGetVolumes(t *testing.T) {
 		name            string
 		mocked          []*serviceConnector
 		expectedVolumes []*ec2.DescribeVolumesOutput
-		expectedError   Errs
+		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -775,7 +775,7 @@ func TestGetVolumes(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -865,7 +865,7 @@ func TestGetVolumes(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,
@@ -897,7 +897,7 @@ func TestGetSnapshots(t *testing.T) {
 		name              string
 		mocked            []*serviceConnector
 		expectedSnapshots []*ec2.DescribeSnapshotsOutput
-		expectedError     Errs
+		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
 			{
@@ -912,7 +912,7 @@ func TestGetSnapshots(t *testing.T) {
 				},
 			},
 		},
-		expectedError: Errs{&callErr{
+		expectedError: Errors{Error{
 			err:     errors.New("error with test"),
 			region:  "test",
 			service: ec2.ServiceName,
@@ -1002,7 +1002,7 @@ func TestGetSnapshots(t *testing.T) {
 					},
 				},
 			},
-			expectedError: Errs{&callErr{
+			expectedError: Errors{Error{
 				err:     errors.New("error with test-1"),
 				region:  "test-1",
 				service: ec2.ServiceName,

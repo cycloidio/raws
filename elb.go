@@ -8,9 +8,9 @@ import (
 
 func (c *connector) GetLoadBalancers(
 	ctx context.Context, input *elb.DescribeLoadBalancersInput,
-) ([]*elb.DescribeLoadBalancersOutput, Errs) {
+) ([]*elb.DescribeLoadBalancersOutput, error) {
 	var elbs []*elb.DescribeLoadBalancersOutput
-	var errs Errs
+	var errs Errors
 
 	for _, svc := range c.svcs {
 		if svc.elb == nil {
@@ -18,19 +18,24 @@ func (c *connector) GetLoadBalancers(
 		}
 		elbv1, err := svc.elb.DescribeLoadBalancersWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, elb.ServiceName, err))
+			errs = append(errs, NewError(svc.region, elb.ServiceName, err))
 		} else {
 			elbs = append(elbs, elbv1)
 		}
 	}
-	return elbs, errs
+
+	if errs != nil {
+		return elbs, errs
+	}
+
+	return elbs, nil
 }
 
 func (c *connector) GetLoadBalancersTags(
 	ctx context.Context, input *elb.DescribeTagsInput,
-) ([]*elb.DescribeTagsOutput, Errs) {
+) ([]*elb.DescribeTagsOutput, error) {
 	var elbTags []*elb.DescribeTagsOutput
-	var errs Errs
+	var errs Errors
 
 	for _, svc := range c.svcs {
 		if svc.elb == nil {
@@ -38,10 +43,15 @@ func (c *connector) GetLoadBalancersTags(
 		}
 		tags, err := svc.elb.DescribeTagsWithContext(ctx, input)
 		if err != nil {
-			errs = append(errs, NewAPIError(svc.region, elb.ServiceName, err))
+			errs = append(errs, NewError(svc.region, elb.ServiceName, err))
 		} else {
 			elbTags = append(elbTags, tags)
 		}
 	}
-	return elbTags, errs
+
+	if errs != nil {
+		return elbTags, errs
+	}
+
+	return elbTags, nil
 }
