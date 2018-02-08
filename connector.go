@@ -29,6 +29,22 @@ import (
 )
 
 // AWSReader is the interface defining all methods that need to be implemented
+//
+// The next behavior commented in the below paragraph, applies to every method
+// which clearly match what's explained, for the sake of not repeating the same,
+// over and over.
+// The most of the methods defined by this interface, return their results in a
+// map. Those maps, have as keys, the AWS region which have been requested and
+// the values are the items returned by AWS for such region.
+// Because the methods may make calls to different regions, in case that there
+// is an error on a region, the returned map won't have any entry for such
+// region and such errors will be reported by the returned error, nonetheless
+// the items, got from the successful requests to other regions, will be
+// returned, with the meaning that the methods will return partial results, in
+// case of errors.
+// For avoiding by the callers the problem of if the returned map may be nil,
+// the function will always return a map instance, which will be of length 0
+// in case that there is not any successful request.
 type AWSReader interface {
 	// GetAccountID returns the current ID for the account used
 	GetAccountID() string
@@ -36,94 +52,102 @@ type AWSReader interface {
 	// GetRegions returns the currently used regions for the Connector
 	GetRegions() []string
 
-	// GetInstances returns all EC2 instances based on the input given
-	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) ([]*ec2.DescribeInstancesOutput, error)
+	// GetInstances returns all EC2 instances based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (map[string]ec2.DescribeInstancesOutput, error)
 
-	// GetVpcs returns all EC2 VPCs based on the input given
-	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) ([]*ec2.DescribeVpcsOutput, error)
+	// GetVpcs returns all EC2 VPCs based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVpcs(ctx context.Context, input *ec2.DescribeVpcsInput) (map[string]ec2.DescribeVpcsOutput, error)
 
-	// GetImages returns all EC2 AMI belonging to the Account ID based on the input given
-	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) ([]*ec2.DescribeImagesOutput, error)
+	// GetImages returns all EC2 AMI belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetImages(ctx context.Context, input *ec2.DescribeImagesInput) (map[string]ec2.DescribeImagesOutput, error)
 
-	// GetSecurityGroups returns all EC2 security groups based on the input given
+	// GetSecurityGroups returns all EC2 security groups based on the input given.
+	// Returned values are commented in the interface doc comment block.
 	GetSecurityGroups(
 		ctx context.Context, input *ec2.DescribeSecurityGroupsInput,
-	) ([]*ec2.DescribeSecurityGroupsOutput, error)
+	) (map[string]ec2.DescribeSecurityGroupsOutput, error)
 
-	// GetSubnets returns all EC2 subnets based on the input given
-	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) ([]*ec2.DescribeSubnetsOutput, error)
+	// GetSubnets returns all EC2 subnets based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetSubnets(ctx context.Context, input *ec2.DescribeSubnetsInput) (map[string]ec2.DescribeSubnetsOutput, error)
 
-	// GetVolumes returns all EC2 volumes based on the input given
-	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) ([]*ec2.DescribeVolumesOutput, error)
+	// GetVolumes returns all EC2 volumes based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetVolumes(ctx context.Context, input *ec2.DescribeVolumesInput) (map[string]ec2.DescribeVolumesOutput, error)
 
-	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given
-	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) ([]*ec2.DescribeSnapshotsOutput, error)
+	// GetSnapshots returns all snapshots belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (map[string]ec2.DescribeSnapshotsOutput, error)
 
-	// GetElastiCacheCluster returns all Elasticache clusters based on the input given
+	// GetElastiCacheCluster returns all Elasticache clusters based on the input given.
+	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheCluster(
 		ctx context.Context, input *elasticache.DescribeCacheClustersInput,
-	) ([]*elasticache.DescribeCacheClustersOutput, error)
+	) (map[string]elasticache.DescribeCacheClustersOutput, error)
 
-	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN
+	// GetElastiCacheTags returns a list of tags of Elasticache resources based on its ARN.
+	// Returned values are commented in the interface doc comment block.
 	GetElastiCacheTags(
 		ctx context.Context, input *elasticache.ListTagsForResourceInput,
-	) ([]*elasticache.TagListMessage, error)
+	) (map[string]elasticache.TagListMessage, error)
 
-	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions
+	// GetLoadBalancers returns a list of ELB (v1) based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancers(
 		ctx context.Context, input *elb.DescribeLoadBalancersInput,
-	) ([]*elb.DescribeLoadBalancersOutput, error)
+	) (map[string]elb.DescribeLoadBalancersOutput, error)
 
-	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions
-	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) ([]*elb.DescribeTagsOutput, error)
+	// GetLoadBalancersTags returns a list of Tags based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
+	GetLoadBalancersTags(ctx context.Context, input *elb.DescribeTagsInput) (map[string]elb.DescribeTagsOutput, error)
 
-	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions
+	// GetLoadBalancersV2 returns a list of ELB (v2) - also known as ALB - based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2(
 		ctx context.Context, input *elbv2.DescribeLoadBalancersInput,
-	) ([]*elbv2.DescribeLoadBalancersOutput, error)
+	) (map[string]elbv2.DescribeLoadBalancersOutput, error)
 
-	// GetLoadBalancersV2Tags returns a list of Tags based on the input from the different regions
+	// GetLoadBalancersV2Tags returns a list of Tags based on the input from the different regions.
+	// Returned values are commented in the interface doc comment block.
 	GetLoadBalancersV2Tags(
 		ctx context.Context, input *elbv2.DescribeTagsInput,
-	) ([]*elbv2.DescribeTagsOutput, error)
+	) (map[string]elbv2.DescribeTagsOutput, error)
 
-	// GetDBInstances returns all DB instances based on the input given
+	// GetDBInstances returns all DB instances based on the input given.
+	// Returned values are commented in the interface doc comment block.
 	GetDBInstances(
 		ctx context.Context, input *rds.DescribeDBInstancesInput,
-	) ([]*rds.DescribeDBInstancesOutput, error)
+	) (map[string]rds.DescribeDBInstancesOutput, error)
 
-	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided
-	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) ([]*rds.ListTagsForResourceOutput, error)
+	// GetDBInstancesTags returns a list of tags from an ARN, extra filters for tags can also be provided.
+	// Returned values are commented in the interface doc comment block.
+	GetDBInstancesTags(
+		ctx context.Context, input *rds.ListTagsForResourceInput,
+	) (map[string]rds.ListTagsForResourceOutput, error)
 
-	// ListBuckets returns all S3 buckets based on the input given
-	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) ([]*s3.ListBucketsOutput, error)
+	// ListBuckets returns all S3 buckets based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) (map[string]s3.ListBucketsOutput, error)
 
-	// GetBucketTags returns tags associated with S3 buckets based on the input given
-	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) ([]*s3.GetBucketTaggingOutput, error)
+	// GetBucketTags returns tags associated with S3 buckets based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetBucketTags(ctx context.Context, input *s3.GetBucketTaggingInput) (map[string]s3.GetBucketTaggingOutput, error)
 
-	// ListObjects returns a list of all S3 objects in a bucket based on the input given
-	ListObjects(ctx context.Context, input *s3.ListObjectsInput) ([]*s3.ListObjectsOutput, error)
+	// ListObjects returns a list of all S3 objects in a bucket based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	ListObjects(ctx context.Context, input *s3.ListObjectsInput) (map[string]s3.ListObjectsOutput, error)
 
 	// DownloadObject downloads an object in a bucket based on the input given
 	DownloadObject(
 		ctx context.Context, w io.WriterAt, input *s3.GetObjectInput, options ...func(*s3manager.Downloader),
 	) (int64, error)
 
-	// GetObjectsTags returns tags associated with S3 objects based on the input given
-	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) ([]*s3.GetObjectTaggingOutput, error)
-}
-
-// The connector provides easy access to AWS SDK calls.
-//
-// By using it, calls can be made directly through multiple regions, and will filter only data that belongs to you.
-// For example, when fetching the list of AMI, or snapshots.
-//
-// In order to start making calls, only calling NewAWSReader is required.
-type connector struct {
-	regions   []string
-	svcs      []*serviceConnector
-	creds     *credentials.Credentials
-	accountID *string
+	// GetObjectsTags returns tags associated with S3 objects based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) (map[string]s3.GetObjectTaggingOutput, error)
 }
 
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
@@ -156,6 +180,19 @@ func NewAWSReader(
 	}
 	c.setServices(config)
 	return &c, nil
+}
+
+// The connector provides easy access to AWS SDK calls.
+//
+// By using it, calls can be made directly through multiple regions, and will filter only data that belongs to you.
+// For example, when fetching the list of AMI, or snapshots.
+//
+// In order to start making calls, only calling NewAWSReader is required.
+type connector struct {
+	regions   []string
+	svcs      []*serviceConnector
+	creds     *credentials.Credentials
+	accountID *string
 }
 
 func (c *connector) GetAccountID() string {

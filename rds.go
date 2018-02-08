@@ -8,9 +8,9 @@ import (
 
 func (c *connector) GetDBInstances(
 	ctx context.Context, input *rds.DescribeDBInstancesInput,
-) ([]*rds.DescribeDBInstancesOutput, error) {
+) (map[string]rds.DescribeDBInstancesOutput, error) {
 	var errs Errors
-	var instances []*rds.DescribeDBInstancesOutput
+	var instances = map[string]rds.DescribeDBInstancesOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.rds == nil {
@@ -20,7 +20,7 @@ func (c *connector) GetDBInstances(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, rds.ServiceName, err))
 		} else {
-			instances = append(instances, instance)
+			instances[svc.region] = *instance
 		}
 	}
 
@@ -33,9 +33,9 @@ func (c *connector) GetDBInstances(
 
 func (c *connector) GetDBInstancesTags(
 	ctx context.Context, input *rds.ListTagsForResourceInput,
-) ([]*rds.ListTagsForResourceOutput, error) {
+) (map[string]rds.ListTagsForResourceOutput, error) {
 	var errs Errors
-	var rdsTags []*rds.ListTagsForResourceOutput
+	var rdsTags = map[string]rds.ListTagsForResourceOutput{}
 
 	for _, svc := range c.svcs {
 		if svc.rds == nil {
@@ -45,7 +45,7 @@ func (c *connector) GetDBInstancesTags(
 		if err != nil {
 			errs = append(errs, NewError(svc.region, rds.ServiceName, err))
 		} else {
-			rdsTags = append(rdsTags, rdsTag)
+			rdsTags[svc.region] = *rdsTag
 		}
 	}
 

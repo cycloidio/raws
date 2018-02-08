@@ -99,7 +99,7 @@ func TestGetInstances(t *testing.T) {
 	tests := []struct {
 		name              string
 		mocked            []*serviceConnector
-		expectedInstances []*ec2.DescribeInstancesOutput
+		expectedInstances map[string]ec2.DescribeInstancesOutput
 		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -116,7 +116,7 @@ func TestGetInstances(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedInstances: nil,
+		expectedInstances: map[string]ec2.DescribeInstancesOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -133,8 +133,8 @@ func TestGetInstances(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedInstances: []*ec2.DescribeInstancesOutput{
-				{
+			expectedInstances: map[string]ec2.DescribeInstancesOutput{
+				"test": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("xxx"),
 					}},
@@ -167,13 +167,13 @@ func TestGetInstances(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedInstances: []*ec2.DescribeInstancesOutput{
-				{
+			expectedInstances: map[string]ec2.DescribeInstancesOutput{
+				"test-1": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("xxx"),
 					}},
 				},
-				{
+				"test-2": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("yyy"),
 					}},
@@ -206,8 +206,8 @@ func TestGetInstances(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedInstances: []*ec2.DescribeInstancesOutput{
-				{
+			expectedInstances: map[string]ec2.DescribeInstancesOutput{
+				"test-2": {
 					Reservations: []*ec2.Reservation{{
 						OwnerId: aws.String("yyy"),
 					}},
@@ -232,7 +232,7 @@ func TestGetVpcs(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedVpcs  []*ec2.DescribeVpcsOutput
+		expectedVpcs  map[string]ec2.DescribeVpcsOutput
 		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -249,7 +249,7 @@ func TestGetVpcs(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedVpcs: nil,
+		expectedVpcs: map[string]ec2.DescribeVpcsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -266,8 +266,8 @@ func TestGetVpcs(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVpcs: []*ec2.DescribeVpcsOutput{
-				{
+			expectedVpcs: map[string]ec2.DescribeVpcsOutput{
+				"test": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("1"),
 					}},
@@ -300,13 +300,13 @@ func TestGetVpcs(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVpcs: []*ec2.DescribeVpcsOutput{
-				{
+			expectedVpcs: map[string]ec2.DescribeVpcsOutput{
+				"test-1": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("2"),
 					}},
@@ -339,8 +339,8 @@ func TestGetVpcs(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedVpcs: []*ec2.DescribeVpcsOutput{
-				{
+			expectedVpcs: map[string]ec2.DescribeVpcsOutput{
+				"test-2": {
 					Vpcs: []*ec2.Vpc{{
 						VpcId: aws.String("2"),
 					}},
@@ -365,7 +365,7 @@ func TestGetImages(t *testing.T) {
 	tests := []struct {
 		name           string
 		mocked         []*serviceConnector
-		expectedImages []*ec2.DescribeImagesOutput
+		expectedImages map[string]ec2.DescribeImagesOutput
 		expectedError  error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -382,7 +382,7 @@ func TestGetImages(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedImages: nil,
+		expectedImages: map[string]ec2.DescribeImagesOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -399,8 +399,8 @@ func TestGetImages(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedImages: []*ec2.DescribeImagesOutput{
-				{
+			expectedImages: map[string]ec2.DescribeImagesOutput{
+				"test": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test"),
 					}},
@@ -433,13 +433,13 @@ func TestGetImages(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedImages: []*ec2.DescribeImagesOutput{
-				{
+			expectedImages: map[string]ec2.DescribeImagesOutput{
+				"test-1": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test-1"),
 					}},
 				},
-				{
+				"test-2": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test-2"),
 					}},
@@ -472,8 +472,8 @@ func TestGetImages(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedImages: []*ec2.DescribeImagesOutput{
-				{
+			expectedImages: map[string]ec2.DescribeImagesOutput{
+				"test-2": {
 					Images: []*ec2.Image{{
 						Name: aws.String("test-2"),
 					}},
@@ -498,7 +498,7 @@ func TestGetSecurityGroups(t *testing.T) {
 	tests := []struct {
 		name              string
 		mocked            []*serviceConnector
-		expectedSecGroups []*ec2.DescribeSecurityGroupsOutput
+		expectedSecGroups map[string]ec2.DescribeSecurityGroupsOutput
 		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -515,7 +515,7 @@ func TestGetSecurityGroups(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedSecGroups: nil,
+		expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -532,8 +532,8 @@ func TestGetSecurityGroups(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSecGroups: []*ec2.DescribeSecurityGroupsOutput{
-				{
+			expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{
+				"test": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("1"),
 					}},
@@ -566,13 +566,13 @@ func TestGetSecurityGroups(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSecGroups: []*ec2.DescribeSecurityGroupsOutput{
-				{
+			expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{
+				"test-1": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("2"),
 					}},
@@ -605,8 +605,8 @@ func TestGetSecurityGroups(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedSecGroups: []*ec2.DescribeSecurityGroupsOutput{
-				{
+			expectedSecGroups: map[string]ec2.DescribeSecurityGroupsOutput{
+				"test-2": {
 					SecurityGroups: []*ec2.SecurityGroup{{
 						GroupId: aws.String("2"),
 					}},
@@ -631,7 +631,7 @@ func TestGetSubnets(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
-		expectedSubnets []*ec2.DescribeSubnetsOutput
+		expectedSubnets map[string]ec2.DescribeSubnetsOutput
 		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -648,7 +648,7 @@ func TestGetSubnets(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedSubnets: nil,
+		expectedSubnets: map[string]ec2.DescribeSubnetsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -665,8 +665,8 @@ func TestGetSubnets(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSubnets: []*ec2.DescribeSubnetsOutput{
-				{
+			expectedSubnets: map[string]ec2.DescribeSubnetsOutput{
+				"test": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("1"),
 					}},
@@ -699,13 +699,13 @@ func TestGetSubnets(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSubnets: []*ec2.DescribeSubnetsOutput{
-				{
+			expectedSubnets: map[string]ec2.DescribeSubnetsOutput{
+				"test-1": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("2"),
 					}},
@@ -738,8 +738,8 @@ func TestGetSubnets(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedSubnets: []*ec2.DescribeSubnetsOutput{
-				{
+			expectedSubnets: map[string]ec2.DescribeSubnetsOutput{
+				"test-2": {
 					Subnets: []*ec2.Subnet{{
 						SubnetId: aws.String("2"),
 					}},
@@ -763,7 +763,7 @@ func TestGetVolumes(t *testing.T) {
 	tests := []struct {
 		name            string
 		mocked          []*serviceConnector
-		expectedVolumes []*ec2.DescribeVolumesOutput
+		expectedVolumes map[string]ec2.DescribeVolumesOutput
 		expectedError   error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -780,7 +780,7 @@ func TestGetVolumes(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedVolumes: nil,
+		expectedVolumes: map[string]ec2.DescribeVolumesOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -797,8 +797,8 @@ func TestGetVolumes(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVolumes: []*ec2.DescribeVolumesOutput{
-				{
+			expectedVolumes: map[string]ec2.DescribeVolumesOutput{
+				"test": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("1"),
 					}},
@@ -831,13 +831,13 @@ func TestGetVolumes(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedVolumes: []*ec2.DescribeVolumesOutput{
-				{
+			expectedVolumes: map[string]ec2.DescribeVolumesOutput{
+				"test-1": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("2"),
 					}},
@@ -870,8 +870,8 @@ func TestGetVolumes(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedVolumes: []*ec2.DescribeVolumesOutput{
-				{
+			expectedVolumes: map[string]ec2.DescribeVolumesOutput{
+				"test-2": {
 					Volumes: []*ec2.Volume{{
 						VolumeId: aws.String("2"),
 					}},
@@ -896,7 +896,7 @@ func TestGetSnapshots(t *testing.T) {
 	tests := []struct {
 		name              string
 		mocked            []*serviceConnector
-		expectedSnapshots []*ec2.DescribeSnapshotsOutput
+		expectedSnapshots map[string]ec2.DescribeSnapshotsOutput
 		expectedError     error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -917,7 +917,7 @@ func TestGetSnapshots(t *testing.T) {
 			region:  "test",
 			service: ec2.ServiceName,
 		}},
-		expectedSnapshots: nil,
+		expectedSnapshots: map[string]ec2.DescribeSnapshotsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -934,8 +934,8 @@ func TestGetSnapshots(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSnapshots: []*ec2.DescribeSnapshotsOutput{
-				{
+			expectedSnapshots: map[string]ec2.DescribeSnapshotsOutput{
+				"test": {
 					Snapshots: []*ec2.Snapshot{{
 						SnapshotId: aws.String("1"),
 					}},
@@ -968,13 +968,13 @@ func TestGetSnapshots(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedSnapshots: []*ec2.DescribeSnapshotsOutput{
-				{
+			expectedSnapshots: map[string]ec2.DescribeSnapshotsOutput{
+				"test-1": {
 					Snapshots: []*ec2.Snapshot{{
 						SnapshotId: aws.String("1"),
 					}},
 				},
-				{
+				"test-2": {
 					Snapshots: []*ec2.Snapshot{{
 						SnapshotId: aws.String("2"),
 					}},
@@ -1007,8 +1007,8 @@ func TestGetSnapshots(t *testing.T) {
 				region:  "test-1",
 				service: ec2.ServiceName,
 			}},
-			expectedSnapshots: []*ec2.DescribeSnapshotsOutput{
-				{
+			expectedSnapshots: map[string]ec2.DescribeSnapshotsOutput{
+				"test-2": {
 					Snapshots: []*ec2.Snapshot{{
 						SnapshotId: aws.String("2"),
 					}},

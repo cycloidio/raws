@@ -40,7 +40,7 @@ func TestGetDBInstances(t *testing.T) {
 	tests := []struct {
 		name              string
 		mocked            []*serviceConnector
-		expectedInstances []*rds.DescribeDBInstancesOutput
+		expectedInstances map[string]rds.DescribeDBInstancesOutput
 		expectedError     error
 	}{{
 		name: "one region no error",
@@ -60,8 +60,8 @@ func TestGetDBInstances(t *testing.T) {
 			},
 		},
 		expectedError: nil,
-		expectedInstances: []*rds.DescribeDBInstancesOutput{
-			{
+		expectedInstances: map[string]rds.DescribeDBInstancesOutput{
+			"test": {
 				DBInstances: []*rds.DBInstance{
 					{
 						DbiResourceId: aws.String("1"),
@@ -87,7 +87,7 @@ func TestGetDBInstances(t *testing.T) {
 					service: rds.ServiceName,
 				},
 			},
-			expectedInstances: nil,
+			expectedInstances: map[string]rds.DescribeDBInstancesOutput{},
 		},
 		{name: "multiple region with error",
 			mocked: []*serviceConnector{
@@ -119,8 +119,8 @@ func TestGetDBInstances(t *testing.T) {
 					service: rds.ServiceName,
 				},
 			},
-			expectedInstances: []*rds.DescribeDBInstancesOutput{
-				{
+			expectedInstances: map[string]rds.DescribeDBInstancesOutput{
+				"test-2": {
 					DBInstances: []*rds.DBInstance{
 						{
 							DbiResourceId: aws.String("2"),
@@ -159,15 +159,15 @@ func TestGetDBInstances(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedInstances: []*rds.DescribeDBInstancesOutput{
-				{
+			expectedInstances: map[string]rds.DescribeDBInstancesOutput{
+				"test-1": {
 					DBInstances: []*rds.DBInstance{
 						{
 							DbiResourceId: aws.String("1"),
 						},
 					},
 				},
-				{
+				"test-2": {
 					DBInstances: []*rds.DBInstance{
 						{
 							DbiResourceId: aws.String("2"),
@@ -194,7 +194,7 @@ func TestGetDBInstancesTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedTags  []*rds.ListTagsForResourceOutput
+		expectedTags  map[string]rds.ListTagsForResourceOutput
 		expectedError error
 	}{
 		{name: "one region no error",
@@ -215,8 +215,8 @@ func TestGetDBInstancesTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*rds.ListTagsForResourceOutput{
-				{
+			expectedTags: map[string]rds.ListTagsForResourceOutput{
+				"test": {
 					TagList: []*rds.Tag{
 						{
 							Key:   aws.String("test"),
@@ -243,7 +243,7 @@ func TestGetDBInstancesTags(t *testing.T) {
 					service: rds.ServiceName,
 				},
 			},
-			expectedTags: nil,
+			expectedTags: map[string]rds.ListTagsForResourceOutput{},
 		},
 		{name: "multiple region no error",
 			mocked: []*serviceConnector{
@@ -277,8 +277,8 @@ func TestGetDBInstancesTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*rds.ListTagsForResourceOutput{
-				{
+			expectedTags: map[string]rds.ListTagsForResourceOutput{
+				"test-1": {
 					TagList: []*rds.Tag{
 						{
 							Key:   aws.String("test"),
@@ -286,7 +286,7 @@ func TestGetDBInstancesTags(t *testing.T) {
 						},
 					},
 				},
-				{
+				"test-2": {
 					TagList: []*rds.Tag{
 						{
 							Key:   aws.String("test"),
@@ -327,8 +327,8 @@ func TestGetDBInstancesTags(t *testing.T) {
 					service: rds.ServiceName,
 				},
 			},
-			expectedTags: []*rds.ListTagsForResourceOutput{
-				{
+			expectedTags: map[string]rds.ListTagsForResourceOutput{
+				"test-2": {
 					TagList: []*rds.Tag{
 						{
 							Key:   aws.String("test"),

@@ -41,7 +41,7 @@ func TestGetLoadBalancers(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedELBs  []*elb.DescribeLoadBalancersOutput
+		expectedELBs  map[string]elb.DescribeLoadBalancersOutput
 		expectedError error
 	}{{name: "one region no error",
 		mocked: []*serviceConnector{
@@ -58,7 +58,7 @@ func TestGetLoadBalancers(t *testing.T) {
 			region:  "test",
 			service: elb.ServiceName,
 		}},
-		expectedELBs: nil,
+		expectedELBs: map[string]elb.DescribeLoadBalancersOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -77,8 +77,8 @@ func TestGetLoadBalancers(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedELBs: []*elb.DescribeLoadBalancersOutput{
-				{
+			expectedELBs: map[string]elb.DescribeLoadBalancersOutput{
+				"test": {
 					LoadBalancerDescriptions: []*elb.LoadBalancerDescription{
 						{
 							LoadBalancerName: aws.String("1"),
@@ -117,15 +117,15 @@ func TestGetLoadBalancers(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedELBs: []*elb.DescribeLoadBalancersOutput{
-				{
+			expectedELBs: map[string]elb.DescribeLoadBalancersOutput{
+				"test-1": {
 					LoadBalancerDescriptions: []*elb.LoadBalancerDescription{
 						{
 							LoadBalancerName: aws.String("1"),
 						},
 					},
 				},
-				{
+				"test-2": {
 					LoadBalancerDescriptions: []*elb.LoadBalancerDescription{
 						{
 							LoadBalancerName: aws.String("2"),
@@ -164,8 +164,8 @@ func TestGetLoadBalancers(t *testing.T) {
 					service: elb.ServiceName,
 				},
 			},
-			expectedELBs: []*elb.DescribeLoadBalancersOutput{
-				{
+			expectedELBs: map[string]elb.DescribeLoadBalancersOutput{
+				"test-2": {
 					LoadBalancerDescriptions: []*elb.LoadBalancerDescription{
 						{
 							LoadBalancerName: aws.String("2"),
@@ -193,7 +193,7 @@ func TestGetLoadBalancersTags(t *testing.T) {
 	tests := []struct {
 		name          string
 		mocked        []*serviceConnector
-		expectedTags  []*elb.DescribeTagsOutput
+		expectedTags  map[string]elb.DescribeTagsOutput
 		expectedError error
 	}{{name: "one region with error",
 		mocked: []*serviceConnector{
@@ -210,7 +210,7 @@ func TestGetLoadBalancersTags(t *testing.T) {
 			region:  "test",
 			service: elb.ServiceName,
 		}},
-		expectedTags: nil,
+		expectedTags: map[string]elb.DescribeTagsOutput{},
 	},
 		{name: "one region no error",
 			mocked: []*serviceConnector{
@@ -229,8 +229,8 @@ func TestGetLoadBalancersTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*elb.DescribeTagsOutput{
-				{
+			expectedTags: map[string]elb.DescribeTagsOutput{
+				"test": {
 					TagDescriptions: []*elb.TagDescription{
 						{
 							LoadBalancerName: aws.String("1"),
@@ -269,15 +269,15 @@ func TestGetLoadBalancersTags(t *testing.T) {
 				},
 			},
 			expectedError: nil,
-			expectedTags: []*elb.DescribeTagsOutput{
-				{
+			expectedTags: map[string]elb.DescribeTagsOutput{
+				"test-1": {
 					TagDescriptions: []*elb.TagDescription{
 						{
 							LoadBalancerName: aws.String("1"),
 						},
 					},
 				},
-				{
+				"test-2": {
 					TagDescriptions: []*elb.TagDescription{
 						{
 							LoadBalancerName: aws.String("2"),
@@ -316,8 +316,8 @@ func TestGetLoadBalancersTags(t *testing.T) {
 					service: elb.ServiceName,
 				},
 			},
-			expectedTags: []*elb.DescribeTagsOutput{
-				{
+			expectedTags: map[string]elb.DescribeTagsOutput{
+				"test-2": {
 					TagDescriptions: []*elb.TagDescription{
 						{
 							LoadBalancerName: aws.String("2"),
