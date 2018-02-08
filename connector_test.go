@@ -8,9 +8,23 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
+
+type mockSTS struct {
+	stsiface.STSAPI
+
+	// Mocking of GetCallerIdentity
+	gcio   *sts.GetCallerIdentityOutput
+	gcierr error
+}
+
+func (m mockSTS) GetCallerIdentityWithContext(_ aws.Context, _ *sts.GetCallerIdentityInput, _ ...request.Option) (*sts.GetCallerIdentityOutput, error) {
+	return m.gcio, m.gcierr
+}
 
 func TestConnector_setRegion(t *testing.T) {
 	var ec2Regions = &ec2.DescribeRegionsOutput{
@@ -94,7 +108,7 @@ func TestConnector_setAccountID(t *testing.T) {
 				gcierr: nil,
 			},
 			expectedID:    aws.String("1"),
-			expectedError: errors.New("at least one region name is required"),
+			expectedError: nil,
 		},
 		{name: "error while getting identity",
 			mocked: mockSTS{
