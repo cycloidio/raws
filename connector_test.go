@@ -61,6 +61,15 @@ func TestConnector_setRegion(t *testing.T) {
 			expectedRegions: []string{"eu-west-1", "eu-west-2", "eu-central-1"},
 			expectedError:   nil,
 		},
+		{name: "match all the regions",
+			mocked: mockEC2{
+				dro:   ec2Regions,
+				drerr: nil,
+			},
+			regionsInput:    []string{"*"},
+			expectedRegions: []string{"eu-west-1", "eu-west-2", "eu-central-1", "us-west-1"},
+			expectedError:   nil,
+		},
 		{name: "match nothing",
 			mocked: mockEC2{
 				dro:   ec2Regions,
