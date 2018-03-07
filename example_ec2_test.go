@@ -40,6 +40,58 @@ func ExampleAWSReader_GetInstances() {
 	// Output:
 }
 
+func ExampleAWSReader_GetInstances_emptyInput() {
+	var accessKey, secretKey, err = getAWSKeys()
+	if err != nil {
+		// When no keys the example doesn't run, but if the env vars are set
+		// then it runs and make the AWS SDK calls.
+		return
+	}
+
+	var ctx = context.Background()
+	var awsr raws.AWSReader
+	awsr, err = raws.NewAWSReader(ctx, accessKey, secretKey, []string{"eu-*"}, nil)
+	if err != nil {
+		fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
+		return
+	}
+
+	var _, awsErrs = awsr.GetInstances(ctx, &ec2.DescribeInstancesInput{})
+	if awsErrs != nil {
+		fmt.Printf("Error: %+v\n", awsErrs)
+	}
+
+	// Output:
+}
+
+func ExampleAWSReader_GetInstances_emptySliceOfFilters() {
+	var accessKey, secretKey, err = getAWSKeys()
+	if err != nil {
+		// When no keys the example doesn't run, but if the env vars are set
+		// then it runs and make the AWS SDK calls.
+		return
+	}
+
+	var ctx = context.Background()
+	var awsr raws.AWSReader
+	awsr, err = raws.NewAWSReader(ctx, accessKey, secretKey, []string{"eu-*"}, nil)
+	if err != nil {
+		fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
+		return
+	}
+
+	var filters = []*ec2.Filter{}
+	var dii = &ec2.DescribeInstancesInput{Filters: filters}
+
+	var _, awsErrs = awsr.GetInstances(ctx, dii)
+	if awsErrs == nil {
+		fmt.Println("No error has been returned and it was expected")
+	}
+
+	// error should be returned if filters is an empty slice rather than a nil
+	// Output
+}
+
 func ExampleAWSReader_GetVpcs() {
 	var accessKey, secretKey, err = getAWSKeys()
 	if err != nil {
