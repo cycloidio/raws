@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go/service/elasticache"
@@ -148,6 +149,15 @@ type AWSReader interface {
 	// GetObjectsTags returns tags associated with S3 objects based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) (map[string]s3.GetObjectTaggingOutput, error)
+
+	// GetRecordedResourceCounts returns counts of the AWS resources which have
+	// been recorded by AWS Config.
+	// See https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html
+	// for more information about what to enable in your AWS account, the list of
+	// supported resources, etc.
+	GetRecordedResourceCounts(
+		ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput,
+	) (map[string]configservice.GetDiscoveredResourceCountsOutput, error)
 }
 
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
