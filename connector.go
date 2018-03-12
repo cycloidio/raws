@@ -165,7 +165,7 @@ type AWSReader interface {
 func NewAWSReader(
 	ctx context.Context, accessKey string, secretKey string, regions []string, config *aws.Config,
 ) (AWSReader, error) {
-	var c connector = connector{}
+	var c = connector{}
 
 	creds, ec2s, sts, err := configureAWS(accessKey, secretKey)
 	if err != nil {
@@ -224,7 +224,7 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	 * not try to establish any connections with AWS services.
 	 */
 	const defaultRegion string = "eu-west-1"
-	var token string = ""
+	var token = ""
 
 	creds := credentials.NewStaticCredentials(accessKey, secretKey, token)
 	_, err := creds.Get()
