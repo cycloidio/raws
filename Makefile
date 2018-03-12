@@ -8,6 +8,7 @@ GOFILES_NOVENDOR := $(shell find . -type f -name '*.go' -not -path "./vendor/*" 
 get-deps:
 	go get -t ./...
 	go get golang.org/x/tools/cmd/goimports
+	go get -u golang.org/x/lint/golint
 
 .PHONY: clean
 clean:
@@ -25,7 +26,7 @@ $(COVFILE):
 	go test $(PKG) -covermode=count -coverprofile=$(COVFILE)
 
 .PHONY: travis-ci
-travis-ci: test vetcheck fmtcheck cov
+travis-ci: test vetcheck fmtcheck lintcheck cov
 
 .PHONY: test
 test:
@@ -46,4 +47,13 @@ ifeq ($(shell go tool vet -all -shadow=true . 2>&1 | wc -l), 0)
 else
 	@echo -e "error\tsome files did not pass go vet\n"
 	@go tool vet -all -shadow=true . 2>&1
+endif
+
+.PHONY: lintcheck
+lintcheck:
+ifeq ($(shell golint 2>&1 | wc -l), 0)
+	@printf "ok\tall files passed golint\n"
+else
+	@echo -e "error\tsome files did not pass golint\n"
+	@golint 2>&1
 endif
