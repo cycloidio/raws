@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/configservice"
+	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go/service/elasticache"
@@ -148,6 +150,15 @@ type AWSReader interface {
 	// GetObjectsTags returns tags associated with S3 objects based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetObjectsTags(ctx context.Context, input *s3.GetObjectTaggingInput) (map[string]s3.GetObjectTaggingOutput, error)
+
+	// GetRecordedResourceCounts returns counts of the AWS resources which have
+	// been recorded by AWS Config.
+	// See https://docs.aws.amazon.com/config/latest/APIReference/API_GetDiscoveredResourceCounts.html
+	// for more information about what to enable in your AWS account, the list of
+	// supported resources, etc.
+	GetRecordedResourceCounts(
+		ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput,
+	) (map[string]configservice.GetDiscoveredResourceCountsOutput, error)
 }
 
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
@@ -204,15 +215,16 @@ func (c *connector) GetRegions() []string {
 }
 
 type serviceConnector struct {
-	region       string
-	session      *session.Session
-	ec2          ec2iface.EC2API
-	elb          elbiface.ELBAPI
-	elbv2        elbv2iface.ELBV2API
-	rds          rdsiface.RDSAPI
-	s3           s3iface.S3API
-	s3downloader s3manageriface.DownloaderAPI
-	elasticache  elasticacheiface.ElastiCacheAPI
+	region        string
+	session       *session.Session
+	ec2           ec2iface.EC2API
+	elb           elbiface.ELBAPI
+	elbv2         elbv2iface.ELBV2API
+	rds           rdsiface.RDSAPI
+	s3            s3iface.S3API
+	s3downloader  s3manageriface.DownloaderAPI
+	elasticache   elasticacheiface.ElastiCacheAPI
+	configservice configserviceiface.ConfigServiceAPI
 }
 
 func configureAWS(accessKey string, secretKey string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
