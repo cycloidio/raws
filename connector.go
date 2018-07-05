@@ -173,6 +173,13 @@ type AWSReader interface {
 //
 // The connections are not all established while instancing, but the various sessions are, this way connections are only
 // made for services that are called, otherwise only the sessions remain.
+//
+// An error is returned if any of the needed AWS request for creating the reader returns an AWS error, in such case it
+// will have any of the common error codes (see below) or EmptyStaticCreds code or a go standard error in case that no
+// regions are matched with the ones available, at the time, in AWS.
+// See:
+//  * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
+//  * https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
 func NewAWSReader(
 	ctx context.Context, accessKey string, secretKey string, regions []string, config *aws.Config,
 ) (AWSReader, error) {
@@ -227,6 +234,11 @@ type serviceConnector struct {
 	configservice configserviceiface.ConfigServiceAPI
 }
 
+// configureAWS creates a new static credential with the passed accessKey and
+// secretKey and with it, a sessions which is used to create a EC2 client and
+// a Security Token Service client.
+// The only AWS error code that this function return is
+// * EmptyStaticCreds
 func configureAWS(accessKey string, secretKey string) (*credentials.Credentials, ec2iface.EC2API, stsiface.STSAPI, error) {
 	/* The default region is only used to (1) get the list of region and
 	 * (2) get the account ID associated with the credentials.
@@ -254,6 +266,12 @@ func configureAWS(accessKey string, secretKey string) (*credentials.Credentials,
 	return creds, ec2.New(sess), sts.New(sess), nil
 }
 
+// setRegions retrieves the AWS available regions and matches with the passed
+// enabledRegions (regions regexps) and kept them in the connector, in order
+// to send request to all of them when a AWSReader method is called.
+// A AWS error can be returned with one of the common error codes or a standard
+// go error if enabledRegions is empty or if 0 AWS regions has been matched.
+// See https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
 func (c *connector) setRegions(ctx context.Context, ec2 ec2iface.EC2API, enabledRegions []string) error {
 	if len(enabledRegions) == 0 {
 		return errors.New("at least one region name is required")
@@ -275,6 +293,10 @@ func (c *connector) setRegions(ctx context.Context, ec2 ec2iface.EC2API, enabled
 	return nil
 }
 
+// setAccountID retrieves the caller ID from the Security Token Service and set
+// it in the connector.
+// An AWS error can be returned with one of the common error codes.
+// See https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
 func (c *connector) setAccountID(ctx context.Context, sts stsiface.STSAPI) error {
 	resp, err := sts.GetCallerIdentityWithContext(ctx, nil)
 	if err != nil {
