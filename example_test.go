@@ -72,7 +72,7 @@ func callRDS(c raws.AWSReader) {
 func callElastiCache(c raws.AWSReader) {
 	var ctx = context.Background()
 
-	clusters, _ := c.GetElastiCacheCluster(ctx, nil)
+	clusters, _ := c.GetElastiCacheClusters(ctx, nil)
 	fmt.Println(clusters)
 
 	i := &elasticache.ListTagsForResourceInput{

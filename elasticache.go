@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticache"
 )
 
-func (c *connector) GetElastiCacheCluster(
+func (c *connector) GetElastiCacheClusters(
 	ctx context.Context, input *elasticache.DescribeCacheClustersInput,
 ) (map[string]elasticache.DescribeCacheClustersOutput, error) {
 	var errs Errors

@@ -8,7 +8,7 @@ import (
 	"github.com/cycloidio/raws"
 )
 
-func ExampleAWSReader_GetElastiCacheCluster() {
+func ExampleAWSReader_GetElastiCacheClusters() {
 	var accessKey, secretKey, err = getAWSKeys()
 	if err != nil {
 		// When no keys the example doesn't run, but if the env vars are set
@@ -25,7 +25,7 @@ func ExampleAWSReader_GetElastiCacheCluster() {
 	}
 
 	var deci = &elasticache.DescribeCacheClustersInput{}
-	var _, awsErrs = awsr.GetElastiCacheCluster(ctx, deci)
+	var _, awsErrs = awsr.GetElastiCacheClusters(ctx, deci)
 	if awsErrs != nil {
 		fmt.Printf("Error: %+v\n", awsErrs)
 		return
