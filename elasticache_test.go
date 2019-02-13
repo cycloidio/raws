@@ -179,7 +179,7 @@ func TestGetElastiCacheCluster(t *testing.T) {
 
 	for i, tt := range tests {
 		c := &connector{svcs: tt.mocked}
-		cluster, err := c.GetElastiCacheCluster(ctx, nil)
+		cluster, err := c.GetElastiCacheClusters(ctx, nil)
 		checkErrors(t, tt.name, i, err, tt.expectedError)
 		if !reflect.DeepEqual(cluster, tt.expectedClusters) {
 			t.Errorf("%s [%d] - clusters: received=%+v | expected=%+v",
