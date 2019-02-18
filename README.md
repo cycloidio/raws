@@ -16,39 +16,38 @@ Any contributions are welcome!
 ## Getting started
 
 ### Import the library
-To get started, you can download/include the library to your code:
-```go
-import 	"github.com/cycloidio/raws"
-```
+To get started, you can download/include the library to your code and use it like so:
 
-### Create a reader
 ```go
-var config *aws.Config = nil
-var accessKey string = "xxxxxxxxxxxxxxxx"
-var secretKey string = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-var region []string = []string{"eu-*"}
+func main() {
+  var config *aws.Config = nil
+  var accessKey string = "xxxxxxxxxxxxxxx"
+  var secretKey string = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  var region []string = []string{"eu-*"}
+  var ctx = context.Background()
 
-c, err := raws.NewAWSReader(accessKey, secretKey, region, config)
-if err != nil {
-	fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
-	return err
+  // Create a reader
+  c, err := raws.NewAWSReader(ctx, accessKey, secretKey, region, config)
+  if err != nil {
+    fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
+    return
+  }
+
+  // Start making calls
+  // Errors are intentionally ignored in this example,
+  // no inputs are provided to those calls, even though one could.
+  elbs, _ := c.GetLoadBalancersV2(ctx, nil)
+  fmt.Println(elbs)
+
+  instances, _ := c.GetInstances(ctx, nil)
+  fmt.Println(instances)
+
+  vpcs, _ := c.GetVpcs(ctx, nil)
+  fmt.Println(vpcs)
+
+  return
 }
 ```
-
-### Start making call
-
-Errors are intentionally ignored in this example, no inputs are provided to those calls, even though one could.
-
-```go
-elbs, _ := c.GetLoadBalancersV2(nil)
-fmt.Println(elbs)
-instances, _ := c.GetInstances(nil)
-fmt.Println(instances)
-vpcs, _ := c.GetVpcs(nil)
-fmt.Println(vpcs)
-```
-
-You can also take a look at the [example file](example/main.go).
 
 ### Contribute
 
