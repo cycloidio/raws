@@ -55,3 +55,28 @@ func (c *connector) GetCloudFrontPublicKeys(
 
 	return regionPublicKeys, nil
 }
+
+func (c *connector) GetCloudFrontOriginAccessIdentities(
+	ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput,
+) (map[string]cloudfront.ListCloudFrontOriginAccessIdentitiesOutput, error) {
+	var errs Errors
+	var regionOriginAccessIdentities = map[string]cloudfront.ListCloudFrontOriginAccessIdentitiesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.cloudfront == nil {
+			svc.cloudfront = cloudfront.New(svc.session)
+		}
+		originAccessIdentities, err := svc.cloudfront.ListCloudFrontOriginAccessIdentitiesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, cloudfront.ServiceName, err))
+		} else {
+			regionOriginAccessIdentities[svc.region] = *originAccessIdentities
+		}
+	}
+
+	if errs != nil {
+		return regionOriginAccessIdentities, errs
+	}
+
+	return regionOriginAccessIdentities, nil
+}
