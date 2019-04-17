@@ -30,3 +30,28 @@ func (c *connector) GetCloudFrontDistributions(
 
 	return regionDistributions, nil
 }
+
+func (c *connector) GetCloudFrontPublicKeys(
+	ctx context.Context, input *cloudfront.ListPublicKeysInput,
+) (map[string]cloudfront.ListPublicKeysOutput, error) {
+	var errs Errors
+	var regionPublicKeys = map[string]cloudfront.ListPublicKeysOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.cloudfront == nil {
+			svc.cloudfront = cloudfront.New(svc.session)
+		}
+		publicKeys, err := svc.cloudfront.ListPublicKeysWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, cloudfront.ServiceName, err))
+		} else {
+			regionPublicKeys[svc.region] = *publicKeys
+		}
+	}
+
+	if errs != nil {
+		return regionPublicKeys, errs
+	}
+
+	return regionPublicKeys, nil
+}

@@ -167,6 +167,12 @@ type AWSReader interface {
 	GetCloudFrontDistributions(
 		ctx context.Context, input *cloudfront.ListDistributionsInput,
 	) (map[string]cloudfront.ListDistributionsOutput, error)
+
+	// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetCloudFrontPublicKeys(
+		ctx context.Context, input *cloudfront.ListPublicKeysInput,
+	) (map[string]cloudfront.ListPublicKeysOutput, error)
 }
 
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
