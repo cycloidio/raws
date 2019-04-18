@@ -10,6 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudfront"
+	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -159,6 +161,24 @@ type AWSReader interface {
 	GetRecordedResourceCounts(
 		ctx context.Context, input *configservice.GetDiscoveredResourceCountsInput,
 	) (map[string]configservice.GetDiscoveredResourceCountsOutput, error)
+
+	// GetCloudFrontDistributions returns all the CloudFront Distributions on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetCloudFrontDistributions(
+		ctx context.Context, input *cloudfront.ListDistributionsInput,
+	) (map[string]cloudfront.ListDistributionsOutput, error)
+
+	// GetCloudFrontPublicKeys returns all the CloudFront Public Keys on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetCloudFrontPublicKeys(
+		ctx context.Context, input *cloudfront.ListPublicKeysInput,
+	) (map[string]cloudfront.ListPublicKeysOutput, error)
+
+	// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetCloudFrontOriginAccessIdentities(
+		ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput,
+	) (map[string]cloudfront.ListCloudFrontOriginAccessIdentitiesOutput, error)
 }
 
 // NewAWSReader returns an object which also contains the accountID and extend the different regions to use.
@@ -232,6 +252,7 @@ type serviceConnector struct {
 	s3downloader  s3manageriface.DownloaderAPI
 	elasticache   elasticacheiface.ElastiCacheAPI
 	configservice configserviceiface.ConfigServiceAPI
+	cloudfront    cloudfrontiface.CloudFrontAPI
 }
 
 // configureAWS creates a new static credential with the passed accessKey and
