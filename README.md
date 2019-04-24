@@ -50,6 +50,15 @@ fmt.Println(vpcs)
 
 You can also take a look at the [example file](example/main.go).
 
+### Contribute
+
+We use a custom generation tool located on `cmd/main.go` which basically uses a list of function definitions (`cmd/functions.go`) to generate the wrappers for those,
+if you want to add a call to the AWS API you have to add it to that list and if the implementation fits the template it'll be automatically generated/implemented.
+
+If it does not fit the template you'll have to implement it manually, an example is the `s3downloader.go`.
+
+To generate the code just run `make generate`.
+
 ### Enjoy
 That's it! Nothing more, nothing less.
 
