@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/sts/stsiface"
 )
@@ -24,6 +25,20 @@ type mockSTS struct {
 
 func (m mockSTS) GetCallerIdentityWithContext(_ aws.Context, _ *sts.GetCallerIdentityInput, _ ...request.Option) (*sts.GetCallerIdentityOutput, error) {
 	return m.gcio, m.gcierr
+}
+
+type mockEC2 struct {
+	ec2iface.EC2API
+
+	// Mocking of DescribeRegions
+	dro   *ec2.DescribeRegionsOutput
+	drerr error
+}
+
+func (m mockEC2) DescribeRegionsWithContext(
+	_ aws.Context, _ *ec2.DescribeRegionsInput, _ ...request.Option,
+) (*ec2.DescribeRegionsOutput, error) {
+	return m.dro, m.drerr
 }
 
 func TestConnector_setRegion(t *testing.T) {

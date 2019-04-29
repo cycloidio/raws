@@ -23,14 +23,14 @@ htmlcov: $(COVFILE)
 	go tool cover -html=$(COVFILE)
 
 $(COVFILE):
-	go test $(PKG) -covermode=count -coverprofile=$(COVFILE)
+	go test ./... -covermode=count -coverprofile=$(COVFILE)
 
 .PHONY: travis-ci
 travis-ci: test vetcheck fmtcheck lintcheck cov
 
 .PHONY: test
 test:
-	go test -v $(PKG) -coverprofile=$(COVFILE)
+	go test -v ./... -coverprofile=$(COVFILE)
 
 .PHONY: fmtcheck
 fmtcheck:
@@ -57,3 +57,7 @@ else
 	@echo -e "error\tsome files did not pass golint\n"
 	@golint 2>&1
 endif
+
+.PHONY: generate
+generate:
+	@go generate ./...
