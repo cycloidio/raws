@@ -17,6 +17,7 @@ clean:
 .PHONY: cov
 cov: $(COVFILE)
 	go tool cover -func=$(COVFILE)
+	sed -i '\|github.com/cycloidio/raws/generate.go|d' $(COVFILE)
 
 .PHONY: htmlcov
 htmlcov: $(COVFILE)
