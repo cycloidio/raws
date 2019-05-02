@@ -272,5 +272,170 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+
+		// iam
+		Function{
+			Entity:  "AccessKeys",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetAccessKeys returns all the IAM AccessKeys on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "AccountAliases",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetAccountAliases returns all the IAM AccountAliases on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		// Check
+		Function{
+			Entity:  "AccountPasswordPolicy",
+			Prefix:  "Get",
+			Service: "iam",
+			Documentation: `
+			// GetAccountPasswordPolicy returns the IAM AccountPasswordPolicy on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "Groups",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetGroups returns the IAM Groups on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "GroupPolicies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetGroupPolicies returns the IAM GroupPolicies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "AttachedGroupPolicies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetAttachedGroupPolicies returns the IAM AttachedGroupPolicies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "InstanceProfiles",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetIstanceProfiles returns the IAM InstanceProfiles on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "OpenIDConnectProviders",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetOpenIDConnectProviders returns the IAM OpenIDConnectProviders on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "Policies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetPolicies returns the IAM Policies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "Roles",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetRoles returns the IAM Roles on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "RolePolicies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetRolePolicies returns the IAM RolePolicies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "AttachedRolePolicies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetAttachedRolePolicies returns the IAM AttachedRolePolicies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "SAMLProviders",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetSAMLProviders returns the IAM SAMLProviders on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ServerCertificates",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetServerCertificates returns the IAM ServerCertificates on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "Users",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetUsers returns the IAM Users on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "UserPolicies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetUserPolicies returns the IAM UserPolicies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "AttachedUserPolicies",
+			Prefix:  "List",
+			Service: "iam",
+			Documentation: `
+			// GetAttachedUserPolicies returns the IAM AttachedUserPolicies on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "SSHPublicKey",
+			Prefix:  "Get",
+			Service: "iam",
+			Documentation: `
+			// GetSSHPublicKey returns the IAM SSHPublicKey on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 	}
 )

@@ -16,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticache/elasticacheiface"
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
+	"github.com/aws/aws-sdk-go/service/iam/iamiface"
 	"github.com/aws/aws-sdk-go/service/rds/rdsiface"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager/s3manageriface"
@@ -97,6 +98,7 @@ type serviceConnector struct {
 	elasticache   elasticacheiface.ElastiCacheAPI
 	configservice configserviceiface.ConfigServiceAPI
 	cloudfront    cloudfrontiface.CloudFrontAPI
+	iam           iamiface.IAMAPI
 }
 
 // configureAWS creates a new static credential with the passed accessKey and

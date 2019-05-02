@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elasticache"
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/aws/aws-sdk-go/service/elbv2"
+	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -146,6 +147,78 @@ type AWSReader interface {
 	// GetCloudFrontOriginAccessIdentities returns all the CloudFront Origin Access Identities on the given input
 	// Returned values are commented in the interface doc comment block.
 	GetCloudFrontOriginAccessIdentities(ctx context.Context, input *cloudfront.ListCloudFrontOriginAccessIdentitiesInput) (map[string]cloudfront.ListCloudFrontOriginAccessIdentitiesOutput, error)
+
+	// GetAccessKeys returns all the IAM AccessKeys on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput) (map[string]iam.ListAccessKeysOutput, error)
+
+	// GetAccountAliases returns all the IAM AccountAliases on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAccountAliases(ctx context.Context, input *iam.ListAccountAliasesInput) (map[string]iam.ListAccountAliasesOutput, error)
+
+	// GetAccountPasswordPolicy returns the IAM AccountPasswordPolicy on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (map[string]iam.GetAccountPasswordPolicyOutput, error)
+
+	// GetGroups returns the IAM Groups on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetGroups(ctx context.Context, input *iam.ListGroupsInput) (map[string]iam.ListGroupsOutput, error)
+
+	// GetGroupPolicies returns the IAM GroupPolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) (map[string]iam.ListGroupPoliciesOutput, error)
+
+	// GetAttachedGroupPolicies returns the IAM AttachedGroupPolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) (map[string]iam.ListAttachedGroupPoliciesOutput, error)
+
+	// GetIstanceProfiles returns the IAM InstanceProfiles on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) (map[string]iam.ListInstanceProfilesOutput, error)
+
+	// GetOpenIDConnectProviders returns the IAM OpenIDConnectProviders on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) (map[string]iam.ListOpenIDConnectProvidersOutput, error)
+
+	// GetPolicies returns the IAM Policies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) (map[string]iam.ListPoliciesOutput, error)
+
+	// GetRoles returns the IAM Roles on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetRoles(ctx context.Context, input *iam.ListRolesInput) (map[string]iam.ListRolesOutput, error)
+
+	// GetRolePolicies returns the IAM RolePolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) (map[string]iam.ListRolePoliciesOutput, error)
+
+	// GetAttachedRolePolicies returns the IAM AttachedRolePolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) (map[string]iam.ListAttachedRolePoliciesOutput, error)
+
+	// GetSAMLProviders returns the IAM SAMLProviders on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetSAMLProviders(ctx context.Context, input *iam.ListSAMLProvidersInput) (map[string]iam.ListSAMLProvidersOutput, error)
+
+	// GetServerCertificates returns the IAM ServerCertificates on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) (map[string]iam.ListServerCertificatesOutput, error)
+
+	// GetUsers returns the IAM Users on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetUsers(ctx context.Context, input *iam.ListUsersInput) (map[string]iam.ListUsersOutput, error)
+
+	// GetUserPolicies returns the IAM UserPolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) (map[string]iam.ListUserPoliciesOutput, error)
+
+	// GetAttachedUserPolicies returns the IAM AttachedUserPolicies on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) (map[string]iam.ListAttachedUserPoliciesOutput, error)
+
+	// GetSSHPublicKey returns the IAM SSHPublicKey on the given input
+	// Returned values are commented in the interface doc comment block.
+	GetSSHPublicKey(ctx context.Context, input *iam.GetSSHPublicKeyInput) (map[string]iam.GetSSHPublicKeyOutput, error)
 }
 
 func (c *connector) GetInstances(ctx context.Context, input *ec2.DescribeInstancesInput) (map[string]ec2.DescribeInstancesOutput, error) {
@@ -746,6 +819,438 @@ func (c *connector) GetCloudFrontOriginAccessIdentities(ctx context.Context, inp
 		opt, err := svc.cloudfront.ListCloudFrontOriginAccessIdentitiesWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewError(svc.region, cloudfront.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAccessKeys(ctx context.Context, input *iam.ListAccessKeysInput) (map[string]iam.ListAccessKeysOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListAccessKeysOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListAccessKeysWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAccountAliases(ctx context.Context, input *iam.ListAccountAliasesInput) (map[string]iam.ListAccountAliasesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListAccountAliasesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListAccountAliasesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAccountPasswordPolicy(ctx context.Context, input *iam.GetAccountPasswordPolicyInput) (map[string]iam.GetAccountPasswordPolicyOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.GetAccountPasswordPolicyOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.GetAccountPasswordPolicyWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetGroups(ctx context.Context, input *iam.ListGroupsInput) (map[string]iam.ListGroupsOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListGroupsOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListGroupsWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetGroupPolicies(ctx context.Context, input *iam.ListGroupPoliciesInput) (map[string]iam.ListGroupPoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListGroupPoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListGroupPoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAttachedGroupPolicies(ctx context.Context, input *iam.ListAttachedGroupPoliciesInput) (map[string]iam.ListAttachedGroupPoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListAttachedGroupPoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListAttachedGroupPoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetInstanceProfiles(ctx context.Context, input *iam.ListInstanceProfilesInput) (map[string]iam.ListInstanceProfilesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListInstanceProfilesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListInstanceProfilesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetOpenIDConnectProviders(ctx context.Context, input *iam.ListOpenIDConnectProvidersInput) (map[string]iam.ListOpenIDConnectProvidersOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListOpenIDConnectProvidersOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListOpenIDConnectProvidersWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetPolicies(ctx context.Context, input *iam.ListPoliciesInput) (map[string]iam.ListPoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListPoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListPoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetRoles(ctx context.Context, input *iam.ListRolesInput) (map[string]iam.ListRolesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListRolesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListRolesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetRolePolicies(ctx context.Context, input *iam.ListRolePoliciesInput) (map[string]iam.ListRolePoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListRolePoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListRolePoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAttachedRolePolicies(ctx context.Context, input *iam.ListAttachedRolePoliciesInput) (map[string]iam.ListAttachedRolePoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListAttachedRolePoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListAttachedRolePoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetSAMLProviders(ctx context.Context, input *iam.ListSAMLProvidersInput) (map[string]iam.ListSAMLProvidersOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListSAMLProvidersOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListSAMLProvidersWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetServerCertificates(ctx context.Context, input *iam.ListServerCertificatesInput) (map[string]iam.ListServerCertificatesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListServerCertificatesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListServerCertificatesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetUsers(ctx context.Context, input *iam.ListUsersInput) (map[string]iam.ListUsersOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListUsersOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListUsersWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetUserPolicies(ctx context.Context, input *iam.ListUserPoliciesInput) (map[string]iam.ListUserPoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListUserPoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListUserPoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAttachedUserPolicies(ctx context.Context, input *iam.ListAttachedUserPoliciesInput) (map[string]iam.ListAttachedUserPoliciesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.ListAttachedUserPoliciesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.ListAttachedUserPoliciesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetSSHPublicKey(ctx context.Context, input *iam.GetSSHPublicKeyInput) (map[string]iam.GetSSHPublicKeyOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]iam.GetSSHPublicKeyOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.iam == nil {
+			svc.iam = iam.New(svc.session)
+		}
+
+		opt, err := svc.iam.GetSSHPublicKeyWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, iam.ServiceName, err))
 		} else {
 			regionsOpts[svc.region] = *opt
 		}
