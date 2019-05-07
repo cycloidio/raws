@@ -437,5 +437,145 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		// ses
+		Function{
+			Entity:  "ActiveReceiptRuleSet",
+			Prefix:  "Describe",
+			Service: "ses",
+			Documentation: `
+			// GetActiveReceiptRuleSet returns the SES ActiveReceiptRuleSet on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "Identities",
+			Prefix:  "List",
+			Service: "ses",
+			Documentation: `
+			// GetIdentities returns the SES Identities on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ReceiptFilters",
+			Prefix:  "List",
+			Service: "ses",
+			Documentation: `
+			// GetReceiptFilters returns the SES ReceiptFilters on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ConfigurationSets",
+			Prefix:  "List",
+			Service: "ses",
+			Documentation: `
+			// GetConfigurationSets returns the SES ConfigurationSets on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "IdentityNotificationAttributes",
+			Prefix:  "Get",
+			Service: "ses",
+			Documentation: `
+			// GetIdentityNotificationAttributes returns the SES IdentityNotificationAttributes on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "Templates",
+			Prefix:  "List",
+			Service: "ses",
+			Documentation: `
+			// GetTemplates returns the SES Templates on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// route53
+		Function{
+			Entity:  "ReusableDelegationSets",
+			Prefix:  "List",
+			Service: "route53",
+			Documentation: `
+			// GetReusableDelegationSets returns the Route53 ReusableDelegationSets on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "HealthChecks",
+			Prefix:  "List",
+			Service: "route53",
+			Documentation: `
+			// GetHealthChecks returns the Route53 HealthChecks on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "QueryLoggingConfigs",
+			Prefix:  "List",
+			Service: "route53",
+			Documentation: `
+			// GetQueryLoggingConfigs returns the Route53 QueryLoggingConfigs on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ResourceRecordSets",
+			Prefix:  "List",
+			Service: "route53",
+			Documentation: `
+			// GetResourceRecordSets returns the Route53 ResourceRecordSets on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "HostedZones",
+			Prefix:  "List",
+			Service: "route53",
+			Documentation: `
+			// GetHostedZones returns the Route53 HostedZones on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "VPCAssociationAuthorizations",
+			Prefix:  "List",
+			Service: "route53",
+			Documentation: `
+			// GetVPCAssociationAuthorizations returns the Route53 VPCAssociationAuthorizations on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// route53resolver
+		Function{
+			Entity:  "ResolverEndpoints",
+			Prefix:  "List",
+			Service: "route53resolver",
+			Documentation: `
+			// GetResolverEndpoints returns the Route53Resolver ResolverEndpoints on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ResolverRules",
+			Prefix:  "List",
+			Service: "route53resolver",
+			Documentation: `
+			// GetResolverRules returns the Route53Resolver ResolverRules on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "ResolverRuleAssociations",
+			Prefix:  "List",
+			Service: "route53resolver",
+			Documentation: `
+			// GetResolverRuleAssociations returns the Route53Resolver ResolverRuleAssociations on the given input
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 	}
 )
