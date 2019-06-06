@@ -179,12 +179,14 @@ var (
 		// s3
 		Function{
 			// TODO: https://github.com/cycloidio/raws/issues/44
-			FnName:  "ListBuckets",
-			Entity:  "Buckets",
-			Prefix:  "List",
-			Service: "s3",
+			FnName:       "ListBuckets",
+			Entity:       "Buckets",
+			Prefix:       "List",
+			Service:      "s3",
+			NoGenerateFn: true,
 			Documentation: `
-			// ListBuckets returns all S3 buckets based on the input given.
+			// ListBuckets returns all S3 buckets based on the input given and specifically
+			// filtering by Location as ListBuckets does not do it by itself
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
