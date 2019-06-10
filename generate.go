@@ -113,7 +113,8 @@ type AWSReader interface {
 	// Returned values are commented in the interface doc comment block.
 	GetDBInstancesTags(ctx context.Context, input *rds.ListTagsForResourceInput) (map[string]rds.ListTagsForResourceOutput, error)
 
-	// ListBuckets returns all S3 buckets based on the input given.
+	// ListBuckets returns all S3 buckets based on the input given and specifically
+	// filtering by Location as ListBuckets does not do it by itself
 	// Returned values are commented in the interface doc comment block.
 	ListBuckets(ctx context.Context, input *s3.ListBucketsInput) (map[string]s3.ListBucketsOutput, error)
 
@@ -690,30 +691,6 @@ func (c *connector) GetDBInstancesTags(ctx context.Context, input *rds.ListTagsF
 		opt, err := svc.rds.ListTagsForResourceWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewError(svc.region, rds.ServiceName, err))
-		} else {
-			regionsOpts[svc.region] = *opt
-		}
-	}
-
-	if errs != nil {
-		return regionsOpts, errs
-	}
-
-	return regionsOpts, nil
-}
-
-func (c *connector) ListBuckets(ctx context.Context, input *s3.ListBucketsInput) (map[string]s3.ListBucketsOutput, error) {
-	var errs Errors
-	var regionsOpts = map[string]s3.ListBucketsOutput{}
-
-	for _, svc := range c.svcs {
-		if svc.s3 == nil {
-			svc.s3 = s3.New(svc.session)
-		}
-
-		opt, err := svc.s3.ListBucketsWithContext(ctx, input)
-		if err != nil {
-			errs = append(errs, NewError(svc.region, s3.ServiceName, err))
 		} else {
 			regionsOpts[svc.region] = *opt
 		}
