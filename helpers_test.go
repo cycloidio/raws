@@ -26,8 +26,3 @@ func checkErrors(t *testing.T, name string, index int, err error, expected error
 		}
 	}
 }
-
-func checkError(t *testing.T, err error, expected error) {
-	t.Helper()
-	checkErrors(t, t.Name(), -1, err, expected)
-}
