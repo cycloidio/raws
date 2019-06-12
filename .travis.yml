@@ -1,13 +1,26 @@
 language: go
 sudo: false
 go:
- - "1.10.1"
+ - 1.11.x
+ - 1.12.x
+ - master
 
 before_install:
- - go get -v github.com/mattn/goveralls
+ - go get -u github.com/mattn/goveralls
+
+matrix:
+  # It's ok if our code fails on unstable development versions of Go.
+  allow_failures:
+    - go: master
+  # Don't wait for tip tests to finish. Mark the test run green if the
+  # tests pass on the stable versions of Go.
+  fast_finish: true
 
 install:
  - make get-deps
+
+before_script:
+ - GO111MODULE=on go mod download
 
 script:
  - make travis-ci

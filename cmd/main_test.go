@@ -30,6 +30,7 @@ func Test_generate(t *testing.T) {
 		},
 	}
 	exopt, err := ioutil.ReadFile("./testdata/generated.go")
+	require.NoError(t, err)
 	err = generate(&buff, fns)
 	require.NoError(t, err)
 	assert.Equal(t, exopt, buff.Bytes())
