@@ -3,6 +3,7 @@ package raws
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
@@ -31,7 +32,7 @@ func (c *connector) ListBuckets(ctx context.Context, input *s3.ListBucketsInput)
 				if err != nil {
 					errs = append(errs, NewError(svc.region, s3.ServiceName, err))
 				}
-				if *result.LocationConstraint == svc.region {
+				if s3.NormalizeBucketLocation(aws.StringValue(result.LocationConstraint)) == svc.region {
 					newOpt.Buckets = append(newOpt.Buckets, bucket)
 				}
 			}
