@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
 	"github.com/aws/aws-sdk-go/service/cloudfront/cloudfrontiface"
 	"github.com/aws/aws-sdk-go/service/configservice/configserviceiface"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -105,6 +106,7 @@ type serviceConnector struct {
 	ses             sesiface.SESAPI
 	route53         route53iface.Route53API
 	route53resolver route53resolveriface.Route53ResolverAPI
+	autoscaling     autoscalingiface.AutoScalingAPI
 }
 
 // configureAWS creates a new static credential with the passed accessKey and
