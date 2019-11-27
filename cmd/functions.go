@@ -88,6 +88,35 @@ var (
 			// Returned values are commented in the interface doc comment block.
 			`,
 		},
+		Function{
+			Entity:  "LaunchTemplates",
+			Prefix:  "Describe",
+			Service: "ec2",
+			Documentation: `
+			// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+
+		// autoscaling
+		Function{
+			Entity:  "AutoScalingGroups",
+			Prefix:  "Describe",
+			Service: "autoscaling",
+			Documentation: `
+			// GetAutoScalingGroups returns all AutoScalingGroup belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
+		Function{
+			Entity:  "LaunchConfigurations",
+			Prefix:  "Describe",
+			Service: "autoscaling",
+			Documentation: `
+			// GetLaunchConfigurations returns all LaunchConfiguration belonging to the Account ID based on the input given.
+			// Returned values are commented in the interface doc comment block.
+			`,
+		},
 
 		// elasticache
 		Function{

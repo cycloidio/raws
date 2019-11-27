@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"github.com/aws/aws-sdk-go/service/autoscaling"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -80,6 +81,18 @@ type AWSReader interface {
 	// GetOwnSnapshots returns all snapshots belonging to the Account ID based on the input given.
 	// Returned values are commented in the interface doc comment block.
 	GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnapshotsInput) (map[string]ec2.DescribeSnapshotsOutput, error)
+
+	// GetLaunchTemplates returns all LaunchTemplate belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) (map[string]ec2.DescribeLaunchTemplatesOutput, error)
+
+	// GetAutoScalingGroups returns all AutoScalingGroup belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput) (map[string]autoscaling.DescribeAutoScalingGroupsOutput, error)
+
+	// GetLaunchConfigurations returns all LaunchConfiguration belonging to the Account ID based on the input given.
+	// Returned values are commented in the interface doc comment block.
+	GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) (map[string]autoscaling.DescribeLaunchConfigurationsOutput, error)
 
 	// GetElastiCacheClusters returns all Elasticache clusters based on the input given.
 	// Returned values are commented in the interface doc comment block.
@@ -499,6 +512,78 @@ func (c *connector) GetOwnSnapshots(ctx context.Context, input *ec2.DescribeSnap
 		opt, err := svc.ec2.DescribeSnapshotsWithContext(ctx, input)
 		if err != nil {
 			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetLaunchTemplates(ctx context.Context, input *ec2.DescribeLaunchTemplatesInput) (map[string]ec2.DescribeLaunchTemplatesOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]ec2.DescribeLaunchTemplatesOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.ec2 == nil {
+			svc.ec2 = ec2.New(svc.session)
+		}
+
+		opt, err := svc.ec2.DescribeLaunchTemplatesWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, ec2.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetAutoScalingGroups(ctx context.Context, input *autoscaling.DescribeAutoScalingGroupsInput) (map[string]autoscaling.DescribeAutoScalingGroupsOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]autoscaling.DescribeAutoScalingGroupsOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.autoscaling == nil {
+			svc.autoscaling = autoscaling.New(svc.session)
+		}
+
+		opt, err := svc.autoscaling.DescribeAutoScalingGroupsWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, autoscaling.ServiceName, err))
+		} else {
+			regionsOpts[svc.region] = *opt
+		}
+	}
+
+	if errs != nil {
+		return regionsOpts, errs
+	}
+
+	return regionsOpts, nil
+}
+
+func (c *connector) GetLaunchConfigurations(ctx context.Context, input *autoscaling.DescribeLaunchConfigurationsInput) (map[string]autoscaling.DescribeLaunchConfigurationsOutput, error) {
+	var errs Errors
+	var regionsOpts = map[string]autoscaling.DescribeLaunchConfigurationsOutput{}
+
+	for _, svc := range c.svcs {
+		if svc.autoscaling == nil {
+			svc.autoscaling = autoscaling.New(svc.session)
+		}
+
+		opt, err := svc.autoscaling.DescribeLaunchConfigurationsWithContext(ctx, input)
+		if err != nil {
+			errs = append(errs, NewError(svc.region, autoscaling.ServiceName, err))
 		} else {
 			regionsOpts[svc.region] = *opt
 		}
