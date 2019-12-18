@@ -1,5 +1,11 @@
 # Raws: AWS Reader [![Build Status](https://travis-ci.org/cycloidio/raws.svg?branch=master)](https://travis-ci.org/cycloidio/raws) [![Coverage Status](https://coveralls.io/repos/github/cycloidio/raws/badge.svg)](https://coveralls.io/github/cycloidio/raws)
 
+## UNMAINTAINED (18/12/2019)
+
+For several reasons we moved this lib inside of https://github.com/cycloidio/terracognita ([PR](https://github.com/cycloidio/terracognita/pull/71)), and we are making this as **UNMAINTAINED**, so if you want to use a similar one, it'll be https://github.com/cycloidio/terracognita/tree/master/aws/reader.
+
+It has several differences and its development is made to fit TerraCognita needs. The main difference being no more multi-region, as it was blocking for fetching more results due to pagination.
+
 ## What is Raws?
 
 Raws is a golang project helping to get information from AWS.
