@@ -43,6 +43,9 @@ import (
 // The connections are not all established while instancing, but the various sessions are, this way connections are only
 // made for services that are called, otherwise only the sessions remain.
 //
+// By setting customEndpoint to true indicate we are not using aws services but custom endpoint like min.io.
+// Function getting datas from aws like ec2.DescribeRegionsWithContext will be skipped.
+//
 // An error is returned if any of the needed AWS request for creating the reader returns an AWS error, in such case it
 // will have any of the common error codes (see below) or EmptyStaticCreds code or a go standard error in case that no
 // regions are matched with the ones available, at the time, in AWS.
@@ -50,8 +53,7 @@ import (
 //  * https://docs.aws.amazon.com/AWSEC2/latest/APIReference/errors-overview.html#CommonErrors
 //  * https://docs.aws.amazon.com/STS/latest/APIReference/CommonErrors.html
 func NewAWSReader(
-	ctx context.Context, accessKey string, secretKey string, regions []string, config *aws.Config,
-) (AWSReader, error) {
+	ctx context.Context, accessKey string, secretKey string, regions []string, config *aws.Config, customEndpoint bool) (AWSReader, error) {
 	var c = connector{}
 
 	creds, ec2s, sts, err := configureAWS(accessKey, secretKey)
@@ -59,11 +61,17 @@ func NewAWSReader(
 		return nil, err
 	}
 	c.creds = creds
-	if err := c.setAccountID(ctx, sts); err != nil {
-		return nil, err
-	}
-	if err := c.setRegions(ctx, ec2s, regions); err != nil {
-		return nil, err
+
+	// if customEndpoint true do not use aws services.
+	if customEndpoint {
+		c.regions = regions
+	} else {
+		if err := c.setAccountID(ctx, sts); err != nil {
+			return nil, err
+		}
+		if err := c.setRegions(ctx, ec2s, regions); err != nil {
+			return nil, err
+		}
 	}
 	c.setServices(config)
 	return &c, nil
