@@ -31,9 +31,12 @@ func main() {
   var secretKey string = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
   var region []string = []string{"eu-*"}
   var ctx = context.Background()
+  // customEndpoint, set true to indicate that we are not using aws services but custom endpoint like min.io.
+  // It will skip running function like ec2.DescribeRegions or sts.GetCallerIdentityWithContext.
+  var customEndpoint bool = false
 
   // Create a reader
-  c, err := raws.NewAWSReader(ctx, accessKey, secretKey, region, config)
+  c, err := raws.NewAWSReader(ctx, accessKey, secretKey, region, config, customEndpoint)
   if err != nil {
     fmt.Printf("Error while getting NewConnector: %s\n", err.Error())
     return
